@@ -7,7 +7,8 @@ A powerful, open-source AI SDK with a unified interface across multiple provider
 - **Multi-Provider Support** - OpenAI, Anthropic, Ollama, Google Gemini
 - **Unified API** - Same interface across all providers
 - **Structured Streaming** - JSON chunks with token deltas, tool calls, and usage stats
-- **Tool/Function Calling** - First-class support for AI function calling
+- **Tool/Function Calling** - First-class support for AI function calling (OpenAI & Anthropic)
+- **React Hooks** - Simple `useChat` hook with v5 API (you control input state)
 - **TypeScript First** - Full type safety throughout
 - **Zero Lock-in** - Switch providers at runtime without code changes
 
@@ -22,6 +23,9 @@ npm install @tanstack/ai-openai
 npm install @tanstack/ai-anthropic
 npm install @tanstack/ai-ollama
 npm install @tanstack/ai-gemini
+
+# React hooks (for frontend chat UIs)
+npm install @tanstack/ai-react
 ```
 
 ## Architecture
@@ -74,9 +78,11 @@ ai.setAdapter(newAdapter); // Switch providers
 
 ## API Reference
 
-### AI Class
+### Core Library
 
-#### Constructor
+#### AI Class
+
+**Constructor**
 
 ```typescript
 constructor(adapter: AIAdapter)
@@ -280,6 +286,43 @@ interface Tool {
   }
 }
 ```
+
+### React Hooks
+
+#### useChat
+
+The `useChat` hook provides complete chat functionality for React applications.
+
+```typescript
+import { useChat } from "@tanstack/ai-react";
+
+const {
+  messages, // Current message list
+  sendMessage, // Send a message (you manage input state)
+  isLoading, // Is generating response
+  error, // Current error
+  append, // Add message programmatically
+  reload, // Reload last response
+  stop, // Stop generation
+  clear, // Clear all messages
+} = useChat({
+  api: "/api/chat",
+  onChunk: (chunk) => console.log(chunk),
+});
+
+// Simple usage
+await sendMessage("Hello!");
+```
+
+**Key Features:**
+
+- Maintains message state automatically
+- Sends messages to your API endpoint
+- Parses streaming `StreamChunk` responses
+- Updates messages in real-time
+- You control input state (v5 API style)
+
+See `packages/ai-react/README.md` for full documentation and backend examples.
 
 ## Advanced Usage
 
@@ -492,6 +535,68 @@ const vector = result.embeddings[0]; // number[]
 console.log(`Dimensions: ${vector.length}`);
 ```
 
+### React Hook - useChat
+
+Build chat interfaces with the `useChat` hook:
+
+```typescript
+import { useChat } from "@tanstack/ai-react";
+
+function ChatComponent() {
+  const { messages, sendMessage, isLoading, error } = useChat({
+    api: "/api/chat",
+  });
+
+  const [input, setInput] = useState("");
+
+  return (
+    <div>
+      {/* Message list */}
+      {messages.map((message) => (
+        <div key={message.id}>
+          <strong>{message.role}:</strong> {message.content}
+        </div>
+      ))}
+
+      {/* Input - you control the state */}
+      <input
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            sendMessage(input);
+            setInput("");
+          }
+        }}
+        placeholder="Type a message..."
+        disabled={isLoading}
+      />
+      <button
+        onClick={() => {
+          sendMessage(input);
+          setInput("");
+        }}
+        disabled={isLoading || !input.trim()}
+      >
+        {isLoading ? "Sending..." : "Send"}
+      </button>
+
+      {error && <div>Error: {error.message}</div>}
+    </div>
+  );
+}
+```
+
+The hook handles:
+
+- Message state management
+- Sending messages to your API endpoint
+- Streaming response parsing
+- Loading and error states
+- Automatic message updates as chunks arrive
+
+**You control the input** - the hook only manages message state and API communication.
+
 ## Examples
 
 ### Standalone Scripts
@@ -551,7 +656,10 @@ See `examples/cli/README.md` for full CLI documentation.
 │   ├── ai-openai/           # OpenAI adapter
 │   ├── ai-anthropic/        # Anthropic adapter
 │   ├── ai-ollama/           # Ollama adapter
-│   └── ai-gemini/           # Google Gemini adapter
+│   ├── ai-gemini/           # Google Gemini adapter
+│   └── ai-react/            # React hooks
+│       ├── use-chat.ts      # Chat hook
+│       └── types.ts         # React-specific types
 └── examples/
     └── cli/                 # Interactive CLI demo
 ```
