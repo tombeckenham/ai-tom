@@ -620,6 +620,28 @@ pnpm tool-calling
 
 **Note:** Set `OPENAI_API_KEY` and/or `ANTHROPIC_API_KEY` environment variables to see the examples work with real API calls.
 
+### Full TanStack Start Application
+
+A complete chat application with tool calling, built with TanStack Start and our React hooks:
+
+```bash
+cd examples/ts-chat
+
+# Set your API key
+echo "ANTHROPIC_API_KEY=sk-ant-..." > .env
+
+# Install and run
+pnpm install
+pnpm dev
+```
+
+Open http://localhost:3000/demo/tanchat to see:
+
+- Real-time streaming chat with Claude
+- Tool calling for guitar recommendations
+- Beautiful UI with markdown formatting
+- All powered by `@tanstack/ai-react`
+
 ### Interactive CLI
 
 We provide a full-featured CLI for testing and demos:
@@ -661,7 +683,11 @@ See `examples/cli/README.md` for full CLI documentation.
 │       ├── use-chat.ts      # Chat hook
 │       └── types.ts         # React-specific types
 └── examples/
-    └── cli/                 # Interactive CLI demo
+    ├── cli/                 # Interactive CLI demo
+    ├── ts-chat/             # TanStack Start full app
+    ├── quick-start.js       # Basic examples
+    ├── streaming-demo.js    # Streaming demo
+    └── tool-calling-example.js # Tool calling demo
 ```
 
 ## Provider Support Matrix
