@@ -71,9 +71,34 @@ export interface ExternalImageModel {
   doGenerate(options: any): PromiseLike<any>;
 }
 
-// Type to extract the model ID parameter from a provider function
-// e.g., (modelId: 'gpt-4' | 'gpt-3.5') => Model extracts 'gpt-4' | 'gpt-3.5'
-type ExtractModelId<T> = T extends (modelId: infer M, ...args: any[]) => any ? M : never;
+// Internal helper to extract the raw model parameter from a callable provider shape
+type ExtractRawModelId<T> = T extends {
+  (modelId: infer M, ...args: any[]): any;
+}
+  ? M
+  : T extends (modelId: infer M, ...args: any[]) => any
+  ? M
+  : never;
+
+// Remove "catch-all" string signatures (e.g. `string`, `string & {}`) while keeping literal unions
+type StripGenericString<T> = T extends string
+  ? string extends T
+  ? never
+  : T
+  : never;
+
+// Extract the literal model id union. Falls back to `string` if nothing more specific can be derived.
+type ExtractModelId<T> = ExtractRawModelId<T> extends infer Raw
+  ? [Raw] extends [never]
+  ? string
+  : StripGenericString<Raw> extends infer Narrow
+  ? [Narrow] extends [never]
+  ? Raw extends string
+  ? string
+  : string
+  : Narrow
+  : string
+  : string;
 
 /**
  * Wraps an external AI SDK provider function to work with our AI class.
@@ -83,34 +108,70 @@ type ExtractModelId<T> = T extends (modelId: infer M, ...args: any[]) => any ? M
  * ```typescript
  * import { openai } from '@ai-sdk/openai';
  * 
- * // Provider is a function: openai(modelId: string) => LanguageModel
+ * // Basic usage - models are automatically inferred
  * const adapter = wrapExternalProvider(openai);
+ * 
+ * // With typed provider options
+ * import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai';
+ * const adapter = wrapExternalProvider<OpenAIResponsesProviderOptions>()(openai);
  * ```
  */
+// Overload 1: Curried form with provider options type
 export function wrapExternalProvider<
-  TProvider extends (modelId: any, ...args: any[]) => ExternalLanguageModel,
-  TModels extends string = ExtractModelId<TProvider> extends never ? string : ExtractModelId<TProvider>,
-  TProviderOptions extends Record<string, any> = Record<string, any>
+  TProviderOptions extends Record<string, any>
+>(): <TProvider extends { (modelId: any, ...args: any[]): ExternalLanguageModel }>(
+  provider: TProvider
+) => BaseAdapter<
+  readonly [ExtractModelId<TProvider>],
+  readonly string[],
+  TProviderOptions
+>;
+
+// Overload 2: Direct form without provider options type
+export function wrapExternalProvider<
+  TProvider extends { (modelId: any, ...args: any[]): ExternalLanguageModel }
 >(
   provider: TProvider
 ): BaseAdapter<
-  readonly TModels[],
+  readonly [ExtractModelId<TProvider>],
   readonly string[],
-  TProviderOptions
-> {
-  // Infer provider name from the function or use 'external'
-  const providerName = (provider as any).name || 'external';
+  Record<string, any>
+>;
 
-  // Models array is empty at runtime, but TypeScript knows the types
-  const models = [] as unknown as readonly TModels[];
-  const imageModels = [] as unknown as readonly string[];
+// Implementation
+export function wrapExternalProvider<
+  TProviderOptions extends Record<string, any> = Record<string, any>,
+  TProvider extends { (modelId: any, ...args: any[]): ExternalLanguageModel } = any
+>(provider?: TProvider): any {
+  if (provider) {
+    // Direct call
+    const providerName = (provider as any).name || 'external';
+    const models = [] as unknown as readonly [ExtractModelId<TProvider>];
+    const imageModels = [] as unknown as readonly string[];
 
-  return new ExternalAdapterWrapper<readonly TModels[], TProviderOptions>(
-    provider,
-    providerName,
-    models,
-    imageModels
-  ) as BaseAdapter<readonly TModels[], readonly string[], TProviderOptions>;
+    return new ExternalAdapterWrapper<readonly [ExtractModelId<TProvider>], Record<string, any>>(
+      provider,
+      providerName,
+      models,
+      imageModels
+    ) as any;
+  } else {
+    // Curried call
+    return <TProv extends (modelId: any, ...args: any[]) => ExternalLanguageModel>(
+      prov: TProv
+    ) => {
+      const providerName = (prov as any).name || 'external';
+      const models = [] as unknown as readonly [ExtractModelId<TProv>];
+      const imageModels = [] as unknown as readonly string[];
+
+      return new ExternalAdapterWrapper<readonly [ExtractModelId<TProv>], TProviderOptions>(
+        prov,
+        providerName,
+        models,
+        imageModels
+      ) as any;
+    };
+  }
 }
 
 class ExternalAdapterWrapper<

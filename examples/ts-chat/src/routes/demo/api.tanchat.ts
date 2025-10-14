@@ -3,16 +3,10 @@ import { AI, tool } from "@tanstack/ai";
 import { OllamaAdapter } from "@tanstack/ai-ollama";
 import { OpenAIAdapter } from "@tanstack/ai-openai";
 import { wrapExternalProvider } from "@tanstack/ai";
-import { openai } from "@ai-sdk/openai"
 import type { OpenAIResponsesProviderOptions } from "@ai-sdk/openai";
 import guitars from "@/data/example-guitars";
 
-// this is how you would wrap any external provider to conform to our adapter interface
-// this returns a base-adapter conforming object that you can use in the adapters map
-// it should also be typesafe as our wrapper is
-// By specifying OpenAIResponsesProviderOptions as the type parameter, we get full type safety for providerOptions
-// Models are automatically inferred from the openai function parameter type
-const adapter = wrapExternalProvider<OpenAIResponsesProviderOptions>()(openai);
+
 
 const SYSTEM_PROMPT = `You are a helpful assistant for a store that sells guitars.
 
@@ -66,6 +60,10 @@ const tools = {
   }),
 }
 
+import { openai } from "@ai-sdk/openai"
+const vercelOpenAiAdapter = wrapExternalProvider<OpenAIResponsesProviderOptions>()(openai);
+
+
 // Initialize AI with tools and system prompts in constructor
 const ai = new AI({
   adapters: {
@@ -76,7 +74,7 @@ const ai = new AI({
       apiKey: process.env.AI_KEY!,
     }),
     // this works the same way as the adapters above because wrapper converted it to our convention
-    externalOpenAi: adapter
+    externalOpenAi: vercelOpenAiAdapter
   },
   fallbacks: [
     {
@@ -109,9 +107,10 @@ export const Route = createFileRoute("/demo/api/tanchat")({
             {
               adapter: "externalOpenAi",
               // this should be typesafe
-              model: "gpt-3.5-turbo",
+              model: "chatgpt-4o-latest",
               // this should be typesafe
               providerOptions: {
+
                 "instructions": "You are a helpful assistant that provides concise answers."
               }
             },

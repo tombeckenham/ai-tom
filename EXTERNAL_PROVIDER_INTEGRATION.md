@@ -95,9 +95,49 @@ Our wrapper:
 
 ## Wrapper API
 
-### `wrapExternalProvider(provider)`
+### `wrapExternalProvider<TProviderOptions>(provider)`
 
-Wraps an external provider function to work with TanStack AI. Automatically infers available models from the function's parameter type.
+Wraps an external provider function to work with TanStack AI.
+
+**Type Parameters:**
+- `TProviderOptions` (optional): Type for provider-specific options. Defaults to `Record<string, any>`.
+
+**Parameters:**
+- `provider`: The external provider function (e.g., `openai` from `@ai-sdk/openai`)
+
+**Returns:** A `BaseAdapter` instance with:
+- **Automatic model inference**: Models are extracted from the provider function's parameter type
+- **Type-safe provider options**: When you specify `TProviderOptions`, you get full autocomplete for `providerOptions`
+
+**Signature:**
+```typescript
+function wrapExternalProvider<
+  TProviderOptions extends Record<string, any> = Record<string, any>,
+  TProvider extends (modelId: any, ...args: any[]) => ExternalLanguageModel = (modelId: any, ...args: any[]) => ExternalLanguageModel
+>(provider: TProvider): BaseAdapter<
+  readonly [ExtractModelId<TProvider>],  // ✨ Models automatically inferred!
+  readonly string[],
+  TProviderOptions
+>
+```
+
+**Features:**
+- ✅ **Automatic model inference**: Extracts model types from the provider function's first parameter
+- ✅ **Type-safe provider options**: Optional type parameter for full autocomplete
+- ✅ **Clean single-call API**: No currying or complex syntax
+- ✅ **Zero configuration**: Works out of the box
+
+**Signature:**
+```typescript
+function wrapExternalProvider<
+  TProviderOptions extends Record<string, any> = Record<string, any>
+>(
+  provider: (modelId: any, ...args: any[]) => ExternalLanguageModel
+): BaseAdapter<readonly string[], readonly string[], TProviderOptions>
+```
+
+**Type Parameters:**
+- `TProviderOptions` - Provider-specific options type for `providerOptions` field (optional, defaults to `Record<string, any>`)
 
 **Parameters:**
 - `provider` - External provider function (e.g., `openai` from `@ai-sdk/openai`)
@@ -105,7 +145,22 @@ Wraps an external provider function to work with TanStack AI. Automatically infe
 **Returns:** `BaseAdapter` compatible with TanStack AI
 
 **Type Inference:**
-The wrapper extracts model types using: `Parameters<typeof provider>[0]`
+- **Models**: Automatically extracted from the provider function's first parameter type (e.g., `'gpt-4o' | 'gpt-4' | ...`)
+- **Provider Options**: Can be explicitly typed using the type parameter for full autocomplete support
+
+**Examples:**
+
+```typescript
+// Basic usage - models auto-inferred, providerOptions are Record<string, any>
+const adapter1 = wrapExternalProvider(openai);
+// typeof adapter1.models[0] = 'gpt-4o' | 'gpt-4' | 'gpt-3.5-turbo' | ... ✨
+
+// With typed provider options - models still auto-inferred + full type safety for options
+import type { OpenAIResponsesProviderOptions } from "@ai-sdk/openai";
+const adapter2 = wrapExternalProvider<OpenAIResponsesProviderOptions>(openai);
+// typeof adapter2.models[0] = 'gpt-4o' | 'gpt-4' | 'gpt-3.5-turbo' | ... ✨
+// AND providerOptions get full autocomplete! 🎉
+```
 
 ## Examples
 
@@ -261,6 +316,117 @@ type ExtractModelId<T> = T extends (modelId: infer M, ...args: any[]) => any ? M
 type Models = ExtractModelId<typeof openai>;
 // Result: 'gpt-4o' | 'gpt-4' | 'gpt-3.5-turbo'
 ```
+
+### Provider Options Type Safety
+
+The wrapper supports **both automatic model inference AND typed provider options** with the same clean API!
+
+```typescript
+import { openai } from "@ai-sdk/openai";
+import type { OpenAIResponsesProviderOptions } from "@ai-sdk/openai";
+
+// Pass the type parameter for full type safety on provider options
+// Models are STILL automatically inferred from the openai function!
+const adapter = wrapExternalProvider<OpenAIResponsesProviderOptions>(openai);
+
+const ai = new AI({
+  adapters: { openai: adapter },
+});
+
+// Now you get BOTH:
+// 1. Model autocomplete (from automatic inference)
+// 2. providerOptions autocomplete (from type parameter)
+await ai.chat({
+  adapter: 'openai',
+  model: 'gpt-4o', // ✅ Autocomplete from automatic inference!
+  messages: [{ role: 'user', content: 'Hello!' }],
+  providerOptions: {
+    // ✅ Full autocomplete and type checking for OpenAI options!
+    user: 'user-123',
+    store: true,
+    metadata: { session: 'chat-1' },
+    parallelToolCalls: true,
+    textVerbosity: 'high', // 'low' | 'medium' | 'high'
+    instructions: "You are a helpful assistant",
+    // ❌ TypeScript error for invalid options
+    // invalidOption: true,
+  },
+});
+```
+
+#### Example: Anthropic with Typed Provider Options
+
+```typescript
+import { anthropic } from "@ai-sdk/anthropic";
+import type { AnthropicLanguageModelOptions } from "@ai-sdk/anthropic";
+
+// Pass the type parameter - models still auto-inferred!
+const adapter = wrapExternalProvider<AnthropicLanguageModelOptions>(anthropic);
+
+const ai = new AI({
+  adapters: { anthropic: adapter },
+});
+
+await ai.chat({
+  adapter: 'anthropic',
+  model: 'claude-3-5-sonnet-20241022', // ✅ Auto-inferred from anthropic() function!
+  messages: [{ role: 'user', content: 'Hello!' }],
+  providerOptions: {
+    // ✅ Anthropic-specific options with full type safety
+    cacheControl: { type: 'ephemeral' },
+  },
+});
+```
+
+#### Without Type Parameter (Default)
+
+If you don't specify the provider options type, models are still inferred but `providerOptions` defaults to `Record<string, any>`:
+
+```typescript
+// No type parameter - still gets model inference!
+const adapter = wrapExternalProvider(openai);
+
+// Model autocomplete works, but no autocomplete for providerOptions
+await ai.chat({
+  adapter: 'openai',
+  model: 'gpt-4o', // ✅ Still has autocomplete!
+  messages: [{ role: 'user', content: 'Hello!' }],
+  providerOptions: {
+    // Any properties allowed, but no autocomplete
+    customOption: 'value',
+  },
+});
+```
+
+#### API Pattern Summary
+
+The wrapper uses a simple single-call pattern with **optional type parameter**:
+
+```typescript
+// Without type parameter:
+// - Models: ✅ Auto-inferred from provider
+// - Provider options: Record<string, any>
+const adapter1 = wrapExternalProvider(openai);
+
+// With type parameter:
+// - Models: ✅ Auto-inferred from provider
+// - Provider options: ✅ Fully typed
+const adapter2 = wrapExternalProvider<OpenAIResponsesProviderOptions>(openai);
+```
+
+**Best of both worlds**: Clean API + full type safety! 🎉
+
+```typescript
+// Pattern 1: Direct call (without type parameter)
+wrapExternalProvider(openai)
+// Returns: BaseAdapter with Record<string, any> for providerOptions
+
+// Pattern 2: With type parameter for typed providerOptions
+wrapExternalProvider<OpenAIResponsesProviderOptions>(openai)
+// Returns: BaseAdapter with OpenAIResponsesProviderOptions for providerOptions
+```
+
+This pattern allows you to optionally specify provider options types when you need full type safety, while keeping the API simple and direct.
 
 ## Supported Features
 
