@@ -6,13 +6,13 @@
 
 <div align="center">
 <a href="https://npmjs.com/package/@tanstack/ai" target="\_parent">
-  <img alt="" src="https://img.shields.io/npm/dm/@tanstack/react-ai.svg" />
+  <img alt="" src="https://img.shields.io/npm/dm/@tanstack/ai.svg" />
 </a>
 <a href="https://github.com/TanStack/ai" target="\_parent">
 	  <img alt="" src="https://img.shields.io/github/stars/TanStack/ai.svg?style=social&label=Star" alt="GitHub stars" />
 </a>
-<a href="https://bundlephobia.com/result?p=@tanstack/react-ai@latest" target="\_parent">
-  <img alt="" src="https://badgen.net/bundlephobia/minzip/@tanstack/react-ai@latest" />
+<a href="https://bundlephobia.com/result?p=@tanstack/ai@latest" target="\_parent">
+  <img alt="" src="https://badgen.net/bundlephobia/minzip/@tanstack/ai@latest" />
 </a>
 </div>
 
@@ -35,12 +35,12 @@
 
 # TanStack AI
 
-A debugging toolkit that provides a unified interface for inspecting, monitoring, and extending your applications.
+A powerful, type-safe AI SDK for building AI-powered applications.
 
-- Inspect and debug state and behavior in real time
-- Works with React, Solid, Vanilla JS, and more
-- Extensible plugin architecture with customizable UI
-- Seamless integration with TanStack Query, Router, and other libraries
+- Provider-agnostic adapters (OpenAI, Anthropic, Gemini, Ollama, etc.)
+- Chat completion, streaming, and agent loop strategies
+- Headless chat state management with adapters (SSE, HTTP stream, custom)
+- Type-safe tools with server/client execution
 
 ### <a href="https://tanstack.com/ai">Read the docs →</b></a>
 
@@ -88,6 +88,7 @@ We're looking for TanStack AI Partners to join our mission! Partner with us to p
 
 - <a href="https://github.com/tanstack/config"><b>TanStack Config</b></a> – Tooling for JS/TS packages
 - <a href="https://github.com/tanstack/db"><b>TanStack DB</b></a> – Reactive sync client store
+- <a href="https://github.com/tanstack/devtools">TanStack Devtools</a> – Unified devtools panel
 - <a href="https://github.com/tanstack/form"><b>TanStack Form</b></a> – Type‑safe form state
 - <a href="https://github.com/tanstack/pacer"><b>TanStack Pacer</b></a> – Debouncing, throttling, batching
 - <a href="https://github.com/tanstack/query"><b>TanStack Query</b></a> – Async state & caching
@@ -97,7 +98,6 @@ We're looking for TanStack AI Partners to join our mission! Partner with us to p
 - <a href="https://github.com/tanstack/store"><b>TanStack Store</b></a> – Reactive data store
 - <a href="https://github.com/tanstack/table"><b>TanStack Table</b></a> – Headless datagrids
 - <a href="https://github.com/tanstack/virtual"><b>TanStack Virtual</b></a> – Virtualized rendering
-- <a href="https://github.com/tanstack/devtools"><b>TanStack Devtools</b></a> – Devtools for TanStack libraries & custom plugins
 
 … and more at <a href="https://tanstack.com"><b>TanStack.com »</b></a>
 
