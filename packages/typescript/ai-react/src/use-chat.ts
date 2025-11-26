@@ -1,4 +1,11 @@
-import { useState, useCallback, useMemo, useEffect, useId } from "react";
+import {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useId,
+  useRef,
+} from "react";
 import { ChatClient } from "@tanstack/ai-client";
 import type { ModelMessage } from "@tanstack/ai";
 import type { UseChatOptions, UseChatReturn, UIMessage } from "./types";
@@ -13,15 +20,31 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
 
+  // Track current messages in a ref to preserve them when client is recreated
+  const messagesRef = useRef<UIMessage[]>(options.initialMessages || []);
+  const isFirstMountRef = useRef(true);
+
+  // Update ref whenever messages change
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
   // Create ChatClient instance with callbacks to sync state
   // Note: Connection changes will recreate the client and reset state.
   // Body and other options are captured at client creation time.
   // To update connection/body, remount the component or use a key prop.
   const client = useMemo(() => {
+    // On first mount, use initialMessages. On subsequent recreations, preserve existing messages.
+    const messagesToUse = isFirstMountRef.current
+      ? options.initialMessages || []
+      : messagesRef.current;
+
+    isFirstMountRef.current = false;
+
     return new ChatClient({
       connection: options.connection,
       id: clientId,
-      initialMessages: options.initialMessages,
+      initialMessages: messagesToUse,
       body: options.body,
       onResponse: options.onResponse,
       onChunk: options.onChunk,
