@@ -178,7 +178,7 @@ export function createFalVideo<TModel extends FalModel>(
 }
 
 /**
- * Create a fal.ai video adapter using the FAL_KEY environment variable.
+ * Create a fal.ai video adapter using config.apiKey or the FAL_KEY environment variable.
  *
  * @experimental Video generation is an experimental feature and may change.
  */
@@ -186,6 +186,6 @@ export function falVideo<TModel extends FalModel>(
   model: TModel,
   config?: FalVideoConfig,
 ): FalVideoAdapter<TModel> {
-  const apiKey = getFalApiKeyFromEnv()
+  const apiKey = config?.apiKey ?? getFalApiKeyFromEnv()
   return createFalVideo(model, apiKey, config)
 }

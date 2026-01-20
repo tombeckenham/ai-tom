@@ -181,7 +181,7 @@ export function createFalImage<TModel extends FalModel>(
 }
 
 /**
- * Create a fal.ai image adapter using the FAL_KEY environment variable.
+ * Create a fal.ai image adapter using config.apiKey or the FAL_KEY environment variable.
  *
  * The model parameter accepts any fal.ai model ID with full type inference.
  * As you type, you'll get autocomplete for all 600+ supported models.
@@ -207,6 +207,6 @@ export function falImage<TModel extends FalModel>(
   model: TModel,
   config?: FalImageConfig,
 ): FalImageAdapter<TModel> {
-  const apiKey = getFalApiKeyFromEnv()
+  const apiKey = config?.apiKey ?? getFalApiKeyFromEnv()
   return createFalImage(model, apiKey, config)
 }
