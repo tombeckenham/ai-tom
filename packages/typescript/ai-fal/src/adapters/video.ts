@@ -58,9 +58,10 @@ function mapFalStatusToVideoStatus(
  *
  * @experimental Video generation is an experimental feature and may change.
  */
-export class FalVideoAdapter<
-  TModel extends FalModel,
-> extends BaseVideoAdapter<TModel, FalVideoProviderOptions<TModel>> {
+export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
+  TModel,
+  FalVideoProviderOptions<TModel>
+> {
   readonly kind = 'video' as const
   readonly name = 'fal' as const
 

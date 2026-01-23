@@ -243,7 +243,10 @@ describe('mapSizeToFalFormat', () => {
 
   it('parses custom WIDTHxHEIGHT format', () => {
     expect(mapSizeToFalFormat('800x600')).toEqual({ width: 800, height: 600 })
-    expect(mapSizeToFalFormat('1920x1200')).toEqual({ width: 1920, height: 1200 })
+    expect(mapSizeToFalFormat('1920x1200')).toEqual({
+      width: 1920,
+      height: 1200,
+    })
   })
 
   it('returns preset names as-is', () => {
