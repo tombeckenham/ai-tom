@@ -12,11 +12,13 @@ import type {
   VideoStatusResult,
   VideoUrlResult,
 } from '@tanstack/ai'
-import type { FalModel, FalVideoProviderOptions } from '../model-meta'
+import type {
+  FalModel,
+  FalModelInput,
+  FalVideoProviderOptions,
+} from '../model-meta'
 
-export interface FalVideoConfig extends Omit<FalClientConfig, 'apiKey'> {
-  apiKey?: string
-}
+export interface FalVideoConfig extends Omit<FalClientConfig, 'apiKey'> {}
 
 type FalQueueStatus = 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED'
 
@@ -76,26 +78,11 @@ export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
     const { model, prompt, size, duration, modelOptions } = options
 
     // Build the input object for fal.ai
-    const input: Record<string, unknown> = {
+    const input: FalModelInput<TModel> = {
+      ...modelOptions,
       prompt,
-    }
-
-    // Add duration if specified
-    if (duration) {
-      input.duration = duration
-    }
-
-    // Parse size to aspect ratio if provided
-    if (size) {
-      const aspectRatio = this.sizeToAspectRatio(size)
-      if (aspectRatio) {
-        input.aspect_ratio = aspectRatio
-      }
-    }
-
-    // Merge model-specific options
-    if (modelOptions) {
-      Object.assign(input, modelOptions)
+      ...(duration ? { duration } : {}),
+      ...(size ? { aspect_ratio: this.sizeToAspectRatio(size) } : {}),
     }
 
     // Submit to queue and get request ID
@@ -187,6 +174,6 @@ export function falVideo<TModel extends FalModel>(
   model: TModel,
   config?: FalVideoConfig,
 ): FalVideoAdapter<TModel> {
-  const apiKey = config?.apiKey ?? getFalApiKeyFromEnv()
+  const apiKey = getFalApiKeyFromEnv()
   return createFalVideo(model, apiKey, config)
 }

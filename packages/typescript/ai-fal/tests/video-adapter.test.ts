@@ -22,7 +22,7 @@ vi.mock('@fal-ai/client', () => {
 })
 
 const createAdapter = () =>
-  createFalVideo('fal-ai/minimax-video/image-to-video', 'test-key')
+  createFalVideo('fal-ai/veo3/image-to-video', 'test-key')
 
 describe('Fal Video Adapter', () => {
   beforeEach(() => {
@@ -42,14 +42,14 @@ describe('Fal Video Adapter', () => {
       const adapter = createAdapter()
 
       const result = await adapter.createVideoJob({
-        model: 'fal-ai/minimax-video/image-to-video',
+        model: 'fal-ai/veo3/image-to-video',
         prompt: 'A cat walking in the garden',
       })
 
       expect(mockQueueSubmit).toHaveBeenCalledTimes(1)
 
       const [model, options] = mockQueueSubmit.mock.calls[0]!
-      expect(model).toBe('fal-ai/minimax-video/image-to-video')
+      expect(model).toBe('fal-ai/veo3/image-to-video')
       expect(options).toMatchObject({
         input: {
           prompt: 'A cat walking in the garden',
@@ -57,7 +57,7 @@ describe('Fal Video Adapter', () => {
       })
 
       expect(result.jobId).toBe('job-123')
-      expect(result.model).toBe('fal-ai/minimax-video/image-to-video')
+      expect(result.model).toBe('fal-ai/veo3/image-to-video')
     })
 
     it('includes image URL for image-to-video models', async () => {
@@ -68,7 +68,7 @@ describe('Fal Video Adapter', () => {
       const adapter = createAdapter()
 
       await adapter.createVideoJob({
-        model: 'fal-ai/minimax-video/image-to-video',
+        model: 'fal-ai/veo3/image-to-video',
         prompt: 'A stylish woman walks down a Tokyo street',
         modelOptions: {
           image_url: 'https://example.com/image.jpg',
@@ -89,7 +89,7 @@ describe('Fal Video Adapter', () => {
       const adapter = createAdapter()
 
       await adapter.createVideoJob({
-        model: 'fal-ai/minimax-video/image-to-video',
+        model: 'fal-ai/veo3/image-to-video',
         prompt: 'A time lapse of a sunset',
         duration: 10,
       })
@@ -108,7 +108,7 @@ describe('Fal Video Adapter', () => {
       const adapter = createAdapter()
 
       await adapter.createVideoJob({
-        model: 'fal-ai/minimax-video/image-to-video',
+        model: 'fal-ai/veo3/image-to-video',
         prompt: 'A wide landscape video',
         size: '1920x1080', // 16:9
       })
@@ -127,18 +127,18 @@ describe('Fal Video Adapter', () => {
       const adapter = createAdapter()
 
       await adapter.createVideoJob({
-        model: 'fal-ai/minimax-video/image-to-video',
+        model: 'fal-ai/veo3/image-to-video',
         prompt: 'Test video',
         modelOptions: {
-          with_audio: true,
-          seed: 12345,
+          image_url: 'https://example.com/image.jpg',
+          auto_fix: true,
         },
       })
 
       const [, options] = mockQueueSubmit.mock.calls[0]!
       expect(options.input).toMatchObject({
-        with_audio: true,
-        seed: 12345,
+        image_url: 'https://example.com/image.jpg',
+        auto_fix: true,
       })
     })
   })
@@ -155,7 +155,7 @@ describe('Fal Video Adapter', () => {
       const result = await adapter.getVideoStatus('job-123')
 
       expect(mockQueueStatus).toHaveBeenCalledWith(
-        'fal-ai/minimax-video/image-to-video',
+        'fal-ai/veo3/image-to-video',
         { requestId: 'job-123', logs: true },
       )
 
@@ -203,7 +203,7 @@ describe('Fal Video Adapter', () => {
       const result = await adapter.getVideoUrl('job-123')
 
       expect(mockQueueResult).toHaveBeenCalledWith(
-        'fal-ai/minimax-video/image-to-video',
+        'fal-ai/veo3/image-to-video',
         { requestId: 'job-123' },
       )
 
@@ -240,7 +240,7 @@ describe('Fal Video Adapter', () => {
 
   describe('client configuration', () => {
     it('configures client with API key', () => {
-      createFalVideo('fal-ai/minimax-video/image-to-video', 'my-api-key')
+      createFalVideo('fal-ai/veo3/image-to-video', 'my-api-key')
 
       expect(mockConfig).toHaveBeenCalledWith({
         credentials: 'my-api-key',
@@ -248,7 +248,7 @@ describe('Fal Video Adapter', () => {
     })
 
     it('configures client with proxy URL when provided', () => {
-      createFalVideo('fal-ai/minimax-video/image-to-video', 'my-api-key', {
+      createFalVideo('fal-ai/veo3/image-to-video', 'my-api-key', {
         proxyUrl: '/api/fal/proxy',
       })
 

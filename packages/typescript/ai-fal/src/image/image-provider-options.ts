@@ -47,16 +47,7 @@ export function mapSizeToFalFormat(
   }
 
   // If it's already a preset name, return as-is
-  if (
-    [
-      'square_hd',
-      'square',
-      'landscape_4_3',
-      'landscape_16_9',
-      'portrait_4_3',
-      'portrait_16_9',
-    ].includes(size)
-  ) {
+  if (Object.values(SIZE_TO_FAL_PRESET).includes(size as FalImageSizePreset)) {
     return size as FalImageSizePreset
   }
 

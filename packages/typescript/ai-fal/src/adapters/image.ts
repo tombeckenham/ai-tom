@@ -5,6 +5,7 @@ import {
   getFalApiKeyFromEnv,
   generateId as utilGenerateId,
 } from '../utils'
+import type { OutputType, Result } from '@fal-ai/client'
 import type { FalClientConfig } from '../utils'
 import type {
   GeneratedImage,
@@ -14,12 +15,10 @@ import type {
 import type {
   FalImageProviderOptions,
   FalModel,
-  FalModelOutput,
+  FalModelInput,
 } from '../model-meta'
 
-export interface FalImageConfig extends Omit<FalClientConfig, 'apiKey'> {
-  apiKey?: string
-}
+export interface FalImageConfig extends Omit<FalClientConfig, 'apiKey'> {}
 
 /**
  * fal.ai image generation adapter with full type inference.
@@ -44,8 +43,8 @@ export interface FalImageConfig extends Omit<FalClientConfig, 'apiKey'> {
 export class FalImageAdapter<TModel extends FalModel> extends BaseImageAdapter<
   TModel,
   FalImageProviderOptions<TModel>,
-  Record<string, FalImageProviderOptions<TModel>>,
-  Record<string, string>
+  Record<FalModel, FalImageProviderOptions<TModel>>,
+  Record<FalModel, string>
 > {
   readonly kind = 'image' as const
   readonly name = 'fal' as const
@@ -61,27 +60,16 @@ export class FalImageAdapter<TModel extends FalModel> extends BaseImageAdapter<
     const { model, prompt, numberOfImages, size, modelOptions } = options
 
     // Build the input object - spread modelOptions first, then override with standard options
-    const input: Record<string, unknown> = {
-      ...(modelOptions as Record<string, unknown>),
+    const input: FalModelInput<TModel> = {
+      ...modelOptions,
       prompt,
+      ...(size ? { image_size: this.mapSizeToFalFormat(size) } : {}),
+      ...(numberOfImages ? { num_images: numberOfImages } : {}),
     }
 
-    // Map size to fal.ai format if provided
-    if (size) {
-      input.image_size = this.mapSizeToFalFormat(size)
-    }
+    const result = await fal.subscribe(model as TModel, { input })
 
-    // Add number of images if specified
-    if (numberOfImages) {
-      input.num_images = numberOfImages
-    }
-
-    const result = await fal.subscribe(model, { input })
-
-    return this.transformResponse(
-      model,
-      result as { data: FalModelOutput<TModel>; requestId: string },
-    )
+    return this.transformResponse(model, result)
   }
 
   protected override generateId(): string {
@@ -125,20 +113,20 @@ export class FalImageAdapter<TModel extends FalModel> extends BaseImageAdapter<
 
   private transformResponse(
     model: string,
-    response: { data: FalModelOutput<TModel>; requestId: string },
+    response: Result<OutputType<TModel>>,
   ): ImageGenerationResult {
     const images: Array<GeneratedImage> = []
-    const data = response.data as Record<string, unknown>
+    const data = response.data
 
     // Handle array of images (most models return { images: [...] })
     if ('images' in data && Array.isArray(data.images)) {
-      for (const img of data.images as Array<{ url: string }>) {
+      for (const img of data.images) {
         images.push(this.parseImage(img))
       }
     }
     // Handle single image response (some models return { image: {...} })
     else if ('image' in data && data.image && typeof data.image === 'object') {
-      images.push(this.parseImage(data.image as { url: string }))
+      images.push(this.parseImage(data.image))
     }
 
     return {
@@ -207,6 +195,6 @@ export function falImage<TModel extends FalModel>(
   model: TModel,
   config?: FalImageConfig,
 ): FalImageAdapter<TModel> {
-  const apiKey = config?.apiKey ?? getFalApiKeyFromEnv()
+  const apiKey = getFalApiKeyFromEnv()
   return createFalImage(model, apiKey, config)
 }
