@@ -5,13 +5,11 @@
  */
 import type { EndpointTypeMap } from '@fal-ai/client/endpoints'
 
-export type { EndpointTypeMap } from '@fal-ai/client/endpoints'
-
 /**
  * All known fal.ai model IDs with autocomplete support.
  * Also accepts any string for custom/new models.
  */
-export type FalModel = keyof EndpointTypeMap | (string & {})
+export type FalModel = keyof EndpointTypeMap
 
 /**
  * Utility type to extract the input type for a specific fal model.
@@ -20,10 +18,8 @@ export type FalModel = keyof EndpointTypeMap | (string & {})
  * type FluxInput = FalModelInput<'fal-ai/flux/dev'>
  * // { prompt: string; num_inference_steps?: number; ... }
  */
-export type FalModelInput<TModel extends string> =
-  TModel extends keyof EndpointTypeMap
-    ? EndpointTypeMap[TModel]['input']
-    : Record<string, unknown>
+export type FalModelInput<TModel extends FalModel> =
+  EndpointTypeMap[TModel]['input']
 
 /**
  * Utility type to extract the output type for a specific fal model.
@@ -32,10 +28,8 @@ export type FalModelInput<TModel extends string> =
  * type FluxOutput = FalModelOutput<'fal-ai/flux/dev'>
  * // { images: Array<Image>; seed: number; ... }
  */
-export type FalModelOutput<TModel extends string> =
-  TModel extends keyof EndpointTypeMap
-    ? EndpointTypeMap[TModel]['output']
-    : unknown
+export type FalModelOutput<TModel extends FalModel> =
+  EndpointTypeMap[TModel]['output']
 
 /**
  * Provider options for image generation, excluding fields TanStack AI handles.
@@ -45,7 +39,7 @@ export type FalModelOutput<TModel extends string> =
  * type FluxOptions = FalImageProviderOptions<'fal-ai/flux/dev'>
  * // { num_inference_steps?: number; guidance_scale?: number; seed?: number; ... }
  */
-export type FalImageProviderOptions<TModel extends string> = Omit<
+export type FalImageProviderOptions<TModel extends FalModel> = Omit<
   FalModelInput<TModel>,
   'prompt' | 'image_size' | 'num_images'
 >
@@ -54,7 +48,7 @@ export type FalImageProviderOptions<TModel extends string> = Omit<
  * Provider options for video generation, excluding fields TanStack AI handles.
  * Use this for the `modelOptions` parameter in video generation.
  */
-export type FalVideoProviderOptions<TModel extends string> = Omit<
+export type FalVideoProviderOptions<TModel extends FalModel> = Omit<
   FalModelInput<TModel>,
   'prompt' | 'aspect_ratio' | 'duration'
 >

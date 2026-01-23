@@ -30,7 +30,6 @@ export {
 // ============================================================================
 
 export {
-  type EndpointTypeMap,
   type FalModel,
   type FalModelInput,
   type FalModelOutput,
