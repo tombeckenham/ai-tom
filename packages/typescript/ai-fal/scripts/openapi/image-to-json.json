@@ -1,0 +1,135 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Fal.ai image-to-json Models",
+    "version": "1.0.0",
+    "description": "OpenAPI schemas for all fal.ai image-to-json models (1 models total)",
+    "x-generated-at": "2026-01-26T05:40:51.981Z"
+  },
+  "components": {
+    "schemas": {
+      "File": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "content_type": {
+            "type": "string"
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "file_size": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "QueueStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "IN_PROGRESS",
+              "COMPLETED",
+              "FAILED"
+            ]
+          },
+          "response_url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "BagelUnderstandInput": {
+        "title": "ImageUnderstandingInput",
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "examples": [
+              "What is shown in the image? "
+            ],
+            "title": "Prompt",
+            "type": "string",
+            "description": "The prompt to query the image with."
+          },
+          "seed": {
+            "title": "Seed",
+            "type": "integer",
+            "description": "The seed to use for the generation."
+          },
+          "image_url": {
+            "examples": [
+              "https://storage.googleapis.com/falserverless/bagel/wRhCPSyiKTiLnnWvUpGIl.jpeg"
+            ],
+            "title": "Image Url",
+            "type": "string",
+            "description": "The image for the query."
+          }
+        },
+        "x-fal-order-properties": [
+          "image_url",
+          "prompt",
+          "seed"
+        ],
+        "required": [
+          "image_url",
+          "prompt"
+        ]
+      },
+      "BagelUnderstandOutput": {
+        "title": "TextOutput",
+        "type": "object",
+        "properties": {
+          "text": {
+            "title": "Text",
+            "type": "string",
+            "description": "The answer to the query."
+          },
+          "prompt": {
+            "title": "Prompt",
+            "type": "string",
+            "description": "The query used for the generation."
+          },
+          "seed": {
+            "title": "Seed",
+            "type": "integer",
+            "description": "The seed used for the generation."
+          },
+          "timings": {
+            "title": "Timings",
+            "type": "object",
+            "description": "The timings of the generation."
+          }
+        },
+        "x-fal-order-properties": [
+          "text",
+          "seed",
+          "prompt",
+          "timings"
+        ],
+        "required": [
+          "text",
+          "seed",
+          "prompt",
+          "timings"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    }
+  }
+}

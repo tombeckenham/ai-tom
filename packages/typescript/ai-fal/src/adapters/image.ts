@@ -60,12 +60,12 @@ export class FalImageAdapter<TModel extends FalModel> extends BaseImageAdapter<
     const { model, prompt, numberOfImages, size, modelOptions } = options
 
     // Build the input object - spread modelOptions first, then override with standard options
-    const input: FalModelInput<TModel> = {
+    const input = {
       ...modelOptions,
       prompt,
       ...(size ? { image_size: this.mapSizeToFalFormat(size) } : {}),
       ...(numberOfImages ? { num_images: numberOfImages } : {}),
-    }
+    } as FalModelInput<TModel>
 
     const result = await fal.subscribe(model as TModel, { input })
 

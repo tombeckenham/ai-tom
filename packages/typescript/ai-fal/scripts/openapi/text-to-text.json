@@ -1,0 +1,129 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Fal.ai text-to-text Models",
+    "version": "1.0.0",
+    "description": "OpenAPI schemas for all fal.ai text-to-text models (1 models total)",
+    "x-generated-at": "2026-01-26T05:40:51.980Z"
+  },
+  "components": {
+    "schemas": {
+      "File": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "content_type": {
+            "type": "string"
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "file_size": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "QueueStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "IN_PROGRESS",
+              "COMPLETED",
+              "FAILED"
+            ]
+          },
+          "response_url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "AiDetectorDetectTextInput": {
+        "x-fal-order-properties": [
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "description": "Text content to analyze for AI generation.",
+            "type": "string",
+            "examples": [
+              "yo guys so i just tried this new coffee place downtown and honestly?? not worth the hype. waited like 30 mins for a latte that tasted burnt lol. maybe i caught them on a bad day idk but wont be going back anytime soon"
+            ],
+            "maxLength": 20000,
+            "minLength": 1,
+            "title": "Text"
+          }
+        },
+        "title": "TextDetectionInput",
+        "required": [
+          "text"
+        ]
+      },
+      "AiDetectorDetectTextOutput": {
+        "x-fal-order-properties": [
+          "verdict",
+          "confidence",
+          "is_ai_generated",
+          "latency"
+        ],
+        "type": "object",
+        "properties": {
+          "latency": {
+            "examples": [
+              13.617770671844482
+            ],
+            "title": "Latency",
+            "type": "number"
+          },
+          "verdict": {
+            "examples": [
+              "human"
+            ],
+            "title": "Verdict",
+            "type": "string"
+          },
+          "is_ai_generated": {
+            "examples": [
+              false
+            ],
+            "title": "Is Ai Generated",
+            "type": "boolean"
+          },
+          "confidence": {
+            "examples": [
+              0.85
+            ],
+            "title": "Confidence",
+            "type": "number"
+          }
+        },
+        "title": "AITextDetectionOutput",
+        "required": [
+          "verdict",
+          "confidence",
+          "is_ai_generated",
+          "latency"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    }
+  }
+}

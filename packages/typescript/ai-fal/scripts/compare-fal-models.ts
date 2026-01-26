@@ -47,7 +47,7 @@ interface ComparisonResults {
 /**
  * Load models from JSON file
  */
-async function loadFalModels(): Promise<Array<FalApiModel>> {
+function loadFalModels(): Array<FalApiModel> {
   try {
     const modelsPath = join(process.cwd(), 'scripts/fal.models.json')
     const content = readFileSync(modelsPath, 'utf-8')
@@ -258,7 +258,7 @@ function generateCSV(results: ComparisonResults): string {
       escapeCsvField(model.metadata.updated_at),
       escapeCsvField(model.metadata.description || ''),
       escapeCsvField(`https://fal.ai/models/${model.endpoint_id}`),
-      escapeCsvField(model.metadata.tags?.join('; ') || ''),
+      escapeCsvField(model.metadata.tags.join('; ') || ''),
     ]
     lines.push(row.join(','))
   }

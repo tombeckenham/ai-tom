@@ -1,0 +1,206 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Fal.ai unknown Models",
+    "version": "1.0.0",
+    "description": "OpenAPI schemas for all fal.ai unknown models (1 models total)",
+    "x-generated-at": "2026-01-26T05:40:51.975Z"
+  },
+  "components": {
+    "schemas": {
+      "File": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "content_type": {
+            "type": "string"
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "file_size": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "QueueStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "IN_PROGRESS",
+              "COMPLETED",
+              "FAILED"
+            ]
+          },
+          "response_url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "RouterAudioInput": {
+        "x-fal-order-properties": [
+          "audio_url",
+          "prompt",
+          "system_prompt",
+          "model",
+          "reasoning",
+          "temperature",
+          "max_tokens"
+        ],
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "examples": [
+              "Please transcribe this audio file.",
+              "What is being said in this audio?"
+            ],
+            "description": "Prompt to be used for the audio processing",
+            "type": "string",
+            "title": "Prompt"
+          },
+          "system_prompt": {
+            "examples": [
+              "Transcribe the audio accurately, including speaker identification if multiple speakers are present."
+            ],
+            "description": "System prompt to provide context or instructions to the model",
+            "type": "string",
+            "title": "System Prompt"
+          },
+          "reasoning": {
+            "description": "Should reasoning be the part of the final answer.",
+            "type": "boolean",
+            "title": "Reasoning",
+            "default": false
+          },
+          "model": {
+            "examples": [
+              "google/gemini-3-flash-preview",
+              "google/gemini-2.5-flash",
+              "google/gemini-3-pro-preview"
+            ],
+            "description": "Name of the model to use. Charged based on actual token usage.",
+            "type": "string",
+            "title": "Model"
+          },
+          "max_tokens": {
+            "minimum": 1,
+            "description": "This sets the upper limit for the number of tokens the model can generate in response. It won't produce more than this limit. The maximum value is the context length minus the prompt length.",
+            "type": "integer",
+            "title": "Max Tokens"
+          },
+          "temperature": {
+            "minimum": 0,
+            "maximum": 2,
+            "type": "number",
+            "description": "This setting influences the variety in the model's responses. Lower values lead to more predictable and typical responses, while higher values encourage more diverse and less common responses. At 0, the model always gives the same response for a given input.",
+            "title": "Temperature",
+            "default": 1
+          },
+          "audio_url": {
+            "examples": [
+              "https://storage.googleapis.com/falserverless/model_tests/audio-understanding/Title_%20Running%20on%20Fal.mp3"
+            ],
+            "description": "URL or data URI of the audio file to process. Supported formats: wav, mp3, aiff, aac, ogg, flac, m4a.",
+            "type": "string",
+            "title": "Audio Url"
+          }
+        },
+        "title": "AudioInput",
+        "required": [
+          "prompt",
+          "audio_url",
+          "model"
+        ]
+      },
+      "RouterAudioOutput": {
+        "x-fal-order-properties": [
+          "output",
+          "usage"
+        ],
+        "type": "object",
+        "properties": {
+          "usage": {
+            "examples": [
+              {
+                "prompt_tokens": 500,
+                "total_tokens": 550,
+                "completion_tokens": 50,
+                "cost": 0.0003
+              }
+            ],
+            "description": "Token usage information",
+            "title": "Usage",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UsageInfo"
+              }
+            ]
+          },
+          "output": {
+            "examples": [
+              "The audio contains a conversation between two people discussing the weather forecast for the upcoming week."
+            ],
+            "description": "Generated output from audio processing",
+            "type": "string",
+            "title": "Output"
+          }
+        },
+        "title": "AudioOutput",
+        "required": [
+          "output"
+        ]
+      },
+      "UsageInfo": {
+        "x-fal-order-properties": [
+          "prompt_tokens",
+          "completion_tokens",
+          "total_tokens",
+          "cost"
+        ],
+        "type": "object",
+        "properties": {
+          "prompt_tokens": {
+            "title": "Prompt Tokens",
+            "type": "integer"
+          },
+          "total_tokens": {
+            "title": "Total Tokens",
+            "type": "integer",
+            "default": 0
+          },
+          "completion_tokens": {
+            "title": "Completion Tokens",
+            "type": "integer"
+          },
+          "cost": {
+            "title": "Cost",
+            "type": "number"
+          }
+        },
+        "title": "UsageInfo",
+        "required": [
+          "cost"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    }
+  }
+}

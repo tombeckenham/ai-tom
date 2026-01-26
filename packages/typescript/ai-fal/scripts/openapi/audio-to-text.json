@@ -1,0 +1,238 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Fal.ai audio-to-text Models",
+    "version": "1.0.0",
+    "description": "OpenAPI schemas for all fal.ai audio-to-text models (3 models total)",
+    "x-generated-at": "2026-01-26T05:40:51.971Z"
+  },
+  "components": {
+    "schemas": {
+      "File": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "content_type": {
+            "type": "string"
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "file_size": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "QueueStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "IN_PROGRESS",
+              "COMPLETED",
+              "FAILED"
+            ]
+          },
+          "response_url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "NemotronAsrStreamInput": {
+        "title": "SpeechInput",
+        "type": "object",
+        "properties": {
+          "acceleration": {
+            "enum": [
+              "none",
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Acceleration",
+            "type": "string",
+            "description": "Controls the speed/accuracy trade-off. 'none' = best accuracy (1.12s chunks, ~7.16% WER), 'low' = balanced (0.56s chunks, ~7.22% WER), 'medium' = faster (0.16s chunks, ~7.84% WER), 'high' = fastest (0.08s chunks, ~8.53% WER).",
+            "default": "none"
+          },
+          "audio_url": {
+            "examples": [
+              "https://storage.googleapis.com/falserverless/canary/18e15559-ab3e-4f96-9583-be5ddde91e43.mp3"
+            ],
+            "title": "Audio URL",
+            "type": "string",
+            "description": "URL of the audio file."
+          }
+        },
+        "x-fal-order-properties": [
+          "audio_url",
+          "acceleration"
+        ],
+        "required": [
+          "audio_url"
+        ]
+      },
+      "NemotronAsrStreamOutput": {},
+      "NemotronAsrInput": {
+        "title": "SpeechInput",
+        "type": "object",
+        "properties": {
+          "acceleration": {
+            "enum": [
+              "none",
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Acceleration",
+            "type": "string",
+            "description": "Controls the speed/accuracy trade-off. 'none' = best accuracy (1.12s chunks, ~7.16% WER), 'low' = balanced (0.56s chunks, ~7.22% WER), 'medium' = faster (0.16s chunks, ~7.84% WER), 'high' = fastest (0.08s chunks, ~8.53% WER).",
+            "default": "none"
+          },
+          "audio_url": {
+            "examples": [
+              "https://storage.googleapis.com/falserverless/canary/18e15559-ab3e-4f96-9583-be5ddde91e43.mp3"
+            ],
+            "title": "Audio URL",
+            "type": "string",
+            "description": "URL of the audio file."
+          }
+        },
+        "x-fal-order-properties": [
+          "audio_url",
+          "acceleration"
+        ],
+        "required": [
+          "audio_url"
+        ]
+      },
+      "NemotronAsrOutput": {
+        "title": "SpeechOutput",
+        "type": "object",
+        "properties": {
+          "partial": {
+            "title": "Partial Result",
+            "type": "boolean",
+            "description": "True if this is an intermediate result during streaming.",
+            "default": false
+          },
+          "output": {
+            "title": "Transcribed Text",
+            "type": "string",
+            "description": "The transcribed text from the audio."
+          }
+        },
+        "x-fal-order-properties": [
+          "output",
+          "partial"
+        ],
+        "required": [
+          "output"
+        ]
+      },
+      "SileroVadInput": {
+        "x-fal-order-properties": [
+          "audio_url"
+        ],
+        "type": "object",
+        "properties": {
+          "audio_url": {
+            "examples": [
+              "https://v3b.fal.media/files/b/0a89994c/X3-06RFibRfBu-FS1AI8y_speech.mp3"
+            ],
+            "title": "Audio URL",
+            "type": "string",
+            "description": "The URL of the audio to get speech timestamps from."
+          }
+        },
+        "title": "SileroVADInput",
+        "required": [
+          "audio_url"
+        ]
+      },
+      "SileroVadOutput": {
+        "x-fal-order-properties": [
+          "has_speech",
+          "timestamps"
+        ],
+        "type": "object",
+        "properties": {
+          "has_speech": {
+            "examples": [
+              true
+            ],
+            "title": "Has Speech",
+            "type": "boolean",
+            "description": "Whether the audio has speech."
+          },
+          "timestamps": {
+            "examples": [
+              [
+                {
+                  "end": 1.982,
+                  "start": 0.13
+                },
+                {
+                  "end": 3.998,
+                  "start": 2.434
+                }
+              ]
+            ],
+            "title": "Speech Timestamps",
+            "type": "array",
+            "description": "The speech timestamps.",
+            "items": {
+              "$ref": "#/components/schemas/SpeechTimestamp"
+            }
+          }
+        },
+        "title": "SileroVADOutput",
+        "required": [
+          "has_speech",
+          "timestamps"
+        ]
+      },
+      "SpeechTimestamp": {
+        "x-fal-order-properties": [
+          "start",
+          "end"
+        ],
+        "type": "object",
+        "properties": {
+          "end": {
+            "title": "End Time",
+            "type": "number",
+            "description": "The end time of the speech in seconds."
+          },
+          "start": {
+            "title": "Start Time",
+            "type": "number",
+            "description": "The start time of the speech in seconds."
+          }
+        },
+        "title": "SpeechTimestamp",
+        "required": [
+          "start",
+          "end"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    }
+  }
+}

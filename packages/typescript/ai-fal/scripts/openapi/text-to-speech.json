@@ -1,0 +1,5191 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Fal.ai text-to-speech Models",
+    "version": "1.0.0",
+    "description": "OpenAPI schemas for all fal.ai text-to-speech models (23 models total)",
+    "x-generated-at": "2026-01-26T05:40:51.979Z"
+  },
+  "components": {
+    "schemas": {
+      "File": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "content_type": {
+            "type": "string"
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "file_size": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "QueueStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "IN_PROGRESS",
+              "COMPLETED",
+              "FAILED"
+            ]
+          },
+          "response_url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "Vibevoice05bInput": {
+        "x-fal-order-properties": [
+          "script",
+          "speaker",
+          "seed",
+          "cfg_scale"
+        ],
+        "type": "object",
+        "properties": {
+          "script": {
+            "examples": [
+              "VibeVoice is now available on Fal!"
+            ],
+            "maxLength": 90000,
+            "type": "string",
+            "description": "The script to convert to speech.",
+            "title": "Script"
+          },
+          "seed": {
+            "description": "Random seed for reproducible generation.",
+            "type": "integer",
+            "title": "Seed"
+          },
+          "speaker": {
+            "examples": [
+              "Frank"
+            ],
+            "description": "Voice to use for speaking.",
+            "type": "string",
+            "enum": [
+              "Frank",
+              "Wayne",
+              "Carter",
+              "Emma",
+              "Grace",
+              "Mike"
+            ],
+            "title": "Speaker"
+          },
+          "cfg_scale": {
+            "minimum": 1,
+            "maximum": 2,
+            "type": "number",
+            "title": "CFG Scale",
+            "description": "CFG (Classifier-Free Guidance) scale for generation. Higher values increase adherence to text.",
+            "default": 1.3
+          }
+        },
+        "description": "Input schema for VibeVoice-0.5b TTS generation",
+        "title": "VibeVoice0_5bInput",
+        "required": [
+          "script",
+          "speaker"
+        ]
+      },
+      "Vibevoice05bOutput": {
+        "x-fal-order-properties": [
+          "audio",
+          "duration",
+          "sample_rate",
+          "generation_time",
+          "rtf"
+        ],
+        "type": "object",
+        "properties": {
+          "duration": {
+            "examples": [
+              9.46
+            ],
+            "description": "Duration of the generated audio in seconds",
+            "type": "number",
+            "title": "Duration"
+          },
+          "rtf": {
+            "examples": [
+              0.53
+            ],
+            "description": "Real-time factor (generation_time / audio_duration). Lower is better.",
+            "type": "number",
+            "title": "Rtf"
+          },
+          "sample_rate": {
+            "examples": [
+              24000
+            ],
+            "description": "Sample rate of the generated audio",
+            "type": "integer",
+            "title": "Sample Rate"
+          },
+          "generation_time": {
+            "examples": [
+              5.6
+            ],
+            "description": "Time taken to generate the audio in seconds",
+            "type": "number",
+            "title": "Generation Time"
+          },
+          "audio": {
+            "examples": [
+              {
+                "url": "https://storage.googleapis.com/falserverless/example_outputs/vibevoice/0_5b.mp3"
+              }
+            ],
+            "description": "The generated audio file containing the speech",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiVibevoice05b_File"
+              }
+            ]
+          }
+        },
+        "description": "Output schema for VibeVoice-0.5b TTS generation",
+        "title": "VibeVoice_0_5BOutput",
+        "required": [
+          "audio",
+          "duration",
+          "sample_rate",
+          "generation_time",
+          "rtf"
+        ]
+      },
+      "FalAiVibevoice05b_File": {
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "title": "File",
+        "required": [
+          "url"
+        ]
+      },
+      "ChatterboxTextToSpeechTurboInput": {
+        "title": "ChatterboxTurboRequest",
+        "type": "object",
+        "properties": {
+          "text": {
+            "examples": [
+              "Oh, that's hilarious! [chuckle] Chatterbox Turbo is at FAL on day 1!."
+            ],
+            "description": "The text to be converted to speech. You can add paralinguistic tags: [clear throat], [sigh], [shush], [cough], [groan], [sniff], [gasp], [chuckle], [laugh]",
+            "type": "string",
+            "title": "Text"
+          },
+          "voice": {
+            "examples": [
+              "aaron",
+              "abigail",
+              "anaya",
+              "andy",
+              "archer",
+              "brian",
+              "chloe",
+              "dylan",
+              "emmanuel",
+              "ethan",
+              "evelyn",
+              "gavin",
+              "gordon",
+              "ivan",
+              "laura",
+              "lucy",
+              "madison",
+              "marisol",
+              "meera",
+              "walter"
+            ],
+            "description": "Preset voice to use for synthesis. Choose from available voices or provide a custom audio URL.",
+            "type": "string",
+            "title": "Voice",
+            "default": "lucy"
+          },
+          "audio_url": {
+            "description": "Optional URL to a custom audio file (5-10 seconds) for voice cloning. If provided, this overrides the preset voice selection.",
+            "type": "string",
+            "title": "Audio Url"
+          },
+          "temperature": {
+            "description": "Temperature for generation. Higher values create more varied speech patterns.",
+            "type": "number",
+            "minimum": 0.05,
+            "maximum": 2,
+            "title": "Temperature",
+            "default": 0.8
+          },
+          "seed": {
+            "description": "Random seed for reproducible results. Set to 0 for random generation.",
+            "type": "integer",
+            "title": "Seed"
+          }
+        },
+        "x-fal-order-properties": [
+          "text",
+          "voice",
+          "audio_url",
+          "temperature",
+          "seed"
+        ],
+        "required": [
+          "text"
+        ]
+      },
+      "ChatterboxTextToSpeechTurboOutput": {
+        "title": "ChatterboxTurboOutput",
+        "type": "object",
+        "properties": {
+          "audio": {
+            "examples": [
+              "https://storage.googleapis.com/falserverless/example_outputs/turbo_speech_output.wav"
+            ],
+            "description": "The generated speech audio using Chatterbox Turbo",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiChatterboxTextToSpeechTurbo_File"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "audio"
+        ],
+        "required": [
+          "audio"
+        ]
+      },
+      "FalAiChatterboxTextToSpeechTurbo_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "required": [
+          "url"
+        ]
+      },
+      "MayaBatchInput": {
+        "description": "Input schema for batch Maya-1-Voice TTS generation",
+        "type": "object",
+        "properties": {
+          "repetition_penalty": {
+            "minimum": 1,
+            "maximum": 2,
+            "type": "number",
+            "title": "Repetition Penalty",
+            "description": "Repetition penalty for all generations.",
+            "default": 1.1
+          },
+          "top_p": {
+            "minimum": 0,
+            "maximum": 1,
+            "type": "number",
+            "title": "Top P",
+            "description": "Nucleus sampling parameter for all generations.",
+            "default": 0.9
+          },
+          "output_format": {
+            "enum": [
+              "wav",
+              "mp3"
+            ],
+            "description": "Output audio format for all generated speech files",
+            "type": "string",
+            "examples": [
+              "wav",
+              "mp3"
+            ],
+            "title": "Output Format",
+            "default": "wav"
+          },
+          "texts": {
+            "description": "List of texts to synthesize into speech. You can embed emotion tags in each text using the format <emotion_name>.",
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "title": "Texts",
+            "items": {
+              "type": "string"
+            }
+          },
+          "prompts": {
+            "description": "List of voice descriptions for each text. Must match the length of texts list. Each describes the voice/character attributes.",
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "title": "Prompts",
+            "items": {
+              "type": "string"
+            }
+          },
+          "max_tokens": {
+            "minimum": 28,
+            "maximum": 4000,
+            "type": "integer",
+            "title": "Max Tokens",
+            "description": "Maximum SNAC tokens per generation.",
+            "default": 2000
+          },
+          "temperature": {
+            "minimum": 0,
+            "maximum": 2,
+            "type": "number",
+            "title": "Temperature",
+            "description": "Sampling temperature for all generations.",
+            "default": 0.4
+          },
+          "sample_rate": {
+            "enum": [
+              "48 kHz",
+              "24 kHz"
+            ],
+            "description": "Output audio sample rate for all generations. 48 kHz provides higher quality, 24 kHz is faster.",
+            "type": "string",
+            "examples": [
+              "48 kHz",
+              "24 kHz"
+            ],
+            "title": "Sample Rate",
+            "default": "48 kHz"
+          }
+        },
+        "title": "MayaVoiceBatchInput",
+        "x-fal-order-properties": [
+          "texts",
+          "prompts",
+          "temperature",
+          "top_p",
+          "max_tokens",
+          "repetition_penalty",
+          "sample_rate",
+          "output_format"
+        ],
+        "required": [
+          "texts",
+          "prompts"
+        ]
+      },
+      "MayaBatchOutput": {
+        "description": "Output schema for batch Maya-1-Voice TTS generation",
+        "type": "object",
+        "properties": {
+          "average_rtf": {
+            "examples": [
+              0.15
+            ],
+            "description": "Average real-time factor across all generations",
+            "type": "number",
+            "title": "Average Rtf"
+          },
+          "sample_rate": {
+            "examples": [
+              "48 kHz",
+              "24 kHz"
+            ],
+            "description": "Sample rate of all generated audio files",
+            "type": "string",
+            "title": "Sample Rate"
+          },
+          "total_generation_time": {
+            "examples": [
+              5.7
+            ],
+            "description": "Total time taken to generate all audio files in seconds",
+            "type": "number",
+            "title": "Total Generation Time"
+          },
+          "audios": {
+            "description": "List of generated audio files",
+            "type": "array",
+            "title": "Audios",
+            "items": {
+              "$ref": "#/components/schemas/FalAiMayaBatch_File"
+            }
+          },
+          "durations": {
+            "description": "Duration of each generated audio in seconds",
+            "type": "array",
+            "title": "Durations",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "title": "MayaVoiceBatchOutput",
+        "x-fal-order-properties": [
+          "audios",
+          "durations",
+          "sample_rate",
+          "total_generation_time",
+          "average_rtf"
+        ],
+        "required": [
+          "audios",
+          "durations",
+          "sample_rate",
+          "total_generation_time",
+          "average_rtf"
+        ]
+      },
+      "FalAiMayaBatch_File": {
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size"
+        ],
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The size of the file in bytes.",
+            "title": "File Size",
+            "examples": [
+              4404019
+            ]
+          },
+          "file_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "title": "File Name",
+            "examples": [
+              "z9RV14K95DvU.png"
+            ]
+          },
+          "content_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The mime type of the file.",
+            "title": "Content Type",
+            "examples": [
+              "image/png"
+            ]
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "title": "File",
+        "required": [
+          "url"
+        ]
+      },
+      "MayaStreamInput": {
+        "description": "Input schema for Maya-1-Voice streaming TTS generation",
+        "type": "object",
+        "properties": {
+          "repetition_penalty": {
+            "minimum": 1,
+            "maximum": 2,
+            "type": "number",
+            "title": "Repetition Penalty",
+            "description": "Penalty for repeating tokens. Higher values reduce repetition artifacts.",
+            "default": 1.1
+          },
+          "prompt": {
+            "examples": [
+              "Realistic male voice in the 30s age with american accent. Normal pitch, warm timbre, conversational pacing, neutral tone delivery at med intensity.",
+              "Creative, dark_villain character. Male voice in their 40s with british accent. Low pitch, gravelly timbre, slow pacing, angry tone at high intensity."
+            ],
+            "description": "Description of the voice/character. Includes attributes like age, accent, pitch, timbre, pacing, tone, and intensity. See examples for format.",
+            "type": "string",
+            "title": "Prompt",
+            "maxLength": 500
+          },
+          "top_p": {
+            "minimum": 0,
+            "maximum": 1,
+            "type": "number",
+            "title": "Top P",
+            "description": "Nucleus sampling parameter. Controls diversity of token selection.",
+            "default": 0.9
+          },
+          "text": {
+            "examples": [
+              "Hello world! This is a test of the Maya-1-Voice text-to-speech system.",
+              "The darkness isn't coming... <angry> it's already here!"
+            ],
+            "description": "The text to synthesize into speech. You can embed emotion tags anywhere in the text using the format <emotion_name>. Available emotions: laugh, laugh_harder, sigh, chuckle, gasp, angry, excited, whisper, cry, scream, sing, snort, exhale, gulp, giggle, sarcastic, curious. Example: 'Hello world! <excited> This is amazing!' or 'I can't believe this <sigh> happened again.'",
+            "type": "string",
+            "title": "Text",
+            "maxLength": 5000
+          },
+          "output_format": {
+            "enum": [
+              "mp3",
+              "wav",
+              "pcm"
+            ],
+            "description": "Output audio format. 'mp3' for browser-playable audio, 'wav' for uncompressed audio, 'pcm' for raw PCM (lowest latency, requires client-side decoding).",
+            "type": "string",
+            "examples": [
+              "mp3",
+              "wav",
+              "pcm"
+            ],
+            "title": "Output Format",
+            "default": "mp3"
+          },
+          "max_tokens": {
+            "minimum": 28,
+            "maximum": 4000,
+            "type": "integer",
+            "title": "Max Tokens",
+            "description": "Maximum number of SNAC tokens to generate (7 tokens per frame). Controls maximum audio length.",
+            "default": 2000
+          },
+          "temperature": {
+            "minimum": 0,
+            "maximum": 2,
+            "type": "number",
+            "title": "Temperature",
+            "description": "Sampling temperature. Lower values (0.2-0.5) produce more stable/consistent audio. Higher values add variation.",
+            "default": 0.4
+          },
+          "sample_rate": {
+            "enum": [
+              "48 kHz",
+              "24 kHz"
+            ],
+            "description": "Output audio sample rate. 48 kHz uses upsampling for higher quality audio, 24 kHz is native SNAC output (faster, lower latency).",
+            "type": "string",
+            "examples": [
+              "48 kHz",
+              "24 kHz"
+            ],
+            "title": "Sample Rate",
+            "default": "24 kHz"
+          }
+        },
+        "title": "MayaVoiceStreamingInput",
+        "x-fal-order-properties": [
+          "text",
+          "prompt",
+          "temperature",
+          "top_p",
+          "max_tokens",
+          "repetition_penalty",
+          "sample_rate",
+          "output_format"
+        ],
+        "required": [
+          "text",
+          "prompt"
+        ]
+      },
+      "MayaStreamOutput": {},
+      "MayaInput": {
+        "description": "Input schema for Maya-1-Voice TTS generation",
+        "type": "object",
+        "properties": {
+          "repetition_penalty": {
+            "minimum": 1,
+            "maximum": 2,
+            "type": "number",
+            "title": "Repetition Penalty",
+            "description": "Penalty for repeating tokens. Higher values reduce repetition artifacts.",
+            "default": 1.1
+          },
+          "prompt": {
+            "examples": [
+              "Realistic male voice in the 30s age with american accent. Normal pitch, warm timbre, conversational pacing, neutral tone delivery at med intensity.",
+              "Creative, dark_villain character. Male voice in their 40s with british accent. Low pitch, gravelly timbre, slow pacing, angry tone at high intensity."
+            ],
+            "description": "Description of the voice/character. Includes attributes like age, accent, pitch, timbre, pacing, tone, and intensity. See examples for format.",
+            "type": "string",
+            "title": "Prompt",
+            "maxLength": 500
+          },
+          "top_p": {
+            "minimum": 0,
+            "maximum": 1,
+            "type": "number",
+            "title": "Top P",
+            "description": "Nucleus sampling parameter. Controls diversity of token selection.",
+            "default": 0.9
+          },
+          "text": {
+            "examples": [
+              "Hello world! This is a test of the Maya-1-Voice text-to-speech system.",
+              "The darkness isn't coming... <angry> it's already here!",
+              "That's hilarious! <laugh> I can't stop <laugh_harder> thinking about it!",
+              "<whisper> I have a secret to tell you. <excited> You won't believe what happened!"
+            ],
+            "description": "The text to synthesize into speech. You can embed emotion tags anywhere in the text using the format <emotion_name>. Available emotions: laugh, laugh_harder, sigh, chuckle, gasp, angry, excited, whisper, cry, scream, sing, snort, exhale, gulp, giggle, sarcastic, curious. Example: 'Hello world! <excited> This is amazing!' or 'I can't believe this <sigh> happened again.'",
+            "type": "string",
+            "title": "Text",
+            "maxLength": 5000
+          },
+          "output_format": {
+            "enum": [
+              "wav",
+              "mp3"
+            ],
+            "description": "Output audio format for the generated speech",
+            "type": "string",
+            "examples": [
+              "wav",
+              "mp3"
+            ],
+            "title": "Output Format",
+            "default": "wav"
+          },
+          "max_tokens": {
+            "minimum": 28,
+            "maximum": 4000,
+            "type": "integer",
+            "title": "Max Tokens",
+            "description": "Maximum number of SNAC tokens to generate (7 tokens per frame). Controls maximum audio length.",
+            "default": 2000
+          },
+          "temperature": {
+            "minimum": 0,
+            "maximum": 2,
+            "type": "number",
+            "title": "Temperature",
+            "description": "Sampling temperature. Lower values (0.2-0.5) produce more stable/consistent audio. Higher values add variation.",
+            "default": 0.4
+          },
+          "sample_rate": {
+            "enum": [
+              "48 kHz",
+              "24 kHz"
+            ],
+            "description": "Output audio sample rate. 48 kHz provides higher quality audio, 24 kHz is faster.",
+            "type": "string",
+            "examples": [
+              "48 kHz",
+              "24 kHz"
+            ],
+            "title": "Sample Rate",
+            "default": "48 kHz"
+          }
+        },
+        "title": "MayaVoiceInput",
+        "x-fal-order-properties": [
+          "text",
+          "prompt",
+          "temperature",
+          "top_p",
+          "max_tokens",
+          "repetition_penalty",
+          "sample_rate",
+          "output_format"
+        ],
+        "required": [
+          "text",
+          "prompt"
+        ]
+      },
+      "MayaOutput": {
+        "description": "Output schema for Maya-1-Voice TTS generation",
+        "type": "object",
+        "properties": {
+          "rtf": {
+            "examples": [
+              0.51
+            ],
+            "description": "Real-time factor (generation_time / audio_duration). Lower is better.",
+            "type": "number",
+            "title": "Rtf"
+          },
+          "duration": {
+            "examples": [
+              4.5
+            ],
+            "description": "Duration of the generated audio in seconds",
+            "type": "number",
+            "title": "Duration"
+          },
+          "sample_rate": {
+            "examples": [
+              "48 kHz",
+              "24 kHz"
+            ],
+            "description": "Sample rate of the generated audio",
+            "type": "string",
+            "title": "Sample Rate"
+          },
+          "generation_time": {
+            "examples": [
+              2.3
+            ],
+            "description": "Time taken to generate the audio in seconds",
+            "type": "number",
+            "title": "Generation Time"
+          },
+          "audio": {
+            "description": "The generated audio file containing the speech (WAV or MP3 format, 24kHz or 48kHz mono depending on upsampler)",
+            "$ref": "#/components/schemas/FalAiMaya_File"
+          }
+        },
+        "title": "MayaVoiceOutput",
+        "x-fal-order-properties": [
+          "audio",
+          "duration",
+          "sample_rate",
+          "generation_time",
+          "rtf"
+        ],
+        "required": [
+          "audio",
+          "duration",
+          "sample_rate",
+          "generation_time",
+          "rtf"
+        ]
+      },
+      "FalAiMaya_File": {
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size"
+        ],
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The size of the file in bytes.",
+            "title": "File Size",
+            "examples": [
+              4404019
+            ]
+          },
+          "file_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "title": "File Name",
+            "examples": [
+              "z9RV14K95DvU.png"
+            ]
+          },
+          "content_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The mime type of the file.",
+            "title": "Content Type",
+            "examples": [
+              "image/png"
+            ]
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "title": "File",
+        "required": [
+          "url"
+        ]
+      },
+      "MinimaxSpeech26TurboInput": {
+        "title": "TextToSpeechTurbo26Request",
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "examples": [
+              "Hello world! Welcome MiniMax's new text to speech model <#0.1#> Speech 2.6 Turbo, now available on Fal!"
+            ],
+            "maxLength": 10000,
+            "type": "string",
+            "title": "Prompt",
+            "description": "Text to convert to speech. Paragraph breaks should be marked with newline characters. **NOTE**: You can customize speech pauses by adding markers in the form `<#x#>`, where `x` is the pause duration in seconds. Valid range: `[0.01, 99.99]`, up to two decimal places. Pause markers must be placed between speakable text segments and cannot be used consecutively.",
+            "minLength": 1
+          },
+          "language_boost": {
+            "enum": [
+              "Chinese",
+              "Chinese,Yue",
+              "English",
+              "Arabic",
+              "Russian",
+              "Spanish",
+              "French",
+              "Portuguese",
+              "German",
+              "Turkish",
+              "Dutch",
+              "Ukrainian",
+              "Vietnamese",
+              "Indonesian",
+              "Japanese",
+              "Italian",
+              "Korean",
+              "Thai",
+              "Polish",
+              "Romanian",
+              "Greek",
+              "Czech",
+              "Finnish",
+              "Hindi",
+              "Bulgarian",
+              "Danish",
+              "Hebrew",
+              "Malay",
+              "Slovak",
+              "Swedish",
+              "Croatian",
+              "Hungarian",
+              "Norwegian",
+              "Slovenian",
+              "Catalan",
+              "Nynorsk",
+              "Afrikaans",
+              "auto"
+            ],
+            "description": "Enhance recognition of specified languages and dialects",
+            "type": "string",
+            "title": "Language Boost"
+          },
+          "output_format": {
+            "enum": [
+              "url",
+              "hex"
+            ],
+            "description": "Format of the output content (non-streaming only)",
+            "type": "string",
+            "title": "Output Format",
+            "default": "hex"
+          },
+          "pronunciation_dict": {
+            "description": "Custom pronunciation dictionary for text replacement",
+            "title": "Pronunciation Dict",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PronunciationDict"
+              }
+            ]
+          },
+          "voice_setting": {
+            "default": {
+              "speed": 1,
+              "vol": 1,
+              "voice_id": "Wise_Woman",
+              "pitch": 0,
+              "english_normalization": false
+            },
+            "description": "Voice configuration settings",
+            "title": "Voice Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VoiceSetting"
+              }
+            ]
+          },
+          "normalization_setting": {
+            "description": "Loudness normalization settings for the audio",
+            "title": "Normalization Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LoudnessNormalizationSetting"
+              }
+            ]
+          },
+          "audio_setting": {
+            "description": "Audio configuration settings",
+            "title": "Audio Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AudioSetting"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "voice_setting",
+          "audio_setting",
+          "language_boost",
+          "output_format",
+          "pronunciation_dict",
+          "prompt",
+          "normalization_setting"
+        ],
+        "required": [
+          "prompt"
+        ]
+      },
+      "MinimaxSpeech26TurboOutput": {
+        "title": "TextToSpeechTurbo26Output",
+        "type": "object",
+        "properties": {
+          "duration_ms": {
+            "description": "Duration of the audio in milliseconds",
+            "type": "integer",
+            "title": "Duration Ms"
+          },
+          "audio": {
+            "examples": [
+              {
+                "url": "https://storage.googleapis.com/falserverless/example_outputs/minimax-speech-26/speech_26_turbo_out.mp3"
+              }
+            ],
+            "description": "The generated audio file",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech26Turbo_File"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "audio",
+          "duration_ms"
+        ],
+        "required": [
+          "audio",
+          "duration_ms"
+        ]
+      },
+      "PronunciationDict": {
+        "title": "PronunciationDict",
+        "type": "object",
+        "properties": {
+          "tone_list": {
+            "description": "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+            "type": "array",
+            "title": "Tone List",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "x-fal-order-properties": [
+          "tone_list"
+        ]
+      },
+      "VoiceSetting": {
+        "title": "VoiceSetting",
+        "type": "object",
+        "properties": {
+          "speed": {
+            "minimum": 0.5,
+            "description": "Speech speed (0.5-2.0)",
+            "type": "number",
+            "maximum": 2,
+            "title": "Speed",
+            "default": 1
+          },
+          "vol": {
+            "minimum": 0.01,
+            "description": "Volume (0-10)",
+            "type": "number",
+            "maximum": 10,
+            "title": "Vol",
+            "default": 1
+          },
+          "voice_id": {
+            "examples": [
+              "Wise_Woman",
+              "Friendly_Person",
+              "Inspirational_girl",
+              "Deep_Voice_Man",
+              "Calm_Woman",
+              "Casual_Guy",
+              "Lively_Girl",
+              "Patient_Man",
+              "Young_Knight",
+              "Determined_Man",
+              "Lovely_Girl",
+              "Decent_Boy",
+              "Imposing_Manner",
+              "Elegant_Man",
+              "Abbess",
+              "Sweet_Girl_2",
+              "Exuberant_Girl"
+            ],
+            "description": "Predefined voice ID to use for synthesis",
+            "type": "string",
+            "title": "Voice Id",
+            "default": "Wise_Woman"
+          },
+          "pitch": {
+            "minimum": -12,
+            "description": "Voice pitch (-12 to 12)",
+            "type": "integer",
+            "maximum": 12,
+            "title": "Pitch",
+            "default": 0
+          },
+          "english_normalization": {
+            "description": "Enables English text normalization to improve number reading performance, with a slight increase in latency",
+            "type": "boolean",
+            "title": "English Normalization",
+            "default": false
+          },
+          "emotion": {
+            "enum": [
+              "happy",
+              "sad",
+              "angry",
+              "fearful",
+              "disgusted",
+              "surprised",
+              "neutral"
+            ],
+            "description": "Emotion of the generated speech",
+            "type": "string",
+            "title": "Emotion"
+          }
+        },
+        "x-fal-order-properties": [
+          "voice_id",
+          "speed",
+          "vol",
+          "pitch",
+          "emotion",
+          "english_normalization"
+        ]
+      },
+      "LoudnessNormalizationSetting": {
+        "title": "LoudnessNormalizationSetting",
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "description": "Enable loudness normalization for the audio",
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          },
+          "target_loudness": {
+            "minimum": -70,
+            "description": "Target loudness in LUFS (default -18.0)",
+            "type": "number",
+            "maximum": -10,
+            "title": "Target Loudness",
+            "default": -18
+          },
+          "target_range": {
+            "minimum": 0,
+            "description": "Target loudness range in LU (default 8.0)",
+            "type": "number",
+            "maximum": 20,
+            "title": "Target Range",
+            "default": 8
+          },
+          "target_peak": {
+            "minimum": -3,
+            "description": "Target peak level in dBTP (default -0.5).",
+            "type": "number",
+            "maximum": 0,
+            "title": "Target Peak",
+            "default": -0.5
+          }
+        },
+        "x-fal-order-properties": [
+          "enabled",
+          "target_loudness",
+          "target_range",
+          "target_peak"
+        ]
+      },
+      "AudioSetting": {
+        "title": "AudioSetting",
+        "type": "object",
+        "properties": {
+          "format": {
+            "enum": [
+              "mp3",
+              "pcm",
+              "flac"
+            ],
+            "description": "Audio format",
+            "type": "string",
+            "title": "Format",
+            "default": "mp3"
+          },
+          "sample_rate": {
+            "enum": [
+              8000,
+              16000,
+              22050,
+              24000,
+              32000,
+              44100
+            ],
+            "description": "Sample rate of generated audio",
+            "type": "integer",
+            "title": "Sample Rate",
+            "default": 32000
+          },
+          "channel": {
+            "enum": [
+              1,
+              2
+            ],
+            "description": "Number of audio channels (1=mono, 2=stereo)",
+            "type": "integer",
+            "title": "Channel",
+            "default": 1
+          },
+          "bitrate": {
+            "enum": [
+              32000,
+              64000,
+              128000,
+              256000
+            ],
+            "description": "Bitrate of generated audio",
+            "type": "integer",
+            "title": "Bitrate",
+            "default": 128000
+          }
+        },
+        "x-fal-order-properties": [
+          "sample_rate",
+          "bitrate",
+          "format",
+          "channel"
+        ]
+      },
+      "FalAiMinimaxSpeech26Turbo_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "required": [
+          "url"
+        ]
+      },
+      "MinimaxSpeech26HdInput": {
+        "title": "TextToSpeechHD26Request",
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "examples": [
+              "Hello world! Welcome MiniMax's new text to speech model <#0.1#> Speech 2.6, now available on Fal!"
+            ],
+            "maxLength": 10000,
+            "type": "string",
+            "title": "Prompt",
+            "description": "Text to convert to speech. Paragraph breaks should be marked with newline characters. **NOTE**: You can customize speech pauses by adding markers in the form `<#x#>`, where `x` is the pause duration in seconds. Valid range: `[0.01, 99.99]`, up to two decimal places. Pause markers must be placed between speakable text segments and cannot be used consecutively.",
+            "minLength": 1
+          },
+          "language_boost": {
+            "enum": [
+              "Chinese",
+              "Chinese,Yue",
+              "English",
+              "Arabic",
+              "Russian",
+              "Spanish",
+              "French",
+              "Portuguese",
+              "German",
+              "Turkish",
+              "Dutch",
+              "Ukrainian",
+              "Vietnamese",
+              "Indonesian",
+              "Japanese",
+              "Italian",
+              "Korean",
+              "Thai",
+              "Polish",
+              "Romanian",
+              "Greek",
+              "Czech",
+              "Finnish",
+              "Hindi",
+              "Bulgarian",
+              "Danish",
+              "Hebrew",
+              "Malay",
+              "Slovak",
+              "Swedish",
+              "Croatian",
+              "Hungarian",
+              "Norwegian",
+              "Slovenian",
+              "Catalan",
+              "Nynorsk",
+              "Afrikaans",
+              "auto"
+            ],
+            "description": "Enhance recognition of specified languages and dialects",
+            "type": "string",
+            "title": "Language Boost"
+          },
+          "output_format": {
+            "enum": [
+              "url",
+              "hex"
+            ],
+            "description": "Format of the output content (non-streaming only)",
+            "type": "string",
+            "title": "Output Format",
+            "default": "hex"
+          },
+          "pronunciation_dict": {
+            "description": "Custom pronunciation dictionary for text replacement",
+            "title": "Pronunciation Dict",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech26Hd_PronunciationDict"
+              }
+            ]
+          },
+          "voice_setting": {
+            "default": {
+              "speed": 1,
+              "vol": 1,
+              "voice_id": "Wise_Woman",
+              "pitch": 0,
+              "english_normalization": false
+            },
+            "description": "Voice configuration settings",
+            "title": "Voice Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech26Hd_VoiceSetting"
+              }
+            ]
+          },
+          "normalization_setting": {
+            "description": "Loudness normalization settings for the audio",
+            "title": "Normalization Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech26Hd_LoudnessNormalizationSetting"
+              }
+            ]
+          },
+          "audio_setting": {
+            "description": "Audio configuration settings",
+            "title": "Audio Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech26Hd_AudioSetting"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "voice_setting",
+          "audio_setting",
+          "language_boost",
+          "output_format",
+          "pronunciation_dict",
+          "prompt",
+          "normalization_setting"
+        ],
+        "required": [
+          "prompt"
+        ]
+      },
+      "MinimaxSpeech26HdOutput": {
+        "title": "TextToSpeechHD26Output",
+        "type": "object",
+        "properties": {
+          "duration_ms": {
+            "description": "Duration of the audio in milliseconds",
+            "type": "integer",
+            "title": "Duration Ms"
+          },
+          "audio": {
+            "examples": [
+              {
+                "url": "https://storage.googleapis.com/falserverless/example_outputs/minimax-speech-26/speech_26_hd_out.mp3"
+              }
+            ],
+            "description": "The generated audio file",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech26Hd_File"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "audio",
+          "duration_ms"
+        ],
+        "required": [
+          "audio",
+          "duration_ms"
+        ]
+      },
+      "FalAiMinimaxSpeech26Hd_PronunciationDict": {
+        "title": "PronunciationDict",
+        "type": "object",
+        "properties": {
+          "tone_list": {
+            "description": "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+            "type": "array",
+            "title": "Tone List",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "x-fal-order-properties": [
+          "tone_list"
+        ]
+      },
+      "FalAiMinimaxSpeech26Hd_VoiceSetting": {
+        "title": "VoiceSetting",
+        "type": "object",
+        "properties": {
+          "speed": {
+            "minimum": 0.5,
+            "description": "Speech speed (0.5-2.0)",
+            "type": "number",
+            "maximum": 2,
+            "title": "Speed",
+            "default": 1
+          },
+          "vol": {
+            "minimum": 0.01,
+            "description": "Volume (0-10)",
+            "type": "number",
+            "maximum": 10,
+            "title": "Vol",
+            "default": 1
+          },
+          "voice_id": {
+            "examples": [
+              "Wise_Woman",
+              "Friendly_Person",
+              "Inspirational_girl",
+              "Deep_Voice_Man",
+              "Calm_Woman",
+              "Casual_Guy",
+              "Lively_Girl",
+              "Patient_Man",
+              "Young_Knight",
+              "Determined_Man",
+              "Lovely_Girl",
+              "Decent_Boy",
+              "Imposing_Manner",
+              "Elegant_Man",
+              "Abbess",
+              "Sweet_Girl_2",
+              "Exuberant_Girl"
+            ],
+            "description": "Predefined voice ID to use for synthesis",
+            "type": "string",
+            "title": "Voice Id",
+            "default": "Wise_Woman"
+          },
+          "pitch": {
+            "minimum": -12,
+            "description": "Voice pitch (-12 to 12)",
+            "type": "integer",
+            "maximum": 12,
+            "title": "Pitch",
+            "default": 0
+          },
+          "english_normalization": {
+            "description": "Enables English text normalization to improve number reading performance, with a slight increase in latency",
+            "type": "boolean",
+            "title": "English Normalization",
+            "default": false
+          },
+          "emotion": {
+            "enum": [
+              "happy",
+              "sad",
+              "angry",
+              "fearful",
+              "disgusted",
+              "surprised",
+              "neutral"
+            ],
+            "description": "Emotion of the generated speech",
+            "type": "string",
+            "title": "Emotion"
+          }
+        },
+        "x-fal-order-properties": [
+          "voice_id",
+          "speed",
+          "vol",
+          "pitch",
+          "emotion",
+          "english_normalization"
+        ]
+      },
+      "FalAiMinimaxSpeech26Hd_LoudnessNormalizationSetting": {
+        "title": "LoudnessNormalizationSetting",
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "description": "Enable loudness normalization for the audio",
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          },
+          "target_loudness": {
+            "minimum": -70,
+            "description": "Target loudness in LUFS (default -18.0)",
+            "type": "number",
+            "maximum": -10,
+            "title": "Target Loudness",
+            "default": -18
+          },
+          "target_range": {
+            "minimum": 0,
+            "description": "Target loudness range in LU (default 8.0)",
+            "type": "number",
+            "maximum": 20,
+            "title": "Target Range",
+            "default": 8
+          },
+          "target_peak": {
+            "minimum": -3,
+            "description": "Target peak level in dBTP (default -0.5).",
+            "type": "number",
+            "maximum": 0,
+            "title": "Target Peak",
+            "default": -0.5
+          }
+        },
+        "x-fal-order-properties": [
+          "enabled",
+          "target_loudness",
+          "target_range",
+          "target_peak"
+        ]
+      },
+      "FalAiMinimaxSpeech26Hd_AudioSetting": {
+        "title": "AudioSetting",
+        "type": "object",
+        "properties": {
+          "format": {
+            "enum": [
+              "mp3",
+              "pcm",
+              "flac"
+            ],
+            "description": "Audio format",
+            "type": "string",
+            "title": "Format",
+            "default": "mp3"
+          },
+          "sample_rate": {
+            "enum": [
+              8000,
+              16000,
+              22050,
+              24000,
+              32000,
+              44100
+            ],
+            "description": "Sample rate of generated audio",
+            "type": "integer",
+            "title": "Sample Rate",
+            "default": 32000
+          },
+          "channel": {
+            "enum": [
+              1,
+              2
+            ],
+            "description": "Number of audio channels (1=mono, 2=stereo)",
+            "type": "integer",
+            "title": "Channel",
+            "default": 1
+          },
+          "bitrate": {
+            "enum": [
+              32000,
+              64000,
+              128000,
+              256000
+            ],
+            "description": "Bitrate of generated audio",
+            "type": "integer",
+            "title": "Bitrate",
+            "default": 128000
+          }
+        },
+        "x-fal-order-properties": [
+          "sample_rate",
+          "bitrate",
+          "format",
+          "channel"
+        ]
+      },
+      "FalAiMinimaxSpeech26Hd_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "required": [
+          "url"
+        ]
+      },
+      "IndexTts2TextToSpeechInput": {
+        "x-fal-order-properties": [
+          "audio_url",
+          "prompt",
+          "emotional_audio_url",
+          "strength",
+          "emotional_strengths",
+          "should_use_prompt_for_emotion",
+          "emotion_prompt"
+        ],
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "examples": [
+              "Hide! He's coming! He's coming to get us!"
+            ],
+            "description": "The speech prompt to generate",
+            "type": "string",
+            "title": "Prompt"
+          },
+          "emotional_strengths": {
+            "examples": [
+              null
+            ],
+            "description": "The strengths of individual emotions for fine-grained control. ",
+            "title": "Emotional Strengths",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EmotionalStrengths"
+              }
+            ]
+          },
+          "strength": {
+            "minimum": 0,
+            "description": "The strength of the emotional style transfer. Higher values result in stronger emotional influence.",
+            "type": "number",
+            "maximum": 1,
+            "title": "Strength",
+            "default": 1
+          },
+          "emotional_audio_url": {
+            "description": "The emotional reference audio file to extract the style from.",
+            "type": "string",
+            "title": "Emotional Audio Url"
+          },
+          "audio_url": {
+            "examples": [
+              "https://storage.googleapis.com/falserverless/example_inputs/index-tts-2/tts_in.mp3"
+            ],
+            "description": "The audio file to generate the speech from.",
+            "type": "string",
+            "title": "Audio Url"
+          },
+          "emotion_prompt": {
+            "examples": [
+              "You scared me to death! What are you, a ghost?"
+            ],
+            "description": "The emotional prompt to influence the emotional style. Must be used together with should_use_prompt_for_emotion.",
+            "type": "string",
+            "title": "Emotion Prompt"
+          },
+          "should_use_prompt_for_emotion": {
+            "examples": [
+              true
+            ],
+            "description": "Whether to use the `prompt` to calculate emotional strengths, if enabled it will overwrite the `emotional_strengths` values. If `emotion_prompt` is provided, it will be used to instead of `prompt` to extract the emotional style.",
+            "type": "boolean",
+            "title": "Should Use Prompt For Emotion",
+            "default": false
+          }
+        },
+        "title": "IndexTTS2Input",
+        "required": [
+          "audio_url",
+          "prompt"
+        ]
+      },
+      "IndexTts2TextToSpeechOutput": {
+        "x-fal-order-properties": [
+          "audio"
+        ],
+        "type": "object",
+        "properties": {
+          "audio": {
+            "examples": [
+              "https://storage.googleapis.com/falserverless/example_outputs/index-tts-2/tts_out.mp3"
+            ],
+            "description": "The generated audio file in base64 format.",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiIndexTts2TextToSpeech_File"
+              }
+            ]
+          }
+        },
+        "title": "IndexTTS2Output",
+        "required": [
+          "audio"
+        ]
+      },
+      "EmotionalStrengths": {
+        "x-fal-order-properties": [
+          "happy",
+          "angry",
+          "sad",
+          "afraid",
+          "disgusted",
+          "melancholic",
+          "surprised",
+          "calm"
+        ],
+        "type": "object",
+        "properties": {
+          "afraid": {
+            "minimum": 0,
+            "description": "Strength of fear emotion",
+            "type": "number",
+            "maximum": 1,
+            "title": "Afraid",
+            "default": 0
+          },
+          "calm": {
+            "minimum": 0,
+            "description": "Strength of calm emotion",
+            "type": "number",
+            "maximum": 1,
+            "title": "Calm",
+            "default": 0
+          },
+          "disgusted": {
+            "minimum": 0,
+            "description": "Strength of disgust emotion",
+            "type": "number",
+            "maximum": 1,
+            "title": "Disgusted",
+            "default": 0
+          },
+          "angry": {
+            "minimum": 0,
+            "description": "Strength of anger emotion",
+            "type": "number",
+            "maximum": 1,
+            "title": "Angry",
+            "default": 0
+          },
+          "sad": {
+            "minimum": 0,
+            "description": "Strength of sadness emotion",
+            "type": "number",
+            "maximum": 1,
+            "title": "Sad",
+            "default": 0
+          },
+          "melancholic": {
+            "minimum": 0,
+            "description": "Strength of melancholic emotion",
+            "type": "number",
+            "maximum": 1,
+            "title": "Melancholic",
+            "default": 0
+          },
+          "surprised": {
+            "minimum": 0,
+            "description": "Strength of surprise emotion",
+            "type": "number",
+            "maximum": 1,
+            "title": "Surprised",
+            "default": 0
+          },
+          "happy": {
+            "minimum": 0,
+            "description": "Strength of happiness emotion",
+            "type": "number",
+            "maximum": 1,
+            "title": "Happy",
+            "default": 0
+          }
+        },
+        "title": "EmotionalStrengths"
+      },
+      "FalAiIndexTts2TextToSpeech_File": {
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "title": "File",
+        "required": [
+          "url"
+        ]
+      },
+      "KlingVideoV1TtsInput": {
+        "title": "TTSInput",
+        "type": "object",
+        "properties": {
+          "text": {
+            "examples": [
+              "Hello world! Kling TTS is available on FAL!"
+            ],
+            "description": "The text to be converted to speech",
+            "type": "string",
+            "title": "Text",
+            "maxLength": 500
+          },
+          "voice_id": {
+            "enum": [
+              "genshin_vindi2",
+              "zhinen_xuesheng",
+              "AOT",
+              "ai_shatang",
+              "genshin_klee2",
+              "genshin_kirara",
+              "ai_kaiya",
+              "oversea_male1",
+              "ai_chenjiahao_712",
+              "girlfriend_4_speech02",
+              "chat1_female_new-3",
+              "chat_0407_5-1",
+              "cartoon-boy-07",
+              "uk_boy1",
+              "cartoon-girl-01",
+              "PeppaPig_platform",
+              "ai_huangzhong_712",
+              "ai_huangyaoshi_712",
+              "ai_laoguowang_712",
+              "chengshu_jiejie",
+              "you_pingjing",
+              "calm_story1",
+              "uk_man2",
+              "laopopo_speech02",
+              "heainainai_speech02",
+              "reader_en_m-v1",
+              "commercial_lady_en_f-v1",
+              "tiyuxi_xuedi",
+              "tiexin_nanyou",
+              "girlfriend_1_speech02",
+              "girlfriend_2_speech02",
+              "zhuxi_speech02",
+              "uk_oldman3",
+              "dongbeilaotie_speech02",
+              "chongqingxiaohuo_speech02",
+              "chuanmeizi_speech02",
+              "chaoshandashu_speech02",
+              "ai_taiwan_man2_speech02",
+              "xianzhanggui_speech02",
+              "tianjinjiejie_speech02",
+              "diyinnansang_DB_CN_M_04-v2",
+              "yizhipiannan-v1",
+              "guanxiaofang-v2",
+              "tianmeixuemei-v1",
+              "daopianyansang-v1",
+              "mengwa-v1"
+            ],
+            "title": "Voice Id",
+            "type": "string",
+            "description": "The voice ID to use for speech synthesis",
+            "default": "genshin_vindi2"
+          },
+          "voice_speed": {
+            "minimum": 0.8,
+            "description": "Rate of speech",
+            "type": "number",
+            "maximum": 2,
+            "title": "Voice Speed",
+            "default": 1
+          }
+        },
+        "x-fal-order-properties": [
+          "text",
+          "voice_id",
+          "voice_speed"
+        ],
+        "required": [
+          "text"
+        ]
+      },
+      "KlingVideoV1TtsOutput": {
+        "title": "TTSOutput",
+        "type": "object",
+        "properties": {
+          "audio": {
+            "examples": [
+              {
+                "url": "https://v3.fal.media/files/monkey/O-ekVTtYqeDblD1oSf2uv_output.mp3"
+              }
+            ],
+            "description": "The generated audio",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiKlingVideoV1Tts_File"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "audio"
+        ],
+        "required": [
+          "audio"
+        ]
+      },
+      "FalAiKlingVideoV1Tts_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "required": [
+          "url"
+        ]
+      },
+      "ChatterboxTextToSpeechMultilingualInput": {
+        "title": "ChatterboxMultilingualRequest",
+        "type": "object",
+        "properties": {
+          "text": {
+            "examples": [
+              "Last month, we reached a new milestone with two billion views on our YouTube channel.",
+              "Le mois dernier, nous avons atteint un nouveau jalon avec deux milliards de vues sur notre chaîne YouTube."
+            ],
+            "maxLength": 300,
+            "type": "string",
+            "description": "The text to be converted to speech (maximum 300 characters). Supports 23 languages including English, French, German, Spanish, Italian, Portuguese, Hindi, Arabic, Chinese, Japanese, Korean, and more.",
+            "title": "Text"
+          },
+          "custom_audio_language": {
+            "enum": [
+              "english",
+              "arabic",
+              "danish",
+              "german",
+              "greek",
+              "spanish",
+              "finnish",
+              "french",
+              "hebrew",
+              "hindi",
+              "italian",
+              "japanese",
+              "korean",
+              "malay",
+              "dutch",
+              "norwegian",
+              "polish",
+              "portuguese",
+              "russian",
+              "swedish",
+              "swahili",
+              "turkish",
+              "chinese"
+            ],
+            "description": "If using a custom audio URL, specify the language of the audio here. Ignored if voice is not a custom url.",
+            "type": "string",
+            "title": "Custom Audio Language"
+          },
+          "exaggeration": {
+            "minimum": 0.25,
+            "maximum": 2,
+            "type": "number",
+            "description": "Controls speech expressiveness and emotional intensity (0.25-2.0). 0.5 is neutral, higher values increase expressiveness. Extreme values may be unstable.",
+            "title": "Exaggeration",
+            "default": 0.5
+          },
+          "voice": {
+            "examples": [
+              "english",
+              "arabic",
+              "danish",
+              "german",
+              "greek",
+              "spanish",
+              "finnish",
+              "french",
+              "hebrew",
+              "hindi",
+              "italian",
+              "japanese",
+              "korean",
+              "malay",
+              "dutch",
+              "norwegian",
+              "polish",
+              "portuguese",
+              "russian",
+              "swedish",
+              "swahili",
+              "turkish",
+              "chinese"
+            ],
+            "description": "Language code for synthesis. In case using custom please provide audio url and select custom_audio_language. ",
+            "type": "string",
+            "title": "Voice",
+            "default": "english"
+          },
+          "temperature": {
+            "minimum": 0.05,
+            "maximum": 5,
+            "type": "number",
+            "description": "Controls randomness and variation in generation (0.05-5.0). Higher values create more varied speech patterns.",
+            "title": "Temperature",
+            "default": 0.8
+          },
+          "seed": {
+            "description": "Random seed for reproducible results. Set to 0 for random generation, or provide a specific number for consistent outputs.",
+            "type": "integer",
+            "title": "Seed"
+          },
+          "cfg_scale": {
+            "minimum": 0,
+            "maximum": 1,
+            "type": "number",
+            "description": "Configuration/pace weight controlling generation guidance (0.0-1.0). Use 0.0 for language transfer to mitigate accent inheritance.",
+            "title": "CFG Scale",
+            "default": 0.5
+          }
+        },
+        "x-fal-order-properties": [
+          "text",
+          "voice",
+          "custom_audio_language",
+          "exaggeration",
+          "temperature",
+          "cfg_scale",
+          "seed"
+        ],
+        "required": [
+          "text"
+        ]
+      },
+      "ChatterboxTextToSpeechMultilingualOutput": {
+        "title": "ChatterboxMultilingualOutput",
+        "type": "object",
+        "properties": {
+          "audio": {
+            "examples": [
+              {
+                "url": "https://v3.fal.media/files/example/multilingual_speech_output.wav"
+              }
+            ],
+            "description": "The generated multilingual speech audio file",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiChatterboxTextToSpeechMultilingual_File"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "audio"
+        ],
+        "required": [
+          "audio"
+        ]
+      },
+      "FalAiChatterboxTextToSpeechMultilingual_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "required": [
+          "url"
+        ]
+      },
+      "Vibevoice7bInput": {
+        "x-fal-order-properties": [
+          "script",
+          "speakers",
+          "seed",
+          "cfg_scale"
+        ],
+        "type": "object",
+        "properties": {
+          "script": {
+            "examples": [
+              "Speaker 0: VibeVoice is now available on Fal. Isn't that right, Carter?\nSpeaker 1: That's right Frank, and it supports up to four speakers at once. Try it now!"
+            ],
+            "maxLength": 30000,
+            "type": "string",
+            "description": "The script to convert to speech. Can be formatted with 'Speaker X:' prefixes for multi-speaker dialogues.",
+            "title": "Script"
+          },
+          "seed": {
+            "description": "Random seed for reproducible generation.",
+            "type": "integer",
+            "title": "Seed"
+          },
+          "speakers": {
+            "examples": [
+              [
+                {
+                  "preset": "Frank [EN]"
+                },
+                {
+                  "preset": "Carter [EN]"
+                }
+              ]
+            ],
+            "description": "List of speakers to use for the script. If not provided, will be inferred from the script or voice samples.",
+            "type": "array",
+            "title": "Speakers",
+            "items": {
+              "$ref": "#/components/schemas/VibeVoiceSpeaker"
+            }
+          },
+          "cfg_scale": {
+            "minimum": 1,
+            "maximum": 2,
+            "type": "number",
+            "title": "CFG Scale",
+            "description": "CFG (Classifier-Free Guidance) scale for generation. Higher values increase adherence to text.",
+            "default": 1.3
+          }
+        },
+        "description": "Input schema for VibeVoice-7b TTS generation",
+        "title": "VibeVoice7bInput",
+        "required": [
+          "script",
+          "speakers"
+        ]
+      },
+      "Vibevoice7bOutput": {
+        "x-fal-order-properties": [
+          "audio",
+          "duration",
+          "sample_rate",
+          "generation_time",
+          "rtf"
+        ],
+        "type": "object",
+        "properties": {
+          "duration": {
+            "examples": [
+              9.46
+            ],
+            "description": "Duration of the generated audio in seconds",
+            "type": "number",
+            "title": "Duration"
+          },
+          "rtf": {
+            "examples": [
+              0.53
+            ],
+            "description": "Real-time factor (generation_time / audio_duration). Lower is better.",
+            "type": "number",
+            "title": "Rtf"
+          },
+          "sample_rate": {
+            "examples": [
+              24000
+            ],
+            "description": "Sample rate of the generated audio",
+            "type": "integer",
+            "title": "Sample Rate"
+          },
+          "generation_time": {
+            "examples": [
+              5.6
+            ],
+            "description": "Time taken to generate the audio in seconds",
+            "type": "number",
+            "title": "Generation Time"
+          },
+          "audio": {
+            "examples": [
+              {
+                "url": "https://storage.googleapis.com/falserverless/example_outputs/vibevoice.mp3"
+              }
+            ],
+            "description": "The generated audio file containing the speech",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiVibevoice7b_File"
+              }
+            ]
+          }
+        },
+        "description": "Output schema for VibeVoice TTS generation",
+        "title": "VibeVoiceOutput",
+        "required": [
+          "audio",
+          "duration",
+          "sample_rate",
+          "generation_time",
+          "rtf"
+        ]
+      },
+      "VibeVoiceSpeaker": {
+        "x-fal-order-properties": [
+          "preset",
+          "audio_url"
+        ],
+        "type": "object",
+        "properties": {
+          "preset": {
+            "examples": [
+              "Alice [EN]"
+            ],
+            "title": "Preset",
+            "type": "string",
+            "enum": [
+              "Alice [EN]",
+              "Carter [EN]",
+              "Frank [EN]",
+              "Mary [EN] (Background Music)",
+              "Maya [EN]",
+              "Anchen [ZH] (Background Music)",
+              "Bowen [ZH]",
+              "Xinran [ZH]"
+            ],
+            "description": "Default voice preset to use for the speaker. Not used if `audio_url` is provided.",
+            "default": "Alice [EN]"
+          },
+          "audio_url": {
+            "description": "URL to a voice sample audio file. If provided, `preset` will be ignored.",
+            "type": "string",
+            "title": "Audio URL"
+          }
+        },
+        "title": "VibeVoiceSpeaker"
+      },
+      "FalAiVibevoice7b_File": {
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "title": "File",
+        "required": [
+          "url"
+        ]
+      },
+      "VibevoiceInput": {
+        "x-fal-order-properties": [
+          "script",
+          "speakers",
+          "seed",
+          "cfg_scale"
+        ],
+        "type": "object",
+        "properties": {
+          "script": {
+            "examples": [
+              "Speaker 0: VibeVoice is now available on Fal. Isn't that right, Carter?\nSpeaker 1: That's right Frank, and it supports up to four speakers at once. Try it now!"
+            ],
+            "maxLength": 90000,
+            "type": "string",
+            "description": "The script to convert to speech. Can be formatted with 'Speaker X:' prefixes for multi-speaker dialogues.",
+            "title": "Script"
+          },
+          "seed": {
+            "description": "Random seed for reproducible generation.",
+            "type": "integer",
+            "title": "Seed"
+          },
+          "speakers": {
+            "examples": [
+              [
+                {
+                  "preset": "Frank [EN]"
+                },
+                {
+                  "preset": "Carter [EN]"
+                }
+              ]
+            ],
+            "description": "List of speakers to use for the script. If not provided, will be inferred from the script or voice samples.",
+            "type": "array",
+            "title": "Speakers",
+            "items": {
+              "$ref": "#/components/schemas/FalAiVibevoice_VibeVoiceSpeaker"
+            }
+          },
+          "cfg_scale": {
+            "minimum": 1,
+            "maximum": 2,
+            "type": "number",
+            "title": "CFG Scale",
+            "description": "CFG (Classifier-Free Guidance) scale for generation. Higher values increase adherence to text.",
+            "default": 1.3
+          }
+        },
+        "description": "Input schema for VibeVoice TTS generation",
+        "title": "VibeVoiceInput",
+        "required": [
+          "script",
+          "speakers"
+        ]
+      },
+      "VibevoiceOutput": {
+        "x-fal-order-properties": [
+          "audio",
+          "duration",
+          "sample_rate",
+          "generation_time",
+          "rtf"
+        ],
+        "type": "object",
+        "properties": {
+          "duration": {
+            "examples": [
+              9.46
+            ],
+            "description": "Duration of the generated audio in seconds",
+            "type": "number",
+            "title": "Duration"
+          },
+          "rtf": {
+            "examples": [
+              0.53
+            ],
+            "description": "Real-time factor (generation_time / audio_duration). Lower is better.",
+            "type": "number",
+            "title": "Rtf"
+          },
+          "sample_rate": {
+            "examples": [
+              24000
+            ],
+            "description": "Sample rate of the generated audio",
+            "type": "integer",
+            "title": "Sample Rate"
+          },
+          "generation_time": {
+            "examples": [
+              5.6
+            ],
+            "description": "Time taken to generate the audio in seconds",
+            "type": "number",
+            "title": "Generation Time"
+          },
+          "audio": {
+            "examples": [
+              {
+                "url": "https://storage.googleapis.com/falserverless/example_outputs/vibevoice.mp3"
+              }
+            ],
+            "description": "The generated audio file containing the speech",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiVibevoice_File"
+              }
+            ]
+          }
+        },
+        "description": "Output schema for VibeVoice TTS generation",
+        "title": "VibeVoiceOutput",
+        "required": [
+          "audio",
+          "duration",
+          "sample_rate",
+          "generation_time",
+          "rtf"
+        ]
+      },
+      "FalAiVibevoice_VibeVoiceSpeaker": {
+        "x-fal-order-properties": [
+          "preset",
+          "audio_url"
+        ],
+        "type": "object",
+        "properties": {
+          "preset": {
+            "examples": [
+              "Alice [EN]"
+            ],
+            "title": "Preset",
+            "type": "string",
+            "enum": [
+              "Alice [EN]",
+              "Carter [EN]",
+              "Frank [EN]",
+              "Mary [EN] (Background Music)",
+              "Maya [EN]",
+              "Anchen [ZH] (Background Music)",
+              "Bowen [ZH]",
+              "Xinran [ZH]"
+            ],
+            "description": "Default voice preset to use for the speaker. Not used if `audio_url` is provided.",
+            "default": "Alice [EN]"
+          },
+          "audio_url": {
+            "description": "URL to a voice sample audio file. If provided, `preset` will be ignored.",
+            "type": "string",
+            "title": "Audio URL"
+          }
+        },
+        "title": "VibeVoiceSpeaker"
+      },
+      "FalAiVibevoice_File": {
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "title": "File",
+        "required": [
+          "url"
+        ]
+      },
+      "MinimaxPreviewSpeech25HdInput": {
+        "title": "TextToSpeechHDv25Request",
+        "type": "object",
+        "properties": {
+          "text": {
+            "examples": [
+              "Hello world! This is a test of the text-to-speech system."
+            ],
+            "maxLength": 5000,
+            "type": "string",
+            "title": "Text",
+            "description": "Text to convert to speech (max 5000 characters, minimum 1 non-whitespace character)",
+            "minLength": 1
+          },
+          "language_boost": {
+            "enum": [
+              "Persian",
+              "Filipino",
+              "Tamil",
+              "Chinese",
+              "Chinese,Yue",
+              "English",
+              "Arabic",
+              "Russian",
+              "Spanish",
+              "French",
+              "Portuguese",
+              "German",
+              "Turkish",
+              "Dutch",
+              "Ukrainian",
+              "Vietnamese",
+              "Indonesian",
+              "Japanese",
+              "Italian",
+              "Korean",
+              "Thai",
+              "Polish",
+              "Romanian",
+              "Greek",
+              "Czech",
+              "Finnish",
+              "Hindi",
+              "Bulgarian",
+              "Danish",
+              "Hebrew",
+              "Malay",
+              "Slovak",
+              "Swedish",
+              "Croatian",
+              "Hungarian",
+              "Norwegian",
+              "Slovenian",
+              "Catalan",
+              "Nynorsk",
+              "Afrikaans",
+              "auto"
+            ],
+            "description": "Enhance recognition of specified languages and dialects",
+            "type": "string",
+            "title": "Language Boost"
+          },
+          "voice_setting": {
+            "default": {
+              "speed": 1,
+              "vol": 1,
+              "voice_id": "Wise_Woman",
+              "pitch": 0,
+              "english_normalization": false
+            },
+            "description": "Voice configuration settings",
+            "title": "Voice Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxPreviewSpeech25Hd_VoiceSetting"
+              }
+            ]
+          },
+          "output_format": {
+            "enum": [
+              "url",
+              "hex"
+            ],
+            "description": "Format of the output content (non-streaming only)",
+            "type": "string",
+            "title": "Output Format",
+            "default": "hex"
+          },
+          "pronunciation_dict": {
+            "description": "Custom pronunciation dictionary for text replacement",
+            "title": "Pronunciation Dict",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxPreviewSpeech25Hd_PronunciationDict"
+              }
+            ]
+          },
+          "audio_setting": {
+            "description": "Audio configuration settings",
+            "title": "Audio Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxPreviewSpeech25Hd_AudioSetting"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "text",
+          "voice_setting",
+          "audio_setting",
+          "language_boost",
+          "output_format",
+          "pronunciation_dict"
+        ],
+        "required": [
+          "text"
+        ]
+      },
+      "MinimaxPreviewSpeech25HdOutput": {
+        "title": "TextToSpeechOutput",
+        "type": "object",
+        "properties": {
+          "duration_ms": {
+            "description": "Duration of the audio in milliseconds",
+            "type": "integer",
+            "title": "Duration Ms"
+          },
+          "audio": {
+            "examples": [
+              {
+                "url": "https://fal.media/files/kangaroo/kojPUCNZ9iUGFGMR-xb7h_speech.mp3"
+              }
+            ],
+            "description": "The generated audio file",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxPreviewSpeech25Hd_File"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "audio",
+          "duration_ms"
+        ],
+        "required": [
+          "audio",
+          "duration_ms"
+        ]
+      },
+      "FalAiMinimaxPreviewSpeech25Hd_VoiceSetting": {
+        "title": "VoiceSetting",
+        "type": "object",
+        "properties": {
+          "speed": {
+            "minimum": 0.5,
+            "description": "Speech speed (0.5-2.0)",
+            "type": "number",
+            "maximum": 2,
+            "title": "Speed",
+            "default": 1
+          },
+          "vol": {
+            "minimum": 0.01,
+            "description": "Volume (0-10)",
+            "type": "number",
+            "maximum": 10,
+            "title": "Vol",
+            "default": 1
+          },
+          "voice_id": {
+            "examples": [
+              "Wise_Woman",
+              "Friendly_Person",
+              "Inspirational_girl",
+              "Deep_Voice_Man",
+              "Calm_Woman",
+              "Casual_Guy",
+              "Lively_Girl",
+              "Patient_Man",
+              "Young_Knight",
+              "Determined_Man",
+              "Lovely_Girl",
+              "Decent_Boy",
+              "Imposing_Manner",
+              "Elegant_Man",
+              "Abbess",
+              "Sweet_Girl_2",
+              "Exuberant_Girl"
+            ],
+            "description": "Predefined voice ID to use for synthesis",
+            "type": "string",
+            "title": "Voice Id",
+            "default": "Wise_Woman"
+          },
+          "pitch": {
+            "minimum": -12,
+            "description": "Voice pitch (-12 to 12)",
+            "type": "integer",
+            "maximum": 12,
+            "title": "Pitch",
+            "default": 0
+          },
+          "english_normalization": {
+            "description": "Enables English text normalization to improve number reading performance, with a slight increase in latency",
+            "type": "boolean",
+            "title": "English Normalization",
+            "default": false
+          },
+          "emotion": {
+            "enum": [
+              "happy",
+              "sad",
+              "angry",
+              "fearful",
+              "disgusted",
+              "surprised",
+              "neutral"
+            ],
+            "description": "Emotion of the generated speech",
+            "type": "string",
+            "title": "Emotion"
+          }
+        },
+        "x-fal-order-properties": [
+          "voice_id",
+          "speed",
+          "vol",
+          "pitch",
+          "emotion",
+          "english_normalization"
+        ]
+      },
+      "FalAiMinimaxPreviewSpeech25Hd_PronunciationDict": {
+        "title": "PronunciationDict",
+        "type": "object",
+        "properties": {
+          "tone_list": {
+            "description": "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+            "type": "array",
+            "title": "Tone List",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "x-fal-order-properties": [
+          "tone_list"
+        ]
+      },
+      "FalAiMinimaxPreviewSpeech25Hd_AudioSetting": {
+        "title": "AudioSetting",
+        "type": "object",
+        "properties": {
+          "format": {
+            "enum": [
+              "mp3",
+              "pcm",
+              "flac"
+            ],
+            "description": "Audio format",
+            "type": "string",
+            "title": "Format",
+            "default": "mp3"
+          },
+          "sample_rate": {
+            "enum": [
+              8000,
+              16000,
+              22050,
+              24000,
+              32000,
+              44100
+            ],
+            "description": "Sample rate of generated audio",
+            "type": "integer",
+            "title": "Sample Rate",
+            "default": 32000
+          },
+          "channel": {
+            "enum": [
+              1,
+              2
+            ],
+            "description": "Number of audio channels (1=mono, 2=stereo)",
+            "type": "integer",
+            "title": "Channel",
+            "default": 1
+          },
+          "bitrate": {
+            "enum": [
+              32000,
+              64000,
+              128000,
+              256000
+            ],
+            "description": "Bitrate of generated audio",
+            "type": "integer",
+            "title": "Bitrate",
+            "default": 128000
+          }
+        },
+        "x-fal-order-properties": [
+          "sample_rate",
+          "bitrate",
+          "format",
+          "channel"
+        ]
+      },
+      "FalAiMinimaxPreviewSpeech25Hd_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "required": [
+          "url"
+        ]
+      },
+      "MinimaxPreviewSpeech25TurboInput": {
+        "title": "TextToSpeechTurbov25Request",
+        "type": "object",
+        "properties": {
+          "text": {
+            "examples": [
+              "Hello world! This is a test of the text-to-speech system."
+            ],
+            "maxLength": 5000,
+            "type": "string",
+            "title": "Text",
+            "description": "Text to convert to speech (max 5000 characters, minimum 1 non-whitespace character)",
+            "minLength": 1
+          },
+          "language_boost": {
+            "enum": [
+              "Persian",
+              "Filipino",
+              "Tamil",
+              "Chinese",
+              "Chinese,Yue",
+              "English",
+              "Arabic",
+              "Russian",
+              "Spanish",
+              "French",
+              "Portuguese",
+              "German",
+              "Turkish",
+              "Dutch",
+              "Ukrainian",
+              "Vietnamese",
+              "Indonesian",
+              "Japanese",
+              "Italian",
+              "Korean",
+              "Thai",
+              "Polish",
+              "Romanian",
+              "Greek",
+              "Czech",
+              "Finnish",
+              "Hindi",
+              "Bulgarian",
+              "Danish",
+              "Hebrew",
+              "Malay",
+              "Slovak",
+              "Swedish",
+              "Croatian",
+              "Hungarian",
+              "Norwegian",
+              "Slovenian",
+              "Catalan",
+              "Nynorsk",
+              "Afrikaans",
+              "auto"
+            ],
+            "description": "Enhance recognition of specified languages and dialects",
+            "type": "string",
+            "title": "Language Boost"
+          },
+          "voice_setting": {
+            "default": {
+              "speed": 1,
+              "vol": 1,
+              "voice_id": "Wise_Woman",
+              "pitch": 0,
+              "english_normalization": false
+            },
+            "description": "Voice configuration settings",
+            "title": "Voice Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxPreviewSpeech25Turbo_VoiceSetting"
+              }
+            ]
+          },
+          "output_format": {
+            "enum": [
+              "url",
+              "hex"
+            ],
+            "description": "Format of the output content (non-streaming only)",
+            "type": "string",
+            "title": "Output Format",
+            "default": "hex"
+          },
+          "pronunciation_dict": {
+            "description": "Custom pronunciation dictionary for text replacement",
+            "title": "Pronunciation Dict",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxPreviewSpeech25Turbo_PronunciationDict"
+              }
+            ]
+          },
+          "audio_setting": {
+            "description": "Audio configuration settings",
+            "title": "Audio Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxPreviewSpeech25Turbo_AudioSetting"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "text",
+          "voice_setting",
+          "audio_setting",
+          "language_boost",
+          "output_format",
+          "pronunciation_dict"
+        ],
+        "required": [
+          "text"
+        ]
+      },
+      "MinimaxPreviewSpeech25TurboOutput": {
+        "title": "TextToSpeechOutput",
+        "type": "object",
+        "properties": {
+          "duration_ms": {
+            "description": "Duration of the audio in milliseconds",
+            "type": "integer",
+            "title": "Duration Ms"
+          },
+          "audio": {
+            "examples": [
+              {
+                "url": "https://fal.media/files/kangaroo/kojPUCNZ9iUGFGMR-xb7h_speech.mp3"
+              }
+            ],
+            "description": "The generated audio file",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxPreviewSpeech25Turbo_File"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "audio",
+          "duration_ms"
+        ],
+        "required": [
+          "audio",
+          "duration_ms"
+        ]
+      },
+      "FalAiMinimaxPreviewSpeech25Turbo_VoiceSetting": {
+        "title": "VoiceSetting",
+        "type": "object",
+        "properties": {
+          "speed": {
+            "minimum": 0.5,
+            "description": "Speech speed (0.5-2.0)",
+            "type": "number",
+            "maximum": 2,
+            "title": "Speed",
+            "default": 1
+          },
+          "vol": {
+            "minimum": 0.01,
+            "description": "Volume (0-10)",
+            "type": "number",
+            "maximum": 10,
+            "title": "Vol",
+            "default": 1
+          },
+          "voice_id": {
+            "examples": [
+              "Wise_Woman",
+              "Friendly_Person",
+              "Inspirational_girl",
+              "Deep_Voice_Man",
+              "Calm_Woman",
+              "Casual_Guy",
+              "Lively_Girl",
+              "Patient_Man",
+              "Young_Knight",
+              "Determined_Man",
+              "Lovely_Girl",
+              "Decent_Boy",
+              "Imposing_Manner",
+              "Elegant_Man",
+              "Abbess",
+              "Sweet_Girl_2",
+              "Exuberant_Girl"
+            ],
+            "description": "Predefined voice ID to use for synthesis",
+            "type": "string",
+            "title": "Voice Id",
+            "default": "Wise_Woman"
+          },
+          "pitch": {
+            "minimum": -12,
+            "description": "Voice pitch (-12 to 12)",
+            "type": "integer",
+            "maximum": 12,
+            "title": "Pitch",
+            "default": 0
+          },
+          "english_normalization": {
+            "description": "Enables English text normalization to improve number reading performance, with a slight increase in latency",
+            "type": "boolean",
+            "title": "English Normalization",
+            "default": false
+          },
+          "emotion": {
+            "enum": [
+              "happy",
+              "sad",
+              "angry",
+              "fearful",
+              "disgusted",
+              "surprised",
+              "neutral"
+            ],
+            "description": "Emotion of the generated speech",
+            "type": "string",
+            "title": "Emotion"
+          }
+        },
+        "x-fal-order-properties": [
+          "voice_id",
+          "speed",
+          "vol",
+          "pitch",
+          "emotion",
+          "english_normalization"
+        ]
+      },
+      "FalAiMinimaxPreviewSpeech25Turbo_PronunciationDict": {
+        "title": "PronunciationDict",
+        "type": "object",
+        "properties": {
+          "tone_list": {
+            "description": "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+            "type": "array",
+            "title": "Tone List",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "x-fal-order-properties": [
+          "tone_list"
+        ]
+      },
+      "FalAiMinimaxPreviewSpeech25Turbo_AudioSetting": {
+        "title": "AudioSetting",
+        "type": "object",
+        "properties": {
+          "format": {
+            "enum": [
+              "mp3",
+              "pcm",
+              "flac"
+            ],
+            "description": "Audio format",
+            "type": "string",
+            "title": "Format",
+            "default": "mp3"
+          },
+          "sample_rate": {
+            "enum": [
+              8000,
+              16000,
+              22050,
+              24000,
+              32000,
+              44100
+            ],
+            "description": "Sample rate of generated audio",
+            "type": "integer",
+            "title": "Sample Rate",
+            "default": 32000
+          },
+          "channel": {
+            "enum": [
+              1,
+              2
+            ],
+            "description": "Number of audio channels (1=mono, 2=stereo)",
+            "type": "integer",
+            "title": "Channel",
+            "default": 1
+          },
+          "bitrate": {
+            "enum": [
+              32000,
+              64000,
+              128000,
+              256000
+            ],
+            "description": "Bitrate of generated audio",
+            "type": "integer",
+            "title": "Bitrate",
+            "default": 128000
+          }
+        },
+        "x-fal-order-properties": [
+          "sample_rate",
+          "bitrate",
+          "format",
+          "channel"
+        ]
+      },
+      "FalAiMinimaxPreviewSpeech25Turbo_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "required": [
+          "url"
+        ]
+      },
+      "MinimaxVoiceDesignInput": {
+        "title": "VoiceDesignRequest",
+        "type": "object",
+        "properties": {
+          "preview_text": {
+            "examples": [
+              "Oh my gosh, hi. It's like so amazing to be here. This new endpoint just dropped on fal and the results have been like totally incredible. Use it now, It's gonna be like epic!"
+            ],
+            "maxLength": 500,
+            "type": "string",
+            "title": "Preview Text",
+            "description": "Text for audio preview. Limited to 500 characters. A fee of $30 per 1M characters will be charged for the generation of the preview audio."
+          },
+          "prompt": {
+            "examples": [
+              "Bubbly and excitable female pop star interviewee, youthful, slightly breathless, and very enthusiastic"
+            ],
+            "maxLength": 2000,
+            "type": "string",
+            "title": "Prompt",
+            "description": "Voice description prompt for generating a personalized voice"
+          }
+        },
+        "x-fal-order-properties": [
+          "prompt",
+          "preview_text"
+        ],
+        "required": [
+          "prompt",
+          "preview_text"
+        ]
+      },
+      "MinimaxVoiceDesignOutput": {
+        "title": "VoiceDesignOutput",
+        "type": "object",
+        "properties": {
+          "custom_voice_id": {
+            "description": "The voice_id of the generated voice",
+            "type": "string",
+            "title": "Custom Voice Id"
+          },
+          "audio": {
+            "examples": [
+              {
+                "url": "https://v3.fal.media/files/kangaroo/gT22cxTqxgLtGMSDz2JSq_preview.mp3"
+              }
+            ],
+            "description": "The preview audio using the generated voice",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxVoiceDesign_File"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "custom_voice_id",
+          "audio"
+        ],
+        "required": [
+          "custom_voice_id",
+          "audio"
+        ]
+      },
+      "FalAiMinimaxVoiceDesign_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "required": [
+          "url"
+        ]
+      },
+      "ChatterboxhdTextToSpeechInput": {
+        "description": "Input parameters for the TTS request.",
+        "type": "object",
+        "properties": {
+          "text": {
+            "description": "Text to synthesize into speech.",
+            "type": "string",
+            "title": "Text",
+            "default": "My name is Maximus Decimus Meridius, commander of the Armies of the North, General of the Felix Legions and loyal servant to the true emperor, Marcus Aurelius. Father to a murdered son, husband to a murdered wife. And I will have my vengeance, in this life or the next."
+          },
+          "exaggeration": {
+            "description": "Controls emotion exaggeration. Range typically 0.25 to 2.0.",
+            "type": "number",
+            "minimum": 0.25,
+            "maximum": 2,
+            "title": "Exaggeration",
+            "default": 0.5
+          },
+          "high_quality_audio": {
+            "description": "If True, the generated audio will be upscaled to 48kHz. The generation of the audio will take longer, but the quality will be higher. If False, the generated audio will be 24kHz. ",
+            "type": "boolean",
+            "title": "High Quality Audio",
+            "default": false
+          },
+          "voice": {
+            "enum": [
+              "Aurora",
+              "Blade",
+              "Britney",
+              "Carl",
+              "Cliff",
+              "Richard",
+              "Rico",
+              "Siobhan",
+              "Vicky"
+            ],
+            "description": "The voice to use for the TTS request. If neither voice nor audio are provided, a random voice will be used.",
+            "type": "string",
+            "title": "Voice"
+          },
+          "audio_url": {
+            "examples": [
+              "https://storage.googleapis.com/chatterbox-demo-samples/prompts/male_rickmorty.mp3",
+              "https://storage.googleapis.com/chatterbox-demo-samples/prompts/male_old_movie.flac"
+            ],
+            "description": "URL to the audio sample to use as a voice prompt for zero-shot TTS voice cloning. Providing a audio sample will override the voice setting. If neither voice nor audio_url are provided, a random voice will be used.",
+            "type": "string",
+            "title": "Audio Url"
+          },
+          "temperature": {
+            "minimum": 0.05,
+            "maximum": 5,
+            "type": "number",
+            "description": "Controls the randomness of generation. Range typically 0.05 to 5.",
+            "title": "Temperature",
+            "default": 0.8
+          },
+          "seed": {
+            "minimum": 0,
+            "description": "Useful to control the reproducibility of the generated audio. Assuming all other properties didn't change, a fixed seed should always generate the exact same audio file. Set to 0 for random seed.",
+            "type": "integer",
+            "title": "Seed",
+            "default": 0
+          },
+          "cfg": {
+            "description": "Classifier-free guidance scale (CFG) controls the conditioning factor. Range typically 0.2 to 1.0. For expressive or dramatic speech, try lower cfg values (e.g. ~0.3) and increase exaggeration to around 0.7 or higher. If the reference speaker has a fast speaking style, lowering cfg to around 0.3 can improve pacing.",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "title": "Cfg",
+            "default": 0.5
+          }
+        },
+        "x-fal-order-properties": [
+          "text",
+          "voice",
+          "audio_url",
+          "exaggeration",
+          "cfg",
+          "high_quality_audio",
+          "seed",
+          "temperature"
+        ],
+        "title": "TTSInput"
+      },
+      "ChatterboxhdTextToSpeechOutput": {
+        "description": "Output parameters for the TTS request.",
+        "type": "object",
+        "properties": {
+          "audio": {
+            "examples": [
+              {
+                "url": "https://storage.googleapis.com/chatterbox-demo-samples/samples/gladiator_rick.wav"
+              },
+              {
+                "url": "https://storage.googleapis.com/chatterbox-demo-samples/samples/gladiator_old_movie.wav"
+              }
+            ],
+            "description": "The generated audio file.",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Audio"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "audio"
+        ],
+        "title": "TTSOutput",
+        "required": [
+          "audio"
+        ]
+      },
+      "Audio": {
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "title": "Audio",
+        "required": [
+          "url"
+        ]
+      },
+      "ChatterboxTextToSpeechInput": {
+        "title": "ChatterboxRequest",
+        "type": "object",
+        "properties": {
+          "text": {
+            "examples": [
+              "I just found a hidden treasure in the backyard! Check it out!"
+            ],
+            "description": "The text to be converted to speech. You can additionally add the following emotive tags: <laugh>, <chuckle>, <sigh>, <cough>, <sniffle>, <groan>, <yawn>, <gasp>",
+            "type": "string",
+            "title": "Text"
+          },
+          "exaggeration": {
+            "description": "Exaggeration factor for the generated speech (0.0 = no exaggeration, 1.0 = maximum exaggeration).",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "title": "Exaggeration",
+            "default": 0.25
+          },
+          "audio_url": {
+            "description": "Optional URL to an audio file to use as a reference for the generated speech. If provided, the model will try to match the style and tone of the reference audio.",
+            "type": "string",
+            "title": "Audio Url",
+            "default": "https://storage.googleapis.com/chatterbox-demo-samples/prompts/male_rickmorty.mp3"
+          },
+          "temperature": {
+            "minimum": 0.05,
+            "maximum": 2,
+            "type": "number",
+            "description": "Temperature for generation (higher = more creative).",
+            "title": "Temperature",
+            "default": 0.7
+          },
+          "seed": {
+            "description": "Useful to control the reproducibility of the generated audio. Assuming all other properties didn't change, a fixed seed should always generate the exact same audio file. Set to 0 for random seed..",
+            "type": "integer",
+            "title": "Seed"
+          },
+          "cfg": {
+            "minimum": 0.1,
+            "maximum": 1,
+            "type": "number",
+            "title": "Cfg",
+            "default": 0.5
+          }
+        },
+        "x-fal-order-properties": [
+          "text",
+          "audio_url",
+          "exaggeration",
+          "temperature",
+          "cfg",
+          "seed"
+        ],
+        "required": [
+          "text"
+        ]
+      },
+      "ChatterboxTextToSpeechOutput": {},
+      "MinimaxVoiceCloneInput": {
+        "title": "VoiceCloneRequest",
+        "type": "object",
+        "properties": {
+          "model": {
+            "examples": [
+              "speech-02-hd",
+              "speech-02-turbo",
+              "speech-01-hd",
+              "speech-01-turbo"
+            ],
+            "description": "TTS model to use for preview. Options: speech-02-hd, speech-02-turbo, speech-01-hd, speech-01-turbo",
+            "type": "string",
+            "title": "Model",
+            "enum": [
+              "speech-02-hd",
+              "speech-02-turbo",
+              "speech-01-hd",
+              "speech-01-turbo"
+            ],
+            "default": "speech-02-hd"
+          },
+          "text": {
+            "examples": [
+              "Hello, this is a preview of your cloned voice! I hope you like it!"
+            ],
+            "maxLength": 1000,
+            "type": "string",
+            "title": "Text",
+            "description": "Text to generate a TTS preview with the cloned voice (optional)",
+            "default": "Hello, this is a preview of your cloned voice! I hope you like it!"
+          },
+          "audio_url": {
+            "examples": [
+              "https://storage.googleapis.com/falserverless/model_tests/zonos/demo_voice_zonos.wav"
+            ],
+            "description": "\n            URL of the input audio file for voice cloning. Should be at least 10 seconds\n            long. To retain the voice permanently, use it with a TTS (text-to-speech)\n            endpoint at least once within 7 days. Otherwise, it will be\n            automatically deleted.\n        ",
+            "type": "string",
+            "title": "Audio Url"
+          },
+          "accuracy": {
+            "minimum": 0,
+            "description": "Text validation accuracy threshold (0-1)",
+            "type": "number",
+            "title": "Accuracy",
+            "maximum": 1
+          },
+          "noise_reduction": {
+            "description": "Enable noise reduction for the cloned voice",
+            "type": "boolean",
+            "title": "Noise Reduction",
+            "default": false
+          },
+          "need_volume_normalization": {
+            "description": "Enable volume normalization for the cloned voice",
+            "type": "boolean",
+            "title": "Need Volume Normalization",
+            "default": false
+          }
+        },
+        "x-fal-order-properties": [
+          "audio_url",
+          "noise_reduction",
+          "need_volume_normalization",
+          "accuracy",
+          "text",
+          "model"
+        ],
+        "required": [
+          "audio_url"
+        ]
+      },
+      "MinimaxVoiceCloneOutput": {
+        "title": "VoiceCloneOutput",
+        "type": "object",
+        "properties": {
+          "custom_voice_id": {
+            "description": "The cloned voice ID for use with TTS",
+            "type": "string",
+            "title": "Custom Voice Id"
+          },
+          "audio": {
+            "examples": [
+              {
+                "url": "https://fal.media/files/kangaroo/kojPUCNZ9iUGFGMR-xb7h_speech.mp3"
+              }
+            ],
+            "description": "Preview audio generated with the cloned voice (if requested)",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxVoiceClone_File"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "custom_voice_id",
+          "audio"
+        ],
+        "required": [
+          "custom_voice_id"
+        ]
+      },
+      "FalAiMinimaxVoiceClone_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "required": [
+          "url"
+        ]
+      },
+      "MinimaxSpeech02TurboInput": {
+        "title": "TextToSpeechTurboRequest",
+        "type": "object",
+        "properties": {
+          "text": {
+            "examples": [
+              "Hello world! This is a test of the text-to-speech system."
+            ],
+            "maxLength": 5000,
+            "type": "string",
+            "title": "Text",
+            "description": "Text to convert to speech (max 5000 characters, minimum 1 non-whitespace character)",
+            "minLength": 1
+          },
+          "language_boost": {
+            "enum": [
+              "Chinese",
+              "Chinese,Yue",
+              "English",
+              "Arabic",
+              "Russian",
+              "Spanish",
+              "French",
+              "Portuguese",
+              "German",
+              "Turkish",
+              "Dutch",
+              "Ukrainian",
+              "Vietnamese",
+              "Indonesian",
+              "Japanese",
+              "Italian",
+              "Korean",
+              "Thai",
+              "Polish",
+              "Romanian",
+              "Greek",
+              "Czech",
+              "Finnish",
+              "Hindi",
+              "Bulgarian",
+              "Danish",
+              "Hebrew",
+              "Malay",
+              "Slovak",
+              "Swedish",
+              "Croatian",
+              "Hungarian",
+              "Norwegian",
+              "Slovenian",
+              "Catalan",
+              "Nynorsk",
+              "Afrikaans",
+              "auto"
+            ],
+            "description": "Enhance recognition of specified languages and dialects",
+            "type": "string",
+            "title": "Language Boost"
+          },
+          "voice_setting": {
+            "default": {
+              "speed": 1,
+              "vol": 1,
+              "voice_id": "Wise_Woman",
+              "pitch": 0,
+              "english_normalization": false
+            },
+            "description": "Voice configuration settings",
+            "title": "Voice Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech02Turbo_VoiceSetting"
+              }
+            ]
+          },
+          "output_format": {
+            "enum": [
+              "url",
+              "hex"
+            ],
+            "description": "Format of the output content (non-streaming only)",
+            "type": "string",
+            "title": "Output Format",
+            "default": "hex"
+          },
+          "pronunciation_dict": {
+            "description": "Custom pronunciation dictionary for text replacement",
+            "title": "Pronunciation Dict",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech02Turbo_PronunciationDict"
+              }
+            ]
+          },
+          "audio_setting": {
+            "description": "Audio configuration settings",
+            "title": "Audio Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech02Turbo_AudioSetting"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "text",
+          "voice_setting",
+          "audio_setting",
+          "language_boost",
+          "output_format",
+          "pronunciation_dict"
+        ],
+        "required": [
+          "text"
+        ]
+      },
+      "MinimaxSpeech02TurboOutput": {
+        "title": "TextToSpeechOutput",
+        "type": "object",
+        "properties": {
+          "duration_ms": {
+            "description": "Duration of the audio in milliseconds",
+            "type": "integer",
+            "title": "Duration Ms"
+          },
+          "audio": {
+            "examples": [
+              {
+                "url": "https://fal.media/files/kangaroo/kojPUCNZ9iUGFGMR-xb7h_speech.mp3"
+              }
+            ],
+            "description": "The generated audio file",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech02Turbo_File"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "audio",
+          "duration_ms"
+        ],
+        "required": [
+          "audio",
+          "duration_ms"
+        ]
+      },
+      "FalAiMinimaxSpeech02Turbo_VoiceSetting": {
+        "title": "VoiceSetting",
+        "type": "object",
+        "properties": {
+          "speed": {
+            "minimum": 0.5,
+            "description": "Speech speed (0.5-2.0)",
+            "type": "number",
+            "maximum": 2,
+            "title": "Speed",
+            "default": 1
+          },
+          "vol": {
+            "minimum": 0.01,
+            "description": "Volume (0-10)",
+            "type": "number",
+            "maximum": 10,
+            "title": "Vol",
+            "default": 1
+          },
+          "voice_id": {
+            "examples": [
+              "Wise_Woman",
+              "Friendly_Person",
+              "Inspirational_girl",
+              "Deep_Voice_Man",
+              "Calm_Woman",
+              "Casual_Guy",
+              "Lively_Girl",
+              "Patient_Man",
+              "Young_Knight",
+              "Determined_Man",
+              "Lovely_Girl",
+              "Decent_Boy",
+              "Imposing_Manner",
+              "Elegant_Man",
+              "Abbess",
+              "Sweet_Girl_2",
+              "Exuberant_Girl"
+            ],
+            "description": "Predefined voice ID to use for synthesis",
+            "type": "string",
+            "title": "Voice Id",
+            "default": "Wise_Woman"
+          },
+          "pitch": {
+            "minimum": -12,
+            "description": "Voice pitch (-12 to 12)",
+            "type": "integer",
+            "maximum": 12,
+            "title": "Pitch",
+            "default": 0
+          },
+          "english_normalization": {
+            "description": "Enables English text normalization to improve number reading performance, with a slight increase in latency",
+            "type": "boolean",
+            "title": "English Normalization",
+            "default": false
+          },
+          "emotion": {
+            "enum": [
+              "happy",
+              "sad",
+              "angry",
+              "fearful",
+              "disgusted",
+              "surprised",
+              "neutral"
+            ],
+            "description": "Emotion of the generated speech",
+            "type": "string",
+            "title": "Emotion"
+          }
+        },
+        "x-fal-order-properties": [
+          "voice_id",
+          "speed",
+          "vol",
+          "pitch",
+          "emotion",
+          "english_normalization"
+        ]
+      },
+      "FalAiMinimaxSpeech02Turbo_PronunciationDict": {
+        "title": "PronunciationDict",
+        "type": "object",
+        "properties": {
+          "tone_list": {
+            "description": "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+            "type": "array",
+            "title": "Tone List",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "x-fal-order-properties": [
+          "tone_list"
+        ]
+      },
+      "FalAiMinimaxSpeech02Turbo_AudioSetting": {
+        "title": "AudioSetting",
+        "type": "object",
+        "properties": {
+          "format": {
+            "enum": [
+              "mp3",
+              "pcm",
+              "flac"
+            ],
+            "description": "Audio format",
+            "type": "string",
+            "title": "Format",
+            "default": "mp3"
+          },
+          "sample_rate": {
+            "enum": [
+              8000,
+              16000,
+              22050,
+              24000,
+              32000,
+              44100
+            ],
+            "description": "Sample rate of generated audio",
+            "type": "integer",
+            "title": "Sample Rate",
+            "default": 32000
+          },
+          "channel": {
+            "enum": [
+              1,
+              2
+            ],
+            "description": "Number of audio channels (1=mono, 2=stereo)",
+            "type": "integer",
+            "title": "Channel",
+            "default": 1
+          },
+          "bitrate": {
+            "enum": [
+              32000,
+              64000,
+              128000,
+              256000
+            ],
+            "description": "Bitrate of generated audio",
+            "type": "integer",
+            "title": "Bitrate",
+            "default": 128000
+          }
+        },
+        "x-fal-order-properties": [
+          "sample_rate",
+          "bitrate",
+          "format",
+          "channel"
+        ]
+      },
+      "FalAiMinimaxSpeech02Turbo_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "required": [
+          "url"
+        ]
+      },
+      "MinimaxSpeech02HdInput": {
+        "title": "TextToSpeechHDRequest",
+        "type": "object",
+        "properties": {
+          "text": {
+            "examples": [
+              "Hello world! This is a test of the text-to-speech system."
+            ],
+            "maxLength": 5000,
+            "type": "string",
+            "title": "Text",
+            "description": "Text to convert to speech (max 5000 characters, minimum 1 non-whitespace character)",
+            "minLength": 1
+          },
+          "language_boost": {
+            "enum": [
+              "Chinese",
+              "Chinese,Yue",
+              "English",
+              "Arabic",
+              "Russian",
+              "Spanish",
+              "French",
+              "Portuguese",
+              "German",
+              "Turkish",
+              "Dutch",
+              "Ukrainian",
+              "Vietnamese",
+              "Indonesian",
+              "Japanese",
+              "Italian",
+              "Korean",
+              "Thai",
+              "Polish",
+              "Romanian",
+              "Greek",
+              "Czech",
+              "Finnish",
+              "Hindi",
+              "Bulgarian",
+              "Danish",
+              "Hebrew",
+              "Malay",
+              "Slovak",
+              "Swedish",
+              "Croatian",
+              "Hungarian",
+              "Norwegian",
+              "Slovenian",
+              "Catalan",
+              "Nynorsk",
+              "Afrikaans",
+              "auto"
+            ],
+            "description": "Enhance recognition of specified languages and dialects",
+            "type": "string",
+            "title": "Language Boost"
+          },
+          "voice_setting": {
+            "default": {
+              "speed": 1,
+              "vol": 1,
+              "voice_id": "Wise_Woman",
+              "pitch": 0,
+              "english_normalization": false
+            },
+            "description": "Voice configuration settings",
+            "title": "Voice Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech02Hd_VoiceSetting"
+              }
+            ]
+          },
+          "output_format": {
+            "enum": [
+              "url",
+              "hex"
+            ],
+            "description": "Format of the output content (non-streaming only)",
+            "type": "string",
+            "title": "Output Format",
+            "default": "hex"
+          },
+          "pronunciation_dict": {
+            "description": "Custom pronunciation dictionary for text replacement",
+            "title": "Pronunciation Dict",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech02Hd_PronunciationDict"
+              }
+            ]
+          },
+          "audio_setting": {
+            "description": "Audio configuration settings",
+            "title": "Audio Setting",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech02Hd_AudioSetting"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "text",
+          "voice_setting",
+          "audio_setting",
+          "language_boost",
+          "output_format",
+          "pronunciation_dict"
+        ],
+        "required": [
+          "text"
+        ]
+      },
+      "MinimaxSpeech02HdOutput": {
+        "title": "TextToSpeechOutput",
+        "type": "object",
+        "properties": {
+          "duration_ms": {
+            "description": "Duration of the audio in milliseconds",
+            "type": "integer",
+            "title": "Duration Ms"
+          },
+          "audio": {
+            "examples": [
+              {
+                "url": "https://fal.media/files/kangaroo/kojPUCNZ9iUGFGMR-xb7h_speech.mp3"
+              }
+            ],
+            "description": "The generated audio file",
+            "title": "Audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiMinimaxSpeech02Hd_File"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "audio",
+          "duration_ms"
+        ],
+        "required": [
+          "audio",
+          "duration_ms"
+        ]
+      },
+      "FalAiMinimaxSpeech02Hd_VoiceSetting": {
+        "title": "VoiceSetting",
+        "type": "object",
+        "properties": {
+          "speed": {
+            "minimum": 0.5,
+            "description": "Speech speed (0.5-2.0)",
+            "type": "number",
+            "maximum": 2,
+            "title": "Speed",
+            "default": 1
+          },
+          "vol": {
+            "minimum": 0.01,
+            "description": "Volume (0-10)",
+            "type": "number",
+            "maximum": 10,
+            "title": "Vol",
+            "default": 1
+          },
+          "voice_id": {
+            "examples": [
+              "Wise_Woman",
+              "Friendly_Person",
+              "Inspirational_girl",
+              "Deep_Voice_Man",
+              "Calm_Woman",
+              "Casual_Guy",
+              "Lively_Girl",
+              "Patient_Man",
+              "Young_Knight",
+              "Determined_Man",
+              "Lovely_Girl",
+              "Decent_Boy",
+              "Imposing_Manner",
+              "Elegant_Man",
+              "Abbess",
+              "Sweet_Girl_2",
+              "Exuberant_Girl"
+            ],
+            "description": "Predefined voice ID to use for synthesis",
+            "type": "string",
+            "title": "Voice Id",
+            "default": "Wise_Woman"
+          },
+          "pitch": {
+            "minimum": -12,
+            "description": "Voice pitch (-12 to 12)",
+            "type": "integer",
+            "maximum": 12,
+            "title": "Pitch",
+            "default": 0
+          },
+          "english_normalization": {
+            "description": "Enables English text normalization to improve number reading performance, with a slight increase in latency",
+            "type": "boolean",
+            "title": "English Normalization",
+            "default": false
+          },
+          "emotion": {
+            "enum": [
+              "happy",
+              "sad",
+              "angry",
+              "fearful",
+              "disgusted",
+              "surprised",
+              "neutral"
+            ],
+            "description": "Emotion of the generated speech",
+            "type": "string",
+            "title": "Emotion"
+          }
+        },
+        "x-fal-order-properties": [
+          "voice_id",
+          "speed",
+          "vol",
+          "pitch",
+          "emotion",
+          "english_normalization"
+        ]
+      },
+      "FalAiMinimaxSpeech02Hd_PronunciationDict": {
+        "title": "PronunciationDict",
+        "type": "object",
+        "properties": {
+          "tone_list": {
+            "description": "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+            "type": "array",
+            "title": "Tone List",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "x-fal-order-properties": [
+          "tone_list"
+        ]
+      },
+      "FalAiMinimaxSpeech02Hd_AudioSetting": {
+        "title": "AudioSetting",
+        "type": "object",
+        "properties": {
+          "format": {
+            "enum": [
+              "mp3",
+              "pcm",
+              "flac"
+            ],
+            "description": "Audio format",
+            "type": "string",
+            "title": "Format",
+            "default": "mp3"
+          },
+          "sample_rate": {
+            "enum": [
+              8000,
+              16000,
+              22050,
+              24000,
+              32000,
+              44100
+            ],
+            "description": "Sample rate of generated audio",
+            "type": "integer",
+            "title": "Sample Rate",
+            "default": 32000
+          },
+          "channel": {
+            "enum": [
+              1,
+              2
+            ],
+            "description": "Number of audio channels (1=mono, 2=stereo)",
+            "type": "integer",
+            "title": "Channel",
+            "default": 1
+          },
+          "bitrate": {
+            "enum": [
+              32000,
+              64000,
+              128000,
+              256000
+            ],
+            "description": "Bitrate of generated audio",
+            "type": "integer",
+            "title": "Bitrate",
+            "default": 128000
+          }
+        },
+        "x-fal-order-properties": [
+          "sample_rate",
+          "bitrate",
+          "format",
+          "channel"
+        ]
+      },
+      "FalAiMinimaxSpeech02Hd_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "examples": [
+              4404019
+            ],
+            "description": "The size of the file in bytes.",
+            "type": "integer",
+            "title": "File Size"
+          },
+          "file_name": {
+            "examples": [
+              "z9RV14K95DvU.png"
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_type": {
+            "examples": [
+              "image/png"
+            ],
+            "description": "The mime type of the file.",
+            "type": "string",
+            "title": "Content Type"
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          },
+          "file_data": {
+            "format": "binary",
+            "description": "File data",
+            "type": "string",
+            "title": "File Data"
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size",
+          "file_data"
+        ],
+        "required": [
+          "url"
+        ]
+      },
+      "DiaTtsInput": {
+        "title": "DiaRequest",
+        "type": "object",
+        "properties": {
+          "text": {
+            "examples": [
+              "[S1] Dia is an open weights text to dialogue model. [S2] You get full control over scripts and voices. [S1] Wow. Amazing. (laughs) [S2] Try it now on Fal."
+            ],
+            "title": "Text",
+            "type": "string",
+            "description": "The text to be converted to speech."
+          }
+        },
+        "x-fal-order-properties": [
+          "text"
+        ],
+        "required": [
+          "text"
+        ]
+      },
+      "DiaTtsOutput": {
+        "title": "DiaOutput",
+        "type": "object",
+        "properties": {
+          "audio": {
+            "examples": [
+              {
+                "url": "https://v3.fal.media/files/elephant/d5lORit2npFfBykcAtyUr_tmplacfh8oa.mp3"
+              }
+            ],
+            "description": "The generated speech audio",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FalAiDiaTts_File"
+              }
+            ]
+          }
+        },
+        "x-fal-order-properties": [
+          "audio"
+        ],
+        "required": [
+          "audio"
+        ]
+      },
+      "FalAiDiaTts_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Size",
+            "description": "The size of the file in bytes.",
+            "examples": [
+              4404019
+            ]
+          },
+          "file_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Name",
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "examples": [
+              "z9RV14K95DvU.png"
+            ]
+          },
+          "content_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Type",
+            "description": "The mime type of the file.",
+            "examples": [
+              "image/png"
+            ]
+          },
+          "url": {
+            "title": "Url",
+            "type": "string",
+            "description": "The URL where the file can be downloaded from."
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size"
+        ],
+        "required": [
+          "url"
+        ]
+      },
+      "OrpheusTtsInput": {
+        "title": "OrpheusRequest",
+        "type": "object",
+        "properties": {
+          "text": {
+            "examples": [
+              "I just found a hidden treasure in the backyard! <gasp> Check it out!"
+            ],
+            "title": "Text",
+            "type": "string",
+            "description": "The text to be converted to speech. You can additionally add the following emotive tags: <laugh>, <chuckle>, <sigh>, <cough>, <sniffle>, <groan>, <yawn>, <gasp>"
+          },
+          "voice": {
+            "enum": [
+              "tara",
+              "leah",
+              "jess",
+              "leo",
+              "dan",
+              "mia",
+              "zac",
+              "zoe"
+            ],
+            "title": "Voice",
+            "type": "string",
+            "description": "Voice ID for the desired voice.",
+            "examples": [
+              "tara"
+            ],
+            "default": "tara"
+          },
+          "repetition_penalty": {
+            "minimum": 1.1,
+            "maximum": 2,
+            "type": "number",
+            "title": "Repetition Penalty",
+            "description": "Repetition penalty (>= 1.1 required for stable generations).",
+            "default": 1.2
+          },
+          "temperature": {
+            "minimum": 0,
+            "maximum": 2,
+            "type": "number",
+            "title": "Temperature",
+            "description": "Temperature for generation (higher = more creative).",
+            "default": 0.7
+          }
+        },
+        "x-fal-order-properties": [
+          "text",
+          "voice",
+          "temperature",
+          "repetition_penalty"
+        ],
+        "required": [
+          "text"
+        ]
+      },
+      "OrpheusTtsOutput": {
+        "title": "OrpheusOutput",
+        "type": "object",
+        "properties": {
+          "audio": {
+            "examples": [
+              {
+                "url": "https://v3.fal.media/files/kangaroo/RQ_pxc7oPdueYqWUqEbPE_tmpjnzvvzx_.wav"
+              }
+            ],
+            "description": "The generated speech audio",
+            "$ref": "#/components/schemas/FalAiOrpheusTts_File"
+          }
+        },
+        "x-fal-order-properties": [
+          "audio"
+        ],
+        "required": [
+          "audio"
+        ]
+      },
+      "FalAiOrpheusTts_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Size",
+            "description": "The size of the file in bytes.",
+            "examples": [
+              4404019
+            ]
+          },
+          "file_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Name",
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "examples": [
+              "z9RV14K95DvU.png"
+            ]
+          },
+          "content_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Type",
+            "description": "The mime type of the file.",
+            "examples": [
+              "image/png"
+            ]
+          },
+          "url": {
+            "title": "Url",
+            "type": "string",
+            "description": "The URL where the file can be downloaded from."
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size"
+        ],
+        "required": [
+          "url"
+        ]
+      },
+      "ElevenlabsTtsTurboV25Input": {
+        "title": "TextToSpeechRequest",
+        "type": "object",
+        "properties": {
+          "stability": {
+            "minimum": 0,
+            "maximum": 1,
+            "type": "number",
+            "title": "Stability",
+            "description": "Voice stability (0-1)",
+            "default": 0.5
+          },
+          "next_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The text that comes after the text of the current request. Can be used to improve the speech's continuity when concatenating together multiple generations or to influence the speech's continuity in the current generation.",
+            "title": "Next Text"
+          },
+          "speed": {
+            "minimum": 0.7,
+            "maximum": 1.2,
+            "type": "number",
+            "title": "Speed",
+            "description": "Speech speed (0.7-1.2). Values below 1.0 slow down the speech, above 1.0 speed it up. Extreme values may affect quality.",
+            "default": 1
+          },
+          "style": {
+            "minimum": 0,
+            "maximum": 1,
+            "type": "number",
+            "title": "Style",
+            "description": "Style exaggeration (0-1)",
+            "default": 0
+          },
+          "text": {
+            "examples": [
+              "Hello! This is a test of the text to speech system, powered by ElevenLabs. How does it sound?"
+            ],
+            "description": "The text to convert to speech",
+            "type": "string",
+            "title": "Text",
+            "minLength": 1
+          },
+          "timestamps": {
+            "description": "Whether to return timestamps for each word in the generated speech",
+            "type": "boolean",
+            "title": "Timestamps",
+            "default": false
+          },
+          "similarity_boost": {
+            "minimum": 0,
+            "maximum": 1,
+            "type": "number",
+            "title": "Similarity Boost",
+            "description": "Similarity boost (0-1)",
+            "default": 0.75
+          },
+          "voice": {
+            "examples": [
+              "Aria",
+              "Roger",
+              "Sarah",
+              "Laura",
+              "Charlie",
+              "George",
+              "Callum",
+              "River",
+              "Liam",
+              "Charlotte",
+              "Alice",
+              "Matilda",
+              "Will",
+              "Jessica",
+              "Eric",
+              "Chris",
+              "Brian",
+              "Daniel",
+              "Lily",
+              "Bill"
+            ],
+            "description": "The voice to use for speech generation",
+            "type": "string",
+            "title": "Voice",
+            "default": "Rachel"
+          },
+          "language_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Language code (ISO 639-1) used to enforce a language for the model. An error will be returned if language code is not supported by the model.",
+            "title": "Language Code"
+          },
+          "previous_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The text that came before the text of the current request. Can be used to improve the speech's continuity when concatenating together multiple generations or to influence the speech's continuity in the current generation.",
+            "title": "Previous Text"
+          }
+        },
+        "x-fal-order-properties": [
+          "text",
+          "voice",
+          "stability",
+          "similarity_boost",
+          "style",
+          "speed",
+          "timestamps",
+          "previous_text",
+          "next_text",
+          "language_code"
+        ],
+        "required": [
+          "text"
+        ]
+      },
+      "ElevenlabsTtsTurboV25Output": {
+        "title": "TTSOutput",
+        "type": "object",
+        "properties": {
+          "audio": {
+            "examples": [
+              {
+                "url": "https://v3.fal.media/files/zebra/zJL_oRY8h5RWwjoK1w7tx_output.mp3"
+              }
+            ],
+            "description": "The generated audio file",
+            "$ref": "#/components/schemas/FalAiElevenlabsTtsTurboV25_File"
+          },
+          "timestamps": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {}
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Timestamps for each word in the generated speech. Only returned if `timestamps` is set to True in the request.",
+            "title": "Timestamps"
+          }
+        },
+        "x-fal-order-properties": [
+          "audio",
+          "timestamps"
+        ],
+        "required": [
+          "audio"
+        ]
+      },
+      "FalAiElevenlabsTtsTurboV25_File": {
+        "title": "File",
+        "type": "object",
+        "properties": {
+          "file_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The size of the file in bytes.",
+            "title": "File Size",
+            "examples": [
+              4404019
+            ]
+          },
+          "file_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The name of the file. It will be auto-generated if not provided.",
+            "title": "File Name",
+            "examples": [
+              "z9RV14K95DvU.png"
+            ]
+          },
+          "content_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The mime type of the file.",
+            "title": "Content Type",
+            "examples": [
+              "image/png"
+            ]
+          },
+          "url": {
+            "description": "The URL where the file can be downloaded from.",
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "x-fal-order-properties": [
+          "url",
+          "content_type",
+          "file_name",
+          "file_size"
+        ],
+        "required": [
+          "url"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    }
+  }
+}

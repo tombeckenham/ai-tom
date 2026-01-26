@@ -78,12 +78,12 @@ export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
     const { model, prompt, size, duration, modelOptions } = options
 
     // Build the input object for fal.ai
-    const input: FalModelInput<TModel> = {
+    const input = {
       ...modelOptions,
       prompt,
       ...(duration ? { duration } : {}),
       ...(size ? { aspect_ratio: this.sizeToAspectRatio(size) } : {}),
-    }
+    } as FalModelInput<TModel>
 
     // Submit to queue and get request ID
     const { request_id } = await fal.queue.submit(model, {

@@ -1,35 +1,42 @@
 /**
- * Re-export fal.ai's comprehensive type system for full model support.
- * The fal.ai SDK provides types for 600+ models through EndpointTypeMap.
+ * Re-export our generated comprehensive type system for full fal.ai model support.
+ * Generated from fal.ai's OpenAPI specs with types for 1000+ models across 25 categories.
  * These types give you full autocomplete and type safety for any model.
  */
-import type { EndpointTypeMap } from '@fal-ai/client/endpoints'
+
+// Re-export all category-specific types
+export * from './generated'
+
+// Import the unified type for convenience
+export type { FalModel } from './generated'
 
 /**
- * All known fal.ai model IDs with autocomplete support.
- * Also accepts any string for custom/new models.
- */
-export type FalModel = keyof EndpointTypeMap
-
-/**
- * Utility type to extract the input type for a specific fal model.
+ * Utility type to get the input type for any fal.ai model.
+ *
+ * Note: This is a generic fallback. For better type safety, use category-specific types:
+ * - ImageToImageModelInput<T>
+ * - TextToImageModelInput<T>
+ * - ImageToVideoModelInput<T>
+ * etc.
  *
  * @example
  * type FluxInput = FalModelInput<'fal-ai/flux/dev'>
- * // { prompt: string; num_inference_steps?: number; ... }
  */
-export type FalModelInput<TModel extends FalModel> =
-  EndpointTypeMap[TModel]['input']
+export type FalModelInput<TModel extends string> = TModel extends string ? any : never
 
 /**
- * Utility type to extract the output type for a specific fal model.
+ * Utility type to get the output type for any fal.ai model.
+ *
+ * Note: This is a generic fallback. For better type safety, use category-specific types:
+ * - ImageToImageModelOutput<T>
+ * - TextToImageModelOutput<T>
+ * - ImageToVideoModelOutput<T>
+ * etc.
  *
  * @example
  * type FluxOutput = FalModelOutput<'fal-ai/flux/dev'>
- * // { images: Array<Image>; seed: number; ... }
  */
-export type FalModelOutput<TModel extends FalModel> =
-  EndpointTypeMap[TModel]['output']
+export type FalModelOutput<TModel extends string> = TModel extends string ? any : never
 
 /**
  * Provider options for image generation, excluding fields TanStack AI handles.
@@ -37,9 +44,8 @@ export type FalModelOutput<TModel extends FalModel> =
  *
  * @example
  * type FluxOptions = FalImageProviderOptions<'fal-ai/flux/dev'>
- * // { num_inference_steps?: number; guidance_scale?: number; seed?: number; ... }
  */
-export type FalImageProviderOptions<TModel extends FalModel> = Omit<
+export type FalImageProviderOptions<TModel extends string> = Omit<
   FalModelInput<TModel>,
   'prompt' | 'image_size' | 'num_images'
 >
@@ -48,7 +54,7 @@ export type FalImageProviderOptions<TModel extends FalModel> = Omit<
  * Provider options for video generation, excluding fields TanStack AI handles.
  * Use this for the `modelOptions` parameter in video generation.
  */
-export type FalVideoProviderOptions<TModel extends FalModel> = Omit<
+export type FalVideoProviderOptions<TModel extends string> = Omit<
   FalModelInput<TModel>,
   'prompt' | 'aspect_ratio' | 'duration'
 >
