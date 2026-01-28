@@ -13,7 +13,10 @@
  */
 
 import { readFileSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // ============================================================
 // Type Definitions
@@ -49,7 +52,7 @@ interface ComparisonResults {
  */
 function loadFalModels(): Array<FalApiModel> {
   try {
-    const modelsPath = join(process.cwd(), 'scripts/fal.models.json')
+    const modelsPath = join(__dirname, 'fal.models.json')
     const content = readFileSync(modelsPath, 'utf-8')
     const data = JSON.parse(content) as {
       generated_at: string
@@ -77,8 +80,8 @@ function loadFalModels(): Array<FalApiModel> {
 function getEndpointTypeMapKeys(): Set<string> {
   try {
     const typesPath = join(
-      process.cwd(),
-      'packages/typescript/ai-fal/node_modules/@fal-ai/client/src/types/endpoints.d.ts',
+      __dirname,
+      '../node_modules/@fal-ai/client/src/types/endpoints.d.ts',
     )
 
     const content = readFileSync(typesPath, 'utf-8')

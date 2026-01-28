@@ -168,12 +168,16 @@ function generateOutputTypeUnions(
     // Generate Input type
     lines.push(`/**`)
     lines.push(` * Get the input type for a specific ${outputType} model.`)
-    lines.push(` * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.`)
+    lines.push(
+      ` * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.`,
+    )
     lines.push(` */`)
     lines.push(
       `export type Fal${outputTypePascal}Input<T extends Fal${outputTypePascal}Model> =`,
     )
-    lines.push(`  T extends keyof EndpointTypeMap ? EndpointTypeMap[T]['input'] :`)
+    lines.push(
+      `  T extends keyof EndpointTypeMap ? EndpointTypeMap[T]['input'] :`,
+    )
     for (let i = 0; i < availableCategories.length; i++) {
       const category = availableCategories[i]!
       const typeName = toPascalCase(category)
@@ -188,12 +192,16 @@ function generateOutputTypeUnions(
     // Generate Output type
     lines.push(`/**`)
     lines.push(` * Get the output type for a specific ${outputType} model.`)
-    lines.push(` * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.`)
+    lines.push(
+      ` * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.`,
+    )
     lines.push(` */`)
     lines.push(
       `export type Fal${outputTypePascal}Output<T extends Fal${outputTypePascal}Model> =`,
     )
-    lines.push(`  T extends keyof EndpointTypeMap ? EndpointTypeMap[T]['output'] :`)
+    lines.push(
+      `  T extends keyof EndpointTypeMap ? EndpointTypeMap[T]['output'] :`,
+    )
     for (let i = 0; i < availableCategories.length; i++) {
       const category = availableCategories[i]!
       const typeName = toPascalCase(category)
@@ -412,38 +420,32 @@ async function main() {
     .map((category) => toPascalCase(category))
     .sort()
 
-  const pascalCaseUsedCategories = usedCategoriesList
-    .map((category) => toPascalCase(category))
-    .sort()
-
   // Generate imports first (before exports) to satisfy import/first rule
-  indexLines.push(`// Import value exports (SchemaMap constants) from re-exported category maps`)
-  indexLines.push(`import {`)
-  for (const pascalCaseCategory of pascalCaseUsedCategories) {
-    indexLines.push(`  ${pascalCaseCategory}SchemaMap,`)
+  indexLines.push(
+    `// Import value exports (SchemaMap constants) from category endpoint maps`,
+  )
+  for (const category of usedCategoriesList) {
+    const pascalCaseCategory = toPascalCase(category)
+    indexLines.push(
+      `import { ${pascalCaseCategory}SchemaMap } from './${category}/endpoint-map'`,
+    )
   }
-  indexLines.push(`} from './index'`)
   indexLines.push(``)
 
-  // Generate type imports
-  indexLines.push(`// Import type exports from re-exported category maps`)
-  indexLines.push(`import type {`)
-
-  // Collect all type imports and sort them alphabetically
-  const allTypeImports: Array<string> = []
-  for (const pascalCaseCategory of pascalCaseCategories) {
-    allTypeImports.push(`${pascalCaseCategory}Model`)
+  // Generate type imports grouped by category
+  indexLines.push(`// Import type exports from category endpoint maps`)
+  for (const category of processedCategories) {
+    const pascalCaseCategory = toPascalCase(category)
+    const isUsedCategory = usedCategoriesList.includes(category)
+    const typeImports: Array<string> = [`${pascalCaseCategory}Model`]
+    if (isUsedCategory) {
+      typeImports.push(`${pascalCaseCategory}ModelInput`)
+      typeImports.push(`${pascalCaseCategory}ModelOutput`)
+    }
+    indexLines.push(
+      `import type { ${typeImports.join(', ')} } from './${category}/endpoint-map'`,
+    )
   }
-  for (const pascalCaseCategory of pascalCaseUsedCategories) {
-    allTypeImports.push(`${pascalCaseCategory}ModelInput`)
-    allTypeImports.push(`${pascalCaseCategory}ModelOutput`)
-  }
-  allTypeImports.sort()
-
-  for (const typeImport of allTypeImports) {
-    indexLines.push(`  ${typeImport},`)
-  }
-  indexLines.push(`} from './index'`)
   indexLines.push(``)
 
   // Import external zod type after local imports
@@ -452,7 +454,9 @@ async function main() {
 
   // Import fal.ai EndpointTypeMap for type checking
   indexLines.push(`// Import official fal.ai endpoint types`)
-  indexLines.push(`import type { EndpointTypeMap } from '@fal-ai/client/endpoints'`)
+  indexLines.push(
+    `import type { EndpointTypeMap } from '@fal-ai/client/endpoints'`,
+  )
   indexLines.push(``)
 
   // Now add the re-exports
@@ -474,10 +478,8 @@ async function main() {
   )
   indexLines.push(` */`)
   indexLines.push(`export type FalModel =`)
-  for (let i = 0; i < pascalCaseCategories.length; i++) {
-    const pascalCaseCategory = pascalCaseCategories[i]!
-    const isLast = i === processedCategories.length - 1
-    indexLines.push(`  | ${pascalCaseCategory}Model${isLast ? '' : ''}`)
+  for (const pascalCaseCategory of pascalCaseCategories) {
+    indexLines.push(`  | ${pascalCaseCategory}Model`)
   }
   indexLines.push(``)
 

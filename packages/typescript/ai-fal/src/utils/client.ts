@@ -39,14 +39,14 @@ export function getFalApiKeyFromEnv(): string {
   return key
 }
 
-export function configureFalClient(config: FalClientConfig): void {
-  if (config.proxyUrl) {
+export function configureFalClient(config?: FalClientConfig): void {
+  if (config?.proxyUrl) {
     fal.config({
       proxyUrl: config.proxyUrl,
     })
   } else {
     fal.config({
-      credentials: config.apiKey,
+      credentials: config?.apiKey ?? getFalApiKeyFromEnv(),
     })
   }
 }

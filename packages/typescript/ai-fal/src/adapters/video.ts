@@ -1,12 +1,7 @@
 import { fal } from '@fal-ai/client'
 import { BaseVideoAdapter } from '@tanstack/ai/adapters'
-import {
-  configureFalClient,
-  getFalApiKeyFromEnv,
-  generateId as utilGenerateId,
-} from '../utils'
+import { configureFalClient, generateId as utilGenerateId } from '../utils'
 import { FalVideoSchemaMap } from '../generated'
-import type { FalClientConfig } from '../utils'
 import type { FalVideoInput, FalVideoModel, FalVideoOutput } from '../generated'
 import type {
   VideoGenerationOptions,
@@ -15,10 +10,8 @@ import type {
   VideoUrlResult,
 } from '@tanstack/ai'
 import type { FalVideoProviderOptions } from '../model-meta'
-
+import type { FalClientConfig } from '../utils'
 import type { z } from 'zod'
-
-export interface FalVideoConfig extends Omit<FalClientConfig, 'apiKey'> {}
 
 type FalQueueStatus = 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED'
 
@@ -69,7 +62,7 @@ export class FalVideoAdapter<
   readonly inputSchema: z.ZodSchema<FalVideoInput<TModel>>
   readonly outputSchema: z.ZodSchema<FalVideoOutput<TModel>>
 
-  constructor(apiKey: string, model: TModel, config?: FalVideoConfig) {
+  constructor(model: TModel, config?: FalClientConfig) {
     super({}, model)
     this.model = model
     // The only reason we need to cast here, is because the number of video models is so large,
@@ -81,7 +74,7 @@ export class FalVideoAdapter<
     this.outputSchema = FalVideoSchemaMap[model].output as z.ZodSchema<
       FalVideoOutput<TModel>
     >
-    configureFalClient({ apiKey, proxyUrl: config?.proxyUrl })
+    configureFalClient(config)
   }
 
   async createVideoJob(
@@ -117,9 +110,10 @@ export class FalVideoAdapter<
     return {
       jobId,
       status: mapFalStatusToVideoStatus(statusResponse.status),
-      progress: statusResponse.queue_position
-        ? Math.max(0, 100 - statusResponse.queue_position * 10)
-        : undefined,
+      progress:
+        statusResponse.queue_position != null
+          ? Math.max(0, 100 - statusResponse.queue_position * 10)
+          : undefined,
     }
   }
 
@@ -171,10 +165,9 @@ export class FalVideoAdapter<
  */
 export function createFalVideo<TModel extends FalVideoModel>(
   model: TModel,
-  apiKey: string,
-  config?: FalVideoConfig,
+  config?: FalClientConfig,
 ): FalVideoAdapter<TModel> {
-  return new FalVideoAdapter(apiKey, model, config)
+  return new FalVideoAdapter(model, config)
 }
 
 /**
@@ -184,8 +177,7 @@ export function createFalVideo<TModel extends FalVideoModel>(
  */
 export function falVideo<TModel extends FalVideoModel>(
   model: TModel,
-  config?: FalVideoConfig,
+  config?: FalClientConfig,
 ): FalVideoAdapter<TModel> {
-  const apiKey = getFalApiKeyFromEnv()
-  return createFalVideo(model, apiKey, config)
+  return createFalVideo(model, config)
 }

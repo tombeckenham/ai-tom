@@ -19,8 +19,9 @@
  *   FAL_KEY - Required API key for Fal API authentication
  */
 
-import { writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { mkdirSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 // ============================================================
 // Type Definitions
@@ -303,7 +304,13 @@ function saveModelsByCategory(
 
   console.log('\nSaving category files...')
 
-  const scriptsDir = join(process.cwd(), 'scripts')
+  // Compute script directory (works for both ESM and CommonJS)
+  const scriptDir = dirname(fileURLToPath(import.meta.url))
+  const scriptsDir = join(scriptDir, 'scripts')
+
+  // Ensure the target directory exists
+  mkdirSync(scriptsDir, { recursive: true })
+
   let savedCount = 0
 
   // Save each category to its own file

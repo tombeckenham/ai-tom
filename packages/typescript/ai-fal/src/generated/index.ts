@@ -1,101 +1,139 @@
 // AUTO-GENERATED - Do not edit manually
 // Generated from types.gen.ts via scripts/generate-fal-endpoint-maps.ts
 
-// Import value exports (SchemaMap constants) from re-exported category maps
-import {
-  AudioToAudioSchemaMap,
-  AudioToTextSchemaMap,
-  AudioToVideoSchemaMap,
-  Gen3dTo3dSchemaMap,
-  ImageTo3dSchemaMap,
-  ImageToImageSchemaMap,
-  ImageToJsonSchemaMap,
-  ImageToVideoSchemaMap,
-  JsonSchemaMap,
-  SpeechToSpeechSchemaMap,
-  SpeechToTextSchemaMap,
-  TextTo3dSchemaMap,
-  TextToAudioSchemaMap,
-  TextToImageSchemaMap,
-  TextToJsonSchemaMap,
-  TextToSpeechSchemaMap,
-  TextToTextSchemaMap,
-  TextToVideoSchemaMap,
-  VideoToTextSchemaMap,
-  VideoToVideoSchemaMap,
-  VisionSchemaMap,
-} from './index'
+// Import value exports (SchemaMap constants) from category endpoint maps
+import { Gen3dTo3dSchemaMap } from './3d-to-3d/endpoint-map'
+import { AudioToAudioSchemaMap } from './audio-to-audio/endpoint-map'
+import { AudioToTextSchemaMap } from './audio-to-text/endpoint-map'
+import { AudioToVideoSchemaMap } from './audio-to-video/endpoint-map'
+import { ImageTo3dSchemaMap } from './image-to-3d/endpoint-map'
+import { ImageToImageSchemaMap } from './image-to-image/endpoint-map'
+import { ImageToJsonSchemaMap } from './image-to-json/endpoint-map'
+import { ImageToVideoSchemaMap } from './image-to-video/endpoint-map'
+import { JsonSchemaMap } from './json/endpoint-map'
+import { SpeechToSpeechSchemaMap } from './speech-to-speech/endpoint-map'
+import { SpeechToTextSchemaMap } from './speech-to-text/endpoint-map'
+import { TextTo3dSchemaMap } from './text-to-3d/endpoint-map'
+import { TextToAudioSchemaMap } from './text-to-audio/endpoint-map'
+import { TextToImageSchemaMap } from './text-to-image/endpoint-map'
+import { TextToJsonSchemaMap } from './text-to-json/endpoint-map'
+import { TextToSpeechSchemaMap } from './text-to-speech/endpoint-map'
+import { TextToTextSchemaMap } from './text-to-text/endpoint-map'
+import { TextToVideoSchemaMap } from './text-to-video/endpoint-map'
+import { VideoToTextSchemaMap } from './video-to-text/endpoint-map'
+import { VideoToVideoSchemaMap } from './video-to-video/endpoint-map'
+import { VisionSchemaMap } from './vision/endpoint-map'
 
-// Import type exports from re-exported category maps
+// Import type exports from category endpoint maps
+import type {
+  Gen3dTo3dModel,
+  Gen3dTo3dModelInput,
+  Gen3dTo3dModelOutput,
+} from './3d-to-3d/endpoint-map'
 import type {
   AudioToAudioModel,
   AudioToAudioModelInput,
   AudioToAudioModelOutput,
+} from './audio-to-audio/endpoint-map'
+import type {
   AudioToTextModel,
   AudioToTextModelInput,
   AudioToTextModelOutput,
+} from './audio-to-text/endpoint-map'
+import type {
   AudioToVideoModel,
   AudioToVideoModelInput,
   AudioToVideoModelOutput,
-  Gen3dTo3dModel,
-  Gen3dTo3dModelInput,
-  Gen3dTo3dModelOutput,
+} from './audio-to-video/endpoint-map'
+import type {
   ImageTo3dModel,
   ImageTo3dModelInput,
   ImageTo3dModelOutput,
+} from './image-to-3d/endpoint-map'
+import type {
   ImageToImageModel,
   ImageToImageModelInput,
   ImageToImageModelOutput,
+} from './image-to-image/endpoint-map'
+import type {
   ImageToJsonModel,
   ImageToJsonModelInput,
   ImageToJsonModelOutput,
+} from './image-to-json/endpoint-map'
+import type {
   ImageToVideoModel,
   ImageToVideoModelInput,
   ImageToVideoModelOutput,
+} from './image-to-video/endpoint-map'
+import type {
   JsonModel,
   JsonModelInput,
   JsonModelOutput,
-  LlmModel,
+} from './json/endpoint-map'
+import type { LlmModel } from './llm/endpoint-map'
+import type {
   SpeechToSpeechModel,
   SpeechToSpeechModelInput,
   SpeechToSpeechModelOutput,
+} from './speech-to-speech/endpoint-map'
+import type {
   SpeechToTextModel,
   SpeechToTextModelInput,
   SpeechToTextModelOutput,
+} from './speech-to-text/endpoint-map'
+import type {
   TextTo3dModel,
   TextTo3dModelInput,
   TextTo3dModelOutput,
+} from './text-to-3d/endpoint-map'
+import type {
   TextToAudioModel,
   TextToAudioModelInput,
   TextToAudioModelOutput,
+} from './text-to-audio/endpoint-map'
+import type {
   TextToImageModel,
   TextToImageModelInput,
   TextToImageModelOutput,
+} from './text-to-image/endpoint-map'
+import type {
   TextToJsonModel,
   TextToJsonModelInput,
   TextToJsonModelOutput,
+} from './text-to-json/endpoint-map'
+import type {
   TextToSpeechModel,
   TextToSpeechModelInput,
   TextToSpeechModelOutput,
+} from './text-to-speech/endpoint-map'
+import type {
   TextToTextModel,
   TextToTextModelInput,
   TextToTextModelOutput,
+} from './text-to-text/endpoint-map'
+import type {
   TextToVideoModel,
   TextToVideoModelInput,
   TextToVideoModelOutput,
-  TrainingModel,
-  UnknownModel,
-  VideoToAudioModel,
+} from './text-to-video/endpoint-map'
+import type { TrainingModel } from './training/endpoint-map'
+import type { UnknownModel } from './unknown/endpoint-map'
+import type { VideoToAudioModel } from './video-to-audio/endpoint-map'
+import type {
   VideoToTextModel,
   VideoToTextModelInput,
   VideoToTextModelOutput,
+} from './video-to-text/endpoint-map'
+import type {
   VideoToVideoModel,
   VideoToVideoModelInput,
   VideoToVideoModelOutput,
+} from './video-to-video/endpoint-map'
+import type {
   VisionModel,
   VisionModelInput,
   VisionModelOutput,
-} from './index'
+} from './vision/endpoint-map'
 
 import type { z } from 'zod'
 

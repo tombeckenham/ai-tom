@@ -2,11 +2,7 @@ import { fal } from '@fal-ai/client'
 import { BaseImageAdapter } from '@tanstack/ai/adapters'
 
 import { FalImageSchemaMap } from '../generated'
-import {
-  configureFalClient,
-  getFalApiKeyFromEnv,
-  generateId as utilGenerateId,
-} from '../utils'
+import { configureFalClient, generateId as utilGenerateId } from '../utils'
 
 import type { OutputType, Result } from '@fal-ai/client'
 import type {
@@ -19,8 +15,6 @@ import type { FalImageInput, FalImageModel, FalImageOutput } from '../generated'
 
 import type { FalClientConfig } from '../utils'
 import type { z } from 'zod'
-
-export type FalImageConfig = Omit<FalClientConfig, 'apiKey'>
 
 /** Map common size strings to fal.ai image_size presets */
 const SIZE_TO_PRESET: Record<string, string> = {
@@ -76,7 +70,7 @@ export class FalImageAdapter<
   readonly inputSchema: z.ZodSchema<FalImageInput<TModel>>
   readonly outputSchema: z.ZodSchema<FalImageOutput<TModel>>
 
-  constructor(apiKey: string, model: TModel, config?: FalImageConfig) {
+  constructor(model: TModel, config?: FalClientConfig) {
     super({}, model)
     this.model = model
     // The only reason we need to cast here, is because the number of image models is so large,
@@ -89,7 +83,7 @@ export class FalImageAdapter<
       FalImageOutput<TModel>
     >
 
-    configureFalClient({ apiKey, proxyUrl: config?.proxyUrl })
+    configureFalClient(config)
   }
 
   async generateImages(
@@ -219,10 +213,9 @@ export class FalImageAdapter<
  */
 export function createFalImage<TModel extends FalImageModel>(
   model: TModel,
-  apiKey: string,
-  config?: FalImageConfig,
+  config?: FalClientConfig,
 ): FalImageAdapter<TModel> {
-  return new FalImageAdapter(apiKey, model, config)
+  return new FalImageAdapter(model, config)
 }
 
 /**
@@ -250,8 +243,7 @@ export function createFalImage<TModel extends FalImageModel>(
  */
 export function falImage<TModel extends FalImageModel>(
   model: TModel,
-  config?: FalImageConfig,
+  config?: FalClientConfig,
 ): FalImageAdapter<TModel> {
-  const apiKey = getFalApiKeyFromEnv()
-  return createFalImage(model, apiKey, config)
+  return createFalImage(model, config)
 }
