@@ -2,443 +2,44 @@
 
 import { z } from 'zod'
 
-export const zFile = z.object({
-  url: z.url(),
-  content_type: z.optional(z.string()),
-  file_name: z.optional(z.string()),
-  file_size: z.optional(z.int()),
-})
-
-export const zQueueStatus = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'FAILED']),
-  response_url: z.optional(z.url()),
-})
-
 /**
- * SpeechToTextRequestScribeV2
+ * DiarizationSegment
  */
-export const zElevenlabsSpeechToTextScribeV2Input = z.object({
-  keyterms: z
-    .optional(
-      z.array(z.string()).max(100).register(z.globalRegistry, {
-        description:
-          'Words or sentences to bias the model towards transcribing. Up to 100 keyterms, max 50 characters each. Adds 30% premium over base transcription price.',
-      }),
-    )
-    .default([]),
-  audio_url: z.string().register(z.globalRegistry, {
-    description: 'URL of the audio file to transcribe',
+export const zSchemaDiarizationSegment = z.object({
+  timestamp: z.tuple([z.unknown(), z.unknown()]).register(z.globalRegistry, {
+    description: 'Start and end timestamp of the segment',
   }),
-  diarize: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to annotate who is speaking',
-      }),
-    )
-    .default(true),
-  language_code: z.optional(z.union([z.string(), z.unknown()])),
-  tag_audio_events: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Tag audio events like laughter, applause, etc.',
-      }),
-    )
-    .default(true),
-})
-
-/**
- * TranscriptionWord
- */
-export const zTranscriptionWord = z.object({
-  text: z.string().register(z.globalRegistry, {
-    description: 'The transcribed word or audio event',
+  speaker: z.string().register(z.globalRegistry, {
+    description: 'Speaker ID of the segment',
   }),
-  start: z.union([z.number(), z.unknown()]),
-  type: z.string().register(z.globalRegistry, {
-    description: 'Type of element (word, spacing, or audio_event)',
-  }),
-  end: z.union([z.number(), z.unknown()]),
-  speaker_id: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * TranscriptionOutputV2
- */
-export const zElevenlabsSpeechToTextScribeV2Output = z.object({
-  text: z.string().register(z.globalRegistry, {
-    description: 'The full transcribed text',
-  }),
-  language_probability: z.number().register(z.globalRegistry, {
-    description: 'Confidence in language detection',
-  }),
-  language_code: z.string().register(z.globalRegistry, {
-    description: 'Detected or specified language code',
-  }),
-  words: z.array(zTranscriptionWord).register(z.globalRegistry, {
-    description: 'Word-level transcription details',
-  }),
-})
-
-/**
- * SmartTurnInput
- */
-export const zSmartTurnInput = z.object({
-  audio_url: z.string().register(z.globalRegistry, {
-    description: 'The URL of the audio file to be processed.',
-  }),
-})
-
-/**
- * Output
- */
-export const zSmartTurnOutput = z.object({
-  prediction: z.int().register(z.globalRegistry, {
-    description: 'The predicted turn type. 1 for Complete, 0 for Incomplete.',
-  }),
-  probability: z.number().register(z.globalRegistry, {
-    description: 'The probability of the predicted turn type.',
-  }),
-  metrics: z.record(z.string(), z.unknown()).register(z.globalRegistry, {
-    description: 'The metrics of the inference.',
-  }),
-})
-
-/**
- * SpeechInput
- */
-export const zSpeechToTextTurboInput = z.object({
-  audio_url: z.string().register(z.globalRegistry, {
-    description: 'Local filesystem path (or remote URL) to a long audio file',
-  }),
-  use_pnc: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          "Whether to use Canary's built-in punctuation & capitalization",
-      }),
-    )
-    .default(true),
-})
-
-/**
- * SpeechOutput
- */
-export const zSpeechToTextTurboOutput = z.object({
-  partial: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Indicates if this is a partial (in-progress) transcript',
-      }),
-    )
-    .default(false),
-  output: z.string().register(z.globalRegistry, {
-    description: 'The partial or final transcription output from Canary',
-  }),
-})
-
-/**
- * SpeechInput
- */
-export const zSpeechToTextTurboStreamInput = z.object({
-  audio_url: z.string().register(z.globalRegistry, {
-    description: 'Local filesystem path (or remote URL) to a long audio file',
-  }),
-  use_pnc: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          "Whether to use Canary's built-in punctuation & capitalization",
-      }),
-    )
-    .default(true),
-})
-
-export const zSpeechToTextTurboStreamOutput = z.unknown()
-
-/**
- * SpeechInput
- */
-export const zSpeechToTextStreamInput = z.object({
-  audio_url: z.string().register(z.globalRegistry, {
-    description: 'Local filesystem path (or remote URL) to a long audio file',
-  }),
-  use_pnc: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          "Whether to use Canary's built-in punctuation & capitalization",
-      }),
-    )
-    .default(true),
-})
-
-export const zSpeechToTextStreamOutput = z.unknown()
-
-/**
- * SpeechInput
- */
-export const zSpeechToTextInput = z.object({
-  audio_url: z.string().register(z.globalRegistry, {
-    description: 'Local filesystem path (or remote URL) to a long audio file',
-  }),
-  use_pnc: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          "Whether to use Canary's built-in punctuation & capitalization",
-      }),
-    )
-    .default(true),
-})
-
-/**
- * SpeechOutput
- */
-export const zSpeechToTextOutput = z.object({
-  partial: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Indicates if this is a partial (in-progress) transcript',
-      }),
-    )
-    .default(false),
-  output: z.string().register(z.globalRegistry, {
-    description: 'The partial or final transcription output from Canary',
-  }),
-})
-
-/**
- * SpeechToTextRequest
- */
-export const zElevenlabsSpeechToTextInput = z.object({
-  language_code: z.optional(z.union([z.string(), z.unknown()])),
-  audio_url: z.string().register(z.globalRegistry, {
-    description: 'URL of the audio file to transcribe',
-  }),
-  diarize: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to annotate who is speaking',
-      }),
-    )
-    .default(true),
-  tag_audio_events: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Tag audio events like laughter, applause, etc.',
-      }),
-    )
-    .default(true),
-})
-
-/**
- * TranscriptionWord
- */
-export const zFalAiElevenlabsSpeechToTextTranscriptionWord = z.object({
-  text: z.string().register(z.globalRegistry, {
-    description: 'The transcribed word or audio event',
-  }),
-  start: z.union([z.number(), z.unknown()]),
-  type: z.string().register(z.globalRegistry, {
-    description: 'Type of element (word, spacing, or audio_event)',
-  }),
-  end: z.union([z.number(), z.unknown()]),
-  speaker_id: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * TranscriptionOutput
- */
-export const zElevenlabsSpeechToTextOutput = z.object({
-  text: z.string().register(z.globalRegistry, {
-    description: 'The full transcribed text',
-  }),
-  language_probability: z.number().register(z.globalRegistry, {
-    description: 'Confidence in language detection',
-  }),
-  language_code: z.string().register(z.globalRegistry, {
-    description: 'Detected or specified language code',
-  }),
-  words: z
-    .array(zFalAiElevenlabsSpeechToTextTranscriptionWord)
-    .register(z.globalRegistry, {
-      description: 'Word-level transcription details',
-    }),
-})
-
-/**
- * WhisperInput
- */
-export const zWizperInput = z.object({
-  language: z.optional(
-    z.union([
-      z.enum([
-        'af',
-        'am',
-        'ar',
-        'as',
-        'az',
-        'ba',
-        'be',
-        'bg',
-        'bn',
-        'bo',
-        'br',
-        'bs',
-        'ca',
-        'cs',
-        'cy',
-        'da',
-        'de',
-        'el',
-        'en',
-        'es',
-        'et',
-        'eu',
-        'fa',
-        'fi',
-        'fo',
-        'fr',
-        'gl',
-        'gu',
-        'ha',
-        'haw',
-        'he',
-        'hi',
-        'hr',
-        'ht',
-        'hu',
-        'hy',
-        'id',
-        'is',
-        'it',
-        'ja',
-        'jw',
-        'ka',
-        'kk',
-        'km',
-        'kn',
-        'ko',
-        'la',
-        'lb',
-        'ln',
-        'lo',
-        'lt',
-        'lv',
-        'mg',
-        'mi',
-        'mk',
-        'ml',
-        'mn',
-        'mr',
-        'ms',
-        'mt',
-        'my',
-        'ne',
-        'nl',
-        'nn',
-        'no',
-        'oc',
-        'pa',
-        'pl',
-        'ps',
-        'pt',
-        'ro',
-        'ru',
-        'sa',
-        'sd',
-        'si',
-        'sk',
-        'sl',
-        'sn',
-        'so',
-        'sq',
-        'sr',
-        'su',
-        'sv',
-        'sw',
-        'ta',
-        'te',
-        'tg',
-        'th',
-        'tk',
-        'tl',
-        'tr',
-        'tt',
-        'uk',
-        'ur',
-        'uz',
-        'vi',
-        'yi',
-        'yo',
-        'zh',
-      ]),
-      z.unknown(),
-    ]),
-  ),
-  version: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description:
-          'Version of the model to use. All of the models are the Whisper large variant.',
-      }),
-    )
-    .default('3'),
-  max_segment_len: z
-    .optional(
-      z.int().gte(10).lte(29).register(z.globalRegistry, {
-        description:
-          'Maximum speech segment duration in seconds before splitting.',
-      }),
-    )
-    .default(29),
-  task: z.optional(
-    z.enum(['transcribe', 'translate']).register(z.globalRegistry, {
-      description:
-        'Task to perform on the audio file. Either transcribe or translate.',
-    }),
-  ),
-  chunk_level: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Level of the chunks to return.',
-      }),
-    )
-    .default('segment'),
-  audio_url: z.string().register(z.globalRegistry, {
-    description:
-      'URL of the audio file to transcribe. Supported formats: mp3, mp4, mpeg, mpga, m4a, wav or webm.',
-  }),
-  merge_chunks: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to merge consecutive chunks. When enabled, chunks are merged if their combined duration does not exceed max_segment_len.',
-      }),
-    )
-    .default(true),
 })
 
 /**
  * WhisperChunk
  */
-export const zWhisperChunk = z.object({
+export const zSchemaWhisperChunk = z.object({
   text: z.string().register(z.globalRegistry, {
     description: 'Transcription of the chunk',
   }),
-  timestamp: z.tuple([]).register(z.globalRegistry, {
+  timestamp: z.tuple([z.unknown(), z.unknown()]).register(z.globalRegistry, {
     description: 'Start and end timestamp of the chunk',
   }),
+  speaker: z.optional(
+    z.string().register(z.globalRegistry, {
+      description:
+        'Speaker ID of the chunk. Only present if diarization is enabled.',
+    }),
+  ),
 })
 
 /**
  * WhisperOutput
  */
-export const zWizperOutput = z.object({
+export const zSchemaWhisperOutput = z.object({
   text: z.string().register(z.globalRegistry, {
     description: 'Transcription of the audio file',
   }),
-  languages: z
+  inferred_languages: z
     .array(
       z.enum([
         'af',
@@ -546,15 +147,23 @@ export const zWizperOutput = z.object({
       description:
         'List of languages that the audio file is inferred to be. Defaults to null.',
     }),
-  chunks: z.array(zWhisperChunk).register(z.globalRegistry, {
-    description: 'Timestamp chunks of the audio file',
-  }),
+  chunks: z.optional(
+    z.array(zSchemaWhisperChunk).register(z.globalRegistry, {
+      description: 'Timestamp chunks of the audio file',
+    }),
+  ),
+  diarization_segments: z
+    .array(zSchemaDiarizationSegment)
+    .register(z.globalRegistry, {
+      description:
+        'Speaker diarization segments of the audio file. Only present if diarization is enabled.',
+    }),
 })
 
 /**
  * WhisperInput
  */
-export const zWhisperInput = z.object({
+export const zSchemaWhisperInput = z.object({
   version: z.optional(
     z.enum(['3']).register(z.globalRegistry, {
       description:
@@ -706,43 +315,13 @@ export const zWhisperInput = z.object({
 })
 
 /**
- * WhisperChunk
- */
-export const zFalAiWhisperWhisperChunk = z.object({
-  text: z.string().register(z.globalRegistry, {
-    description: 'Transcription of the chunk',
-  }),
-  timestamp: z.tuple([z.unknown(), z.unknown()]).register(z.globalRegistry, {
-    description: 'Start and end timestamp of the chunk',
-  }),
-  speaker: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'Speaker ID of the chunk. Only present if diarization is enabled.',
-    }),
-  ),
-})
-
-/**
- * DiarizationSegment
- */
-export const zDiarizationSegment = z.object({
-  timestamp: z.tuple([z.unknown(), z.unknown()]).register(z.globalRegistry, {
-    description: 'Start and end timestamp of the segment',
-  }),
-  speaker: z.string().register(z.globalRegistry, {
-    description: 'Speaker ID of the segment',
-  }),
-})
-
-/**
  * WhisperOutput
  */
-export const zWhisperOutput = z.object({
+export const zSchemaWizperOutput = z.object({
   text: z.string().register(z.globalRegistry, {
     description: 'Transcription of the audio file',
   }),
-  inferred_languages: z
+  languages: z
     .array(
       z.enum([
         'af',
@@ -850,15 +429,1142 @@ export const zWhisperOutput = z.object({
       description:
         'List of languages that the audio file is inferred to be. Defaults to null.',
     }),
-  chunks: z.optional(
-    z.array(zFalAiWhisperWhisperChunk).register(z.globalRegistry, {
-      description: 'Timestamp chunks of the audio file',
+  chunks: z.array(zSchemaWhisperChunk).register(z.globalRegistry, {
+    description: 'Timestamp chunks of the audio file',
+  }),
+})
+
+/**
+ * WhisperInput
+ */
+export const zSchemaWizperInput = z.object({
+  language: z.optional(
+    z.union([
+      z.enum([
+        'af',
+        'am',
+        'ar',
+        'as',
+        'az',
+        'ba',
+        'be',
+        'bg',
+        'bn',
+        'bo',
+        'br',
+        'bs',
+        'ca',
+        'cs',
+        'cy',
+        'da',
+        'de',
+        'el',
+        'en',
+        'es',
+        'et',
+        'eu',
+        'fa',
+        'fi',
+        'fo',
+        'fr',
+        'gl',
+        'gu',
+        'ha',
+        'haw',
+        'he',
+        'hi',
+        'hr',
+        'ht',
+        'hu',
+        'hy',
+        'id',
+        'is',
+        'it',
+        'ja',
+        'jw',
+        'ka',
+        'kk',
+        'km',
+        'kn',
+        'ko',
+        'la',
+        'lb',
+        'ln',
+        'lo',
+        'lt',
+        'lv',
+        'mg',
+        'mi',
+        'mk',
+        'ml',
+        'mn',
+        'mr',
+        'ms',
+        'mt',
+        'my',
+        'ne',
+        'nl',
+        'nn',
+        'no',
+        'oc',
+        'pa',
+        'pl',
+        'ps',
+        'pt',
+        'ro',
+        'ru',
+        'sa',
+        'sd',
+        'si',
+        'sk',
+        'sl',
+        'sn',
+        'so',
+        'sq',
+        'sr',
+        'su',
+        'sv',
+        'sw',
+        'ta',
+        'te',
+        'tg',
+        'th',
+        'tk',
+        'tl',
+        'tr',
+        'tt',
+        'uk',
+        'ur',
+        'uz',
+        'vi',
+        'yi',
+        'yo',
+        'zh',
+      ]),
+      z.unknown(),
+    ]),
+  ),
+  version: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description:
+          'Version of the model to use. All of the models are the Whisper large variant.',
+      }),
+    )
+    .default('3'),
+  max_segment_len: z
+    .optional(
+      z.int().gte(10).lte(29).register(z.globalRegistry, {
+        description:
+          'Maximum speech segment duration in seconds before splitting.',
+      }),
+    )
+    .default(29),
+  task: z.optional(
+    z.enum(['transcribe', 'translate']).register(z.globalRegistry, {
+      description:
+        'Task to perform on the audio file. Either transcribe or translate.',
     }),
   ),
-  diarization_segments: z
-    .array(zDiarizationSegment)
-    .register(z.globalRegistry, {
-      description:
-        'Speaker diarization segments of the audio file. Only present if diarization is enabled.',
-    }),
+  chunk_level: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Level of the chunks to return.',
+      }),
+    )
+    .default('segment'),
+  audio_url: z.string().register(z.globalRegistry, {
+    description:
+      'URL of the audio file to transcribe. Supported formats: mp3, mp4, mpeg, mpga, m4a, wav or webm.',
+  }),
+  merge_chunks: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to merge consecutive chunks. When enabled, chunks are merged if their combined duration does not exceed max_segment_len.',
+      }),
+    )
+    .default(true),
 })
+
+/**
+ * TranscriptionWord
+ */
+export const zSchemaTranscriptionWord = z.object({
+  text: z.string().register(z.globalRegistry, {
+    description: 'The transcribed word or audio event',
+  }),
+  start: z.union([z.number(), z.unknown()]),
+  type: z.string().register(z.globalRegistry, {
+    description: 'Type of element (word, spacing, or audio_event)',
+  }),
+  end: z.union([z.number(), z.unknown()]),
+  speaker_id: z.optional(z.union([z.string(), z.unknown()])),
+})
+
+/**
+ * TranscriptionOutput
+ */
+export const zSchemaElevenlabsSpeechToTextOutput = z.object({
+  text: z.string().register(z.globalRegistry, {
+    description: 'The full transcribed text',
+  }),
+  language_probability: z.number().register(z.globalRegistry, {
+    description: 'Confidence in language detection',
+  }),
+  language_code: z.string().register(z.globalRegistry, {
+    description: 'Detected or specified language code',
+  }),
+  words: z.array(zSchemaTranscriptionWord).register(z.globalRegistry, {
+    description: 'Word-level transcription details',
+  }),
+})
+
+/**
+ * SpeechToTextRequest
+ */
+export const zSchemaElevenlabsSpeechToTextInput = z.object({
+  language_code: z.optional(z.union([z.string(), z.unknown()])),
+  audio_url: z.string().register(z.globalRegistry, {
+    description: 'URL of the audio file to transcribe',
+  }),
+  diarize: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to annotate who is speaking',
+      }),
+    )
+    .default(true),
+  tag_audio_events: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Tag audio events like laughter, applause, etc.',
+      }),
+    )
+    .default(true),
+})
+
+/**
+ * SpeechOutput
+ */
+export const zSchemaSpeechToTextOutput = z.object({
+  partial: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Indicates if this is a partial (in-progress) transcript',
+      }),
+    )
+    .default(false),
+  output: z.string().register(z.globalRegistry, {
+    description: 'The partial or final transcription output from Canary',
+  }),
+})
+
+/**
+ * SpeechInput
+ */
+export const zSchemaSpeechToTextInput = z.object({
+  audio_url: z.string().register(z.globalRegistry, {
+    description: 'Local filesystem path (or remote URL) to a long audio file',
+  }),
+  use_pnc: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "Whether to use Canary's built-in punctuation & capitalization",
+      }),
+    )
+    .default(true),
+})
+
+export const zSchemaSpeechToTextStreamOutput = z.unknown()
+
+/**
+ * SpeechInput
+ */
+export const zSchemaSpeechToTextStreamInput = z.object({
+  audio_url: z.string().register(z.globalRegistry, {
+    description: 'Local filesystem path (or remote URL) to a long audio file',
+  }),
+  use_pnc: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "Whether to use Canary's built-in punctuation & capitalization",
+      }),
+    )
+    .default(true),
+})
+
+export const zSchemaSpeechToTextTurboStreamOutput = z.unknown()
+
+/**
+ * SpeechInput
+ */
+export const zSchemaSpeechToTextTurboStreamInput = z.object({
+  audio_url: z.string().register(z.globalRegistry, {
+    description: 'Local filesystem path (or remote URL) to a long audio file',
+  }),
+  use_pnc: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "Whether to use Canary's built-in punctuation & capitalization",
+      }),
+    )
+    .default(true),
+})
+
+/**
+ * SpeechOutput
+ */
+export const zSchemaSpeechToTextTurboOutput = z.object({
+  partial: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Indicates if this is a partial (in-progress) transcript',
+      }),
+    )
+    .default(false),
+  output: z.string().register(z.globalRegistry, {
+    description: 'The partial or final transcription output from Canary',
+  }),
+})
+
+/**
+ * SpeechInput
+ */
+export const zSchemaSpeechToTextTurboInput = z.object({
+  audio_url: z.string().register(z.globalRegistry, {
+    description: 'Local filesystem path (or remote URL) to a long audio file',
+  }),
+  use_pnc: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "Whether to use Canary's built-in punctuation & capitalization",
+      }),
+    )
+    .default(true),
+})
+
+/**
+ * Output
+ */
+export const zSchemaSmartTurnOutput = z.object({
+  prediction: z.int().register(z.globalRegistry, {
+    description: 'The predicted turn type. 1 for Complete, 0 for Incomplete.',
+  }),
+  probability: z.number().register(z.globalRegistry, {
+    description: 'The probability of the predicted turn type.',
+  }),
+  metrics: z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+    description: 'The metrics of the inference.',
+  }),
+})
+
+/**
+ * SmartTurnInput
+ */
+export const zSchemaSmartTurnInput = z.object({
+  audio_url: z.string().register(z.globalRegistry, {
+    description: 'The URL of the audio file to be processed.',
+  }),
+})
+
+/**
+ * TranscriptionOutputV2
+ */
+export const zSchemaElevenlabsSpeechToTextScribeV2Output = z.object({
+  text: z.string().register(z.globalRegistry, {
+    description: 'The full transcribed text',
+  }),
+  language_probability: z.number().register(z.globalRegistry, {
+    description: 'Confidence in language detection',
+  }),
+  language_code: z.string().register(z.globalRegistry, {
+    description: 'Detected or specified language code',
+  }),
+  words: z.array(zSchemaTranscriptionWord).register(z.globalRegistry, {
+    description: 'Word-level transcription details',
+  }),
+})
+
+/**
+ * SpeechToTextRequestScribeV2
+ */
+export const zSchemaElevenlabsSpeechToTextScribeV2Input = z.object({
+  keyterms: z
+    .optional(
+      z.array(z.string()).max(100).register(z.globalRegistry, {
+        description:
+          'Words or sentences to bias the model towards transcribing. Up to 100 keyterms, max 50 characters each. Adds 30% premium over base transcription price.',
+      }),
+    )
+    .default([]),
+  audio_url: z.string().register(z.globalRegistry, {
+    description: 'URL of the audio file to transcribe',
+  }),
+  diarize: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to annotate who is speaking',
+      }),
+    )
+    .default(true),
+  language_code: z.optional(z.union([z.string(), z.unknown()])),
+  tag_audio_events: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Tag audio events like laughter, applause, etc.',
+      }),
+    )
+    .default(true),
+})
+
+export const zSchemaQueueStatus = z.object({
+  status: z.enum(['IN_QUEUE', 'IN_PROGRESS', 'COMPLETED']),
+  request_id: z.string().register(z.globalRegistry, {
+    description: 'The request id.',
+  }),
+  response_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The response url.',
+    }),
+  ),
+  status_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The status url.',
+    }),
+  ),
+  cancel_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The cancel url.',
+    }),
+  ),
+  logs: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The logs.',
+    }),
+  ),
+  metrics: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The metrics.',
+    }),
+  ),
+  queue_position: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The queue position.',
+    }),
+  ),
+})
+
+export const zGetFalAiElevenlabsSpeechToTextScribeV2RequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiElevenlabsSpeechToTextScribeV2RequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiElevenlabsSpeechToTextScribeV2RequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiElevenlabsSpeechToTextScribeV2RequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiElevenlabsSpeechToTextScribeV2Data = z.object({
+  body: zSchemaElevenlabsSpeechToTextScribeV2Input,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiElevenlabsSpeechToTextScribeV2Response =
+  zSchemaQueueStatus
+
+export const zGetFalAiElevenlabsSpeechToTextScribeV2RequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiElevenlabsSpeechToTextScribeV2RequestsByRequestIdResponse =
+  zSchemaElevenlabsSpeechToTextScribeV2Output
+
+export const zGetFalAiSmartTurnRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiSmartTurnRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiSmartTurnRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiSmartTurnRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiSmartTurnData = z.object({
+  body: zSchemaSmartTurnInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiSmartTurnResponse = zSchemaQueueStatus
+
+export const zGetFalAiSmartTurnRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiSmartTurnRequestsByRequestIdResponse =
+  zSchemaSmartTurnOutput
+
+export const zGetFalAiSpeechToTextTurboRequestsByRequestIdStatusData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  },
+)
+
+/**
+ * The request status.
+ */
+export const zGetFalAiSpeechToTextTurboRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiSpeechToTextTurboRequestsByRequestIdCancelData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiSpeechToTextTurboRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiSpeechToTextTurboData = z.object({
+  body: zSchemaSpeechToTextTurboInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiSpeechToTextTurboResponse = zSchemaQueueStatus
+
+export const zGetFalAiSpeechToTextTurboRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiSpeechToTextTurboRequestsByRequestIdResponse =
+  zSchemaSpeechToTextTurboOutput
+
+export const zGetFalAiSpeechToTextTurboStreamRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiSpeechToTextTurboStreamRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiSpeechToTextTurboStreamRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiSpeechToTextTurboStreamRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiSpeechToTextTurboStreamData = z.object({
+  body: zSchemaSpeechToTextTurboStreamInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiSpeechToTextTurboStreamResponse = zSchemaQueueStatus
+
+export const zGetFalAiSpeechToTextTurboStreamRequestsByRequestIdData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiSpeechToTextTurboStreamRequestsByRequestIdResponse =
+  zSchemaSpeechToTextTurboStreamOutput
+
+export const zGetFalAiSpeechToTextStreamRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiSpeechToTextStreamRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiSpeechToTextStreamRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiSpeechToTextStreamRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiSpeechToTextStreamData = z.object({
+  body: zSchemaSpeechToTextStreamInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiSpeechToTextStreamResponse = zSchemaQueueStatus
+
+export const zGetFalAiSpeechToTextStreamRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiSpeechToTextStreamRequestsByRequestIdResponse =
+  zSchemaSpeechToTextStreamOutput
+
+export const zGetFalAiSpeechToTextRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiSpeechToTextRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiSpeechToTextRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiSpeechToTextRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiSpeechToTextData = z.object({
+  body: zSchemaSpeechToTextInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiSpeechToTextResponse = zSchemaQueueStatus
+
+export const zGetFalAiSpeechToTextRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiSpeechToTextRequestsByRequestIdResponse =
+  zSchemaSpeechToTextOutput
+
+export const zGetFalAiElevenlabsSpeechToTextRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiElevenlabsSpeechToTextRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiElevenlabsSpeechToTextRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiElevenlabsSpeechToTextRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiElevenlabsSpeechToTextData = z.object({
+  body: zSchemaElevenlabsSpeechToTextInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiElevenlabsSpeechToTextResponse = zSchemaQueueStatus
+
+export const zGetFalAiElevenlabsSpeechToTextRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiElevenlabsSpeechToTextRequestsByRequestIdResponse =
+  zSchemaElevenlabsSpeechToTextOutput
+
+export const zGetFalAiWizperRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWizperRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWizperRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWizperRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiWizperData = z.object({
+  body: zSchemaWizperInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWizperResponse = zSchemaQueueStatus
+
+export const zGetFalAiWizperRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWizperRequestsByRequestIdResponse = zSchemaWizperOutput
+
+export const zGetFalAiWhisperRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWhisperRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWhisperRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWhisperRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiWhisperData = z.object({
+  body: zSchemaWhisperInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWhisperResponse = zSchemaQueueStatus
+
+export const zGetFalAiWhisperRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWhisperRequestsByRequestIdResponse = zSchemaWhisperOutput

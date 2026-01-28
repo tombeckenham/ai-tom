@@ -2,16 +2,14 @@
 
 import { z } from 'zod'
 
-export const zFile = z.object({
-  url: z.url(),
-  content_type: z.optional(z.string()),
-  file_name: z.optional(z.string()),
-  file_size: z.optional(z.int()),
-})
-
-export const zQueueStatus = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'FAILED']),
-  response_url: z.optional(z.url()),
+/**
+ * AITextDetectionOutput
+ */
+export const zAiDetectorDetectTextOutput = z.object({
+  latency: z.number(),
+  verdict: z.string(),
+  is_ai_generated: z.boolean(),
+  confidence: z.number(),
 })
 
 /**
@@ -23,12 +21,120 @@ export const zAiDetectorDetectTextInput = z.object({
   }),
 })
 
-/**
- * AITextDetectionOutput
- */
-export const zAiDetectorDetectTextOutput = z.object({
-  latency: z.number(),
-  verdict: z.string(),
-  is_ai_generated: z.boolean(),
-  confidence: z.number(),
+export const zQueueStatus = z.object({
+  status: z.enum(['IN_QUEUE', 'IN_PROGRESS', 'COMPLETED']),
+  request_id: z.string().register(z.globalRegistry, {
+    description: 'The request id.',
+  }),
+  response_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The response url.',
+    }),
+  ),
+  status_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The status url.',
+    }),
+  ),
+  cancel_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The cancel url.',
+    }),
+  ),
+  logs: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The logs.',
+    }),
+  ),
+  metrics: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The metrics.',
+    }),
+  ),
+  queue_position: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The queue position.',
+    }),
+  ),
 })
+
+export const zGetHalfMoonAiAiDetectorDetectTextRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetHalfMoonAiAiDetectorDetectTextRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
+export const zPutHalfMoonAiAiDetectorDetectTextRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutHalfMoonAiAiDetectorDetectTextRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostHalfMoonAiAiDetectorDetectTextData = z.object({
+  body: zAiDetectorDetectTextInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostHalfMoonAiAiDetectorDetectTextResponse = zQueueStatus
+
+export const zGetHalfMoonAiAiDetectorDetectTextRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetHalfMoonAiAiDetectorDetectTextRequestsByRequestIdResponse =
+  zAiDetectorDetectTextOutput

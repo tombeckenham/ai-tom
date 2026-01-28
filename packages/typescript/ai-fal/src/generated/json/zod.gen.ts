@@ -2,22 +2,273 @@
 
 import { z } from 'zod'
 
-export const zFile = z.object({
-  url: z.url(),
-  content_type: z.optional(z.string()),
-  file_name: z.optional(z.string()),
-  file_size: z.optional(z.int()),
+/**
+ * AudioTrack
+ */
+export const zSchemaAudioTrack = z.object({
+  codec: z.string().register(z.globalRegistry, {
+    description: "Audio codec used (e.g., 'aac', 'mp3')",
+  }),
+  channels: z.int().register(z.globalRegistry, {
+    description: 'Number of audio channels',
+  }),
+  sample_rate: z.int().register(z.globalRegistry, {
+    description: 'Audio sample rate in Hz',
+  }),
+  bitrate: z.int().register(z.globalRegistry, {
+    description: 'Audio bitrate in bits per second',
+  }),
 })
 
-export const zQueueStatus = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'FAILED']),
-  response_url: z.optional(z.url()),
+/**
+ * Resolution
+ */
+export const zSchemaResolution = z.object({
+  height: z.int().register(z.globalRegistry, {
+    description: 'Height of the video in pixels',
+  }),
+  aspect_ratio: z.string().register(z.globalRegistry, {
+    description: "Display aspect ratio (e.g., '16:9')",
+  }),
+  width: z.int().register(z.globalRegistry, {
+    description: 'Width of the video in pixels',
+  }),
+})
+
+/**
+ * VideoFormat
+ */
+export const zSchemaVideoFormat = z.object({
+  container: z.string().register(z.globalRegistry, {
+    description: 'Container format of the video',
+  }),
+  level: z.number().register(z.globalRegistry, {
+    description: 'Codec level (e.g., 4.1)',
+  }),
+  pixel_format: z.string().register(z.globalRegistry, {
+    description: "Pixel format used (e.g., 'yuv420p')",
+  }),
+  video_codec: z.string().register(z.globalRegistry, {
+    description: "Video codec used (e.g., 'h264')",
+  }),
+  profile: z.string().register(z.globalRegistry, {
+    description: "Codec profile (e.g., 'main', 'high')",
+  }),
+  bitrate: z.int().register(z.globalRegistry, {
+    description: 'Video bitrate in bits per second',
+  }),
+})
+
+/**
+ * Audio
+ */
+export const zSchemaAudio = z.object({
+  file_size: z.int().register(z.globalRegistry, {
+    description: 'Size of the file in bytes',
+  }),
+  duration: z.number().register(z.globalRegistry, {
+    description: 'Duration of the media in seconds',
+  }),
+  bitrate: z.int().register(z.globalRegistry, {
+    description: 'Overall bitrate of the media in bits per second',
+  }),
+  url: z.string().register(z.globalRegistry, {
+    description: 'URL where the media file can be accessed',
+  }),
+  media_type: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: "Type of media (always 'audio')",
+      }),
+    )
+    .default('audio'),
+  codec: z.string().register(z.globalRegistry, {
+    description: 'Codec used to encode the media',
+  }),
+  file_name: z.string().register(z.globalRegistry, {
+    description: 'Original filename of the media',
+  }),
+  sample_rate: z.int().register(z.globalRegistry, {
+    description: 'Audio sample rate in Hz',
+  }),
+  content_type: z.string().register(z.globalRegistry, {
+    description: 'MIME type of the media file',
+  }),
+  container: z.string().register(z.globalRegistry, {
+    description: "Container format of the media file (e.g., 'mp4', 'mov')",
+  }),
+  channels: z.int().register(z.globalRegistry, {
+    description: 'Number of audio channels',
+  }),
+})
+
+/**
+ * Video
+ */
+export const zSchemaVideo = z.object({
+  file_size: z.int().register(z.globalRegistry, {
+    description: 'Size of the file in bytes',
+  }),
+  timebase: z.string().register(z.globalRegistry, {
+    description: 'Time base used for frame timestamps',
+  }),
+  start_frame_url: z.optional(z.union([z.string(), z.unknown()])),
+  duration: z.number().register(z.globalRegistry, {
+    description: 'Duration of the media in seconds',
+  }),
+  url: z.string().register(z.globalRegistry, {
+    description: 'URL where the media file can be accessed',
+  }),
+  fps: z.int().register(z.globalRegistry, {
+    description: 'Frames per second',
+  }),
+  codec: z.string().register(z.globalRegistry, {
+    description: 'Codec used to encode the media',
+  }),
+  media_type: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: "Type of media (always 'video')",
+      }),
+    )
+    .default('video'),
+  end_frame_url: z.optional(z.union([z.string(), z.unknown()])),
+  content_type: z.string().register(z.globalRegistry, {
+    description: 'MIME type of the media file',
+  }),
+  container: z.string().register(z.globalRegistry, {
+    description: "Container format of the media file (e.g., 'mp4', 'mov')",
+  }),
+  bitrate: z.int().register(z.globalRegistry, {
+    description: 'Overall bitrate of the media in bits per second',
+  }),
+  format: zSchemaVideoFormat,
+  resolution: zSchemaResolution,
+  frame_count: z.int().register(z.globalRegistry, {
+    description: 'Total number of frames in the video',
+  }),
+  file_name: z.string().register(z.globalRegistry, {
+    description: 'Original filename of the media',
+  }),
+  audio: z.optional(z.union([zSchemaAudioTrack, z.unknown()])),
+})
+
+/**
+ * MetadataOutput
+ */
+export const zSchemaFfmpegApiMetadataOutput = z.object({
+  media: z.union([zSchemaVideo, zSchemaAudio]),
+})
+
+/**
+ * MetadataInput
+ */
+export const zSchemaFfmpegApiMetadataInput = z.object({
+  extract_frames: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to extract the start and end frames for videos. Note that when true the request will be slower.',
+      }),
+    )
+    .default(false),
+  media_url: z.string().register(z.globalRegistry, {
+    description: 'URL of the media file (video or audio) to analyze',
+  }),
+})
+
+/**
+ * WaveformOutput
+ */
+export const zSchemaFfmpegApiWaveformOutput = z.object({
+  precision: z.int().register(z.globalRegistry, {
+    description: 'Number of decimal places used in the waveform values',
+  }),
+  duration: z.number().register(z.globalRegistry, {
+    description: 'Duration of the audio in seconds',
+  }),
+  points: z.int().register(z.globalRegistry, {
+    description: 'Number of points in the waveform data',
+  }),
+  waveform: z.array(z.number()).register(z.globalRegistry, {
+    description:
+      'Normalized waveform data as an array of values between -1 and 1. The number of points is determined by audio duration × points_per_second.',
+  }),
+})
+
+/**
+ * WaveformInput
+ */
+export const zSchemaFfmpegApiWaveformInput = z.object({
+  precision: z
+    .optional(
+      z.int().gte(1).lte(6).register(z.globalRegistry, {
+        description:
+          'Number of decimal places for the waveform values. Higher values provide more precision but increase payload size.',
+      }),
+    )
+    .default(2),
+  smoothing_window: z
+    .optional(
+      z.int().gte(1).lte(21).register(z.globalRegistry, {
+        description:
+          'Size of the smoothing window. Higher values create a smoother waveform. Must be an odd number.',
+      }),
+    )
+    .default(3),
+  media_url: z.string().register(z.globalRegistry, {
+    description: 'URL of the audio file to analyze',
+  }),
+  points_per_second: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description:
+          'Controls how many points are sampled per second of audio. Lower values (e.g. 1-2) create a coarser waveform, higher values (e.g. 4-10) create a more detailed one.',
+      }),
+    )
+    .default(4),
+})
+
+/**
+ * File
+ */
+export const zSchemaFile = z.object({
+  file_size: z.optional(z.union([z.int(), z.unknown()])),
+  file_name: z.optional(z.union([z.string(), z.unknown()])),
+  content_type: z.optional(z.union([z.string(), z.unknown()])),
+  url: z.string().register(z.globalRegistry, {
+    description: 'The URL where the file can be downloaded from.',
+  }),
+})
+
+/**
+ * LoudnormSummary
+ */
+export const zSchemaLoudnormSummary = z.object({
+  output_integrated: z.optional(z.union([z.number(), z.unknown()])),
+  output_true_peak: z.optional(z.union([z.number(), z.unknown()])),
+  input_lra: z.optional(z.union([z.number(), z.unknown()])),
+  normalization_type: z.optional(z.union([z.string(), z.unknown()])),
+  output_lra: z.optional(z.union([z.number(), z.unknown()])),
+  output_threshold: z.optional(z.union([z.number(), z.unknown()])),
+  input_integrated: z.optional(z.union([z.number(), z.unknown()])),
+  input_true_peak: z.optional(z.union([z.number(), z.unknown()])),
+  target_offset: z.optional(z.union([z.number(), z.unknown()])),
+  input_threshold: z.optional(z.union([z.number(), z.unknown()])),
+})
+
+/**
+ * LoudnormOutput
+ */
+export const zSchemaFfmpegApiLoudnormOutput = z.object({
+  summary: z.optional(z.union([zSchemaLoudnormSummary, z.unknown()])),
+  audio: zSchemaFile,
 })
 
 /**
  * LoudnormInput
  */
-export const zFfmpegApiLoudnormInput = z.object({
+export const zSchemaFfmpegApiLoudnormInput = z.object({
   measured_tp: z.optional(z.union([z.number().gte(-99).lte(99), z.unknown()])),
   linear: z
     .optional(
@@ -81,265 +332,282 @@ export const zFfmpegApiLoudnormInput = z.object({
     .default(7),
 })
 
-/**
- * LoudnormSummary
- */
-export const zLoudnormSummary = z.object({
-  output_integrated: z.optional(z.union([z.number(), z.unknown()])),
-  output_true_peak: z.optional(z.union([z.number(), z.unknown()])),
-  input_lra: z.optional(z.union([z.number(), z.unknown()])),
-  normalization_type: z.optional(z.union([z.string(), z.unknown()])),
-  output_lra: z.optional(z.union([z.number(), z.unknown()])),
-  output_threshold: z.optional(z.union([z.number(), z.unknown()])),
-  input_integrated: z.optional(z.union([z.number(), z.unknown()])),
-  input_true_peak: z.optional(z.union([z.number(), z.unknown()])),
-  target_offset: z.optional(z.union([z.number(), z.unknown()])),
-  input_threshold: z.optional(z.union([z.number(), z.unknown()])),
-})
-
-/**
- * File
- */
-export const zFalAiFfmpegApiLoudnormFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+export const zSchemaQueueStatus = z.object({
+  status: z.enum(['IN_QUEUE', 'IN_PROGRESS', 'COMPLETED']),
+  request_id: z.string().register(z.globalRegistry, {
+    description: 'The request id.',
   }),
+  response_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The response url.',
+    }),
+  ),
+  status_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The status url.',
+    }),
+  ),
+  cancel_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The cancel url.',
+    }),
+  ),
+  logs: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The logs.',
+    }),
+  ),
+  metrics: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The metrics.',
+    }),
+  ),
+  queue_position: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The queue position.',
+    }),
+  ),
 })
 
-/**
- * LoudnormOutput
- */
-export const zFfmpegApiLoudnormOutput = z.object({
-  summary: z.optional(z.union([zLoudnormSummary, z.unknown()])),
-  audio: zFalAiFfmpegApiLoudnormFile,
-})
-
-/**
- * WaveformInput
- */
-export const zFfmpegApiWaveformInput = z.object({
-  precision: z
-    .optional(
-      z.int().gte(1).lte(6).register(z.globalRegistry, {
-        description:
-          'Number of decimal places for the waveform values. Higher values provide more precision but increase payload size.',
+export const zGetFalAiFfmpegApiLoudnormRequestsByRequestIdStatusData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
       }),
-    )
-    .default(2),
-  smoothing_window: z
-    .optional(
-      z.int().gte(1).lte(21).register(z.globalRegistry, {
-        description:
-          'Size of the smoothing window. Higher values create a smoother waveform. Must be an odd number.',
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
       }),
-    )
-    .default(3),
-  media_url: z.string().register(z.globalRegistry, {
-    description: 'URL of the audio file to analyze',
-  }),
-  points_per_second: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description:
-          'Controls how many points are sampled per second of audio. Lower values (e.g. 1-2) create a coarser waveform, higher values (e.g. 4-10) create a more detailed one.',
-      }),
-    )
-    .default(4),
-})
+    ),
+  },
+)
 
 /**
- * WaveformOutput
+ * The request status.
  */
-export const zFfmpegApiWaveformOutput = z.object({
-  precision: z.int().register(z.globalRegistry, {
-    description: 'Number of decimal places used in the waveform values',
-  }),
-  duration: z.number().register(z.globalRegistry, {
-    description: 'Duration of the audio in seconds',
-  }),
-  points: z.int().register(z.globalRegistry, {
-    description: 'Number of points in the waveform data',
-  }),
-  waveform: z.array(z.number()).register(z.globalRegistry, {
-    description:
-      'Normalized waveform data as an array of values between -1 and 1. The number of points is determined by audio duration × points_per_second.',
-  }),
-})
+export const zGetFalAiFfmpegApiLoudnormRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiFfmpegApiLoudnormRequestsByRequestIdCancelData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
 
 /**
- * MetadataInput
+ * The request was cancelled.
  */
-export const zFfmpegApiMetadataInput = z.object({
-  extract_frames: z
-    .optional(
+export const zPutFalAiFfmpegApiLoudnormRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
       z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to extract the start and end frames for videos. Note that when true the request will be slower.',
+        description: 'Whether the request was cancelled successfully.',
       }),
-    )
-    .default(false),
-  media_url: z.string().register(z.globalRegistry, {
-    description: 'URL of the media file (video or audio) to analyze',
-  }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiFfmpegApiLoudnormData = z.object({
+  body: zSchemaFfmpegApiLoudnormInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
 })
 
 /**
- * VideoFormat
+ * The request status.
  */
-export const zVideoFormat = z.object({
-  container: z.string().register(z.globalRegistry, {
-    description: 'Container format of the video',
+export const zPostFalAiFfmpegApiLoudnormResponse = zSchemaQueueStatus
+
+export const zGetFalAiFfmpegApiLoudnormRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
   }),
-  level: z.number().register(z.globalRegistry, {
-    description: 'Codec level (e.g., 4.1)',
-  }),
-  pixel_format: z.string().register(z.globalRegistry, {
-    description: "Pixel format used (e.g., 'yuv420p')",
-  }),
-  video_codec: z.string().register(z.globalRegistry, {
-    description: "Video codec used (e.g., 'h264')",
-  }),
-  profile: z.string().register(z.globalRegistry, {
-    description: "Codec profile (e.g., 'main', 'high')",
-  }),
-  bitrate: z.int().register(z.globalRegistry, {
-    description: 'Video bitrate in bits per second',
-  }),
+  query: z.optional(z.never()),
 })
 
 /**
- * Resolution
+ * Result of the request.
  */
-export const zResolution = z.object({
-  height: z.int().register(z.globalRegistry, {
-    description: 'Height of the video in pixels',
-  }),
-  aspect_ratio: z.string().register(z.globalRegistry, {
-    description: "Display aspect ratio (e.g., '16:9')",
-  }),
-  width: z.int().register(z.globalRegistry, {
-    description: 'Width of the video in pixels',
-  }),
-})
+export const zGetFalAiFfmpegApiLoudnormRequestsByRequestIdResponse =
+  zSchemaFfmpegApiLoudnormOutput
 
-/**
- * AudioTrack
- */
-export const zAudioTrack = z.object({
-  codec: z.string().register(z.globalRegistry, {
-    description: "Audio codec used (e.g., 'aac', 'mp3')",
-  }),
-  channels: z.int().register(z.globalRegistry, {
-    description: 'Number of audio channels',
-  }),
-  sample_rate: z.int().register(z.globalRegistry, {
-    description: 'Audio sample rate in Hz',
-  }),
-  bitrate: z.int().register(z.globalRegistry, {
-    description: 'Audio bitrate in bits per second',
-  }),
-})
-
-/**
- * Video
- */
-export const zVideo = z.object({
-  file_size: z.int().register(z.globalRegistry, {
-    description: 'Size of the file in bytes',
-  }),
-  timebase: z.string().register(z.globalRegistry, {
-    description: 'Time base used for frame timestamps',
-  }),
-  start_frame_url: z.optional(z.union([z.string(), z.unknown()])),
-  duration: z.number().register(z.globalRegistry, {
-    description: 'Duration of the media in seconds',
-  }),
-  url: z.string().register(z.globalRegistry, {
-    description: 'URL where the media file can be accessed',
-  }),
-  fps: z.int().register(z.globalRegistry, {
-    description: 'Frames per second',
-  }),
-  codec: z.string().register(z.globalRegistry, {
-    description: 'Codec used to encode the media',
-  }),
-  media_type: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: "Type of media (always 'video')",
+export const zGetFalAiFfmpegApiWaveformRequestsByRequestIdStatusData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
       }),
-    )
-    .default('video'),
-  end_frame_url: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.string().register(z.globalRegistry, {
-    description: 'MIME type of the media file',
-  }),
-  container: z.string().register(z.globalRegistry, {
-    description: "Container format of the media file (e.g., 'mp4', 'mov')",
-  }),
-  bitrate: z.int().register(z.globalRegistry, {
-    description: 'Overall bitrate of the media in bits per second',
-  }),
-  format: zVideoFormat,
-  resolution: zResolution,
-  frame_count: z.int().register(z.globalRegistry, {
-    description: 'Total number of frames in the video',
-  }),
-  file_name: z.string().register(z.globalRegistry, {
-    description: 'Original filename of the media',
-  }),
-  audio: z.optional(z.union([zAudioTrack, z.unknown()])),
-})
-
-/**
- * Audio
- */
-export const zAudio = z.object({
-  file_size: z.int().register(z.globalRegistry, {
-    description: 'Size of the file in bytes',
-  }),
-  duration: z.number().register(z.globalRegistry, {
-    description: 'Duration of the media in seconds',
-  }),
-  bitrate: z.int().register(z.globalRegistry, {
-    description: 'Overall bitrate of the media in bits per second',
-  }),
-  url: z.string().register(z.globalRegistry, {
-    description: 'URL where the media file can be accessed',
-  }),
-  media_type: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: "Type of media (always 'audio')",
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
       }),
-    )
-    .default('audio'),
-  codec: z.string().register(z.globalRegistry, {
-    description: 'Codec used to encode the media',
-  }),
-  file_name: z.string().register(z.globalRegistry, {
-    description: 'Original filename of the media',
-  }),
-  sample_rate: z.int().register(z.globalRegistry, {
-    description: 'Audio sample rate in Hz',
-  }),
-  content_type: z.string().register(z.globalRegistry, {
-    description: 'MIME type of the media file',
-  }),
-  container: z.string().register(z.globalRegistry, {
-    description: "Container format of the media file (e.g., 'mp4', 'mov')",
-  }),
-  channels: z.int().register(z.globalRegistry, {
-    description: 'Number of audio channels',
-  }),
+    ),
+  },
+)
+
+/**
+ * The request status.
+ */
+export const zGetFalAiFfmpegApiWaveformRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiFfmpegApiWaveformRequestsByRequestIdCancelData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiFfmpegApiWaveformRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiFfmpegApiWaveformData = z.object({
+  body: zSchemaFfmpegApiWaveformInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
 })
 
 /**
- * MetadataOutput
+ * The request status.
  */
-export const zFfmpegApiMetadataOutput = z.object({
-  media: z.union([zVideo, zAudio]),
+export const zPostFalAiFfmpegApiWaveformResponse = zSchemaQueueStatus
+
+export const zGetFalAiFfmpegApiWaveformRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
 })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiFfmpegApiWaveformRequestsByRequestIdResponse =
+  zSchemaFfmpegApiWaveformOutput
+
+export const zGetFalAiFfmpegApiMetadataRequestsByRequestIdStatusData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  },
+)
+
+/**
+ * The request status.
+ */
+export const zGetFalAiFfmpegApiMetadataRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiFfmpegApiMetadataRequestsByRequestIdCancelData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiFfmpegApiMetadataRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiFfmpegApiMetadataData = z.object({
+  body: zSchemaFfmpegApiMetadataInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiFfmpegApiMetadataResponse = zSchemaQueueStatus
+
+export const zGetFalAiFfmpegApiMetadataRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiFfmpegApiMetadataRequestsByRequestIdResponse =
+  zSchemaFfmpegApiMetadataOutput

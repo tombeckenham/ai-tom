@@ -2,68 +2,10 @@
 
 import { z } from 'zod'
 
-export const zFile = z.object({
-  url: z.url(),
-  content_type: z.optional(z.string()),
-  file_name: z.optional(z.string()),
-  file_size: z.optional(z.int()),
-})
-
-export const zQueueStatus = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'FAILED']),
-  response_url: z.optional(z.url()),
-})
-
-/**
- * VideoEnterpriseInput
- */
-export const zRouterVideoEnterpriseInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'Prompt to be used for the video processing',
-  }),
-  video_urls: z.optional(
-    z.array(z.string()).register(z.globalRegistry, {
-      description:
-        'List of URLs or data URIs of video files to process. Supported formats: mp4, mpeg, mov, webm. For Google Gemini on AI Studio, YouTube links are also supported. Mutually exclusive with video_url.',
-    }),
-  ),
-  system_prompt: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'System prompt to provide context or instructions to the model',
-    }),
-  ),
-  reasoning: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Should reasoning be the part of the final answer.',
-      }),
-    )
-    .default(false),
-  model: z.string().register(z.globalRegistry, {
-    description:
-      'Name of the model to use. Charged based on actual token usage.',
-  }),
-  max_tokens: z.optional(
-    z.int().gte(1).register(z.globalRegistry, {
-      description:
-        "This sets the upper limit for the number of tokens the model can generate in response. It won't produce more than this limit. The maximum value is the context length minus the prompt length.",
-    }),
-  ),
-  temperature: z
-    .optional(
-      z.number().gte(0).lte(2).register(z.globalRegistry, {
-        description:
-          "This setting influences the variety in the model's responses. Lower values lead to more predictable and typical responses, while higher values encourage more diverse and less common responses. At 0, the model always gives the same response for a given input.",
-      }),
-    )
-    .default(1),
-})
-
 /**
  * UsageInfo
  */
-export const zUsageInfo = z.object({
+export const zSchemaUsageInfo = z.object({
   prompt_tokens: z.optional(z.int()),
   total_tokens: z.optional(z.int()).default(0),
   completion_tokens: z.optional(z.int()),
@@ -73,8 +15,8 @@ export const zUsageInfo = z.object({
 /**
  * VideoOutput
  */
-export const zRouterVideoEnterpriseOutput = z.object({
-  usage: z.optional(zUsageInfo),
+export const zSchemaRouterVideoOutput = z.object({
+  usage: z.optional(zSchemaUsageInfo),
   output: z.string().register(z.globalRegistry, {
     description: 'Generated output from video processing',
   }),
@@ -83,7 +25,7 @@ export const zRouterVideoEnterpriseOutput = z.object({
 /**
  * VideoInput
  */
-export const zRouterVideoInput = z.object({
+export const zSchemaRouterVideoInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'Prompt to be used for the video processing',
   }),
@@ -127,21 +69,252 @@ export const zRouterVideoInput = z.object({
 })
 
 /**
- * UsageInfo
- */
-export const zOpenrouterRouterVideoUsageInfo = z.object({
-  prompt_tokens: z.optional(z.int()),
-  total_tokens: z.optional(z.int()).default(0),
-  completion_tokens: z.optional(z.int()),
-  cost: z.number(),
-})
-
-/**
  * VideoOutput
  */
-export const zRouterVideoOutput = z.object({
-  usage: z.optional(zOpenrouterRouterVideoUsageInfo),
+export const zSchemaRouterVideoEnterpriseOutput = z.object({
+  usage: z.optional(zSchemaUsageInfo),
   output: z.string().register(z.globalRegistry, {
     description: 'Generated output from video processing',
   }),
 })
+
+/**
+ * VideoEnterpriseInput
+ */
+export const zSchemaRouterVideoEnterpriseInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'Prompt to be used for the video processing',
+  }),
+  video_urls: z.optional(
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'List of URLs or data URIs of video files to process. Supported formats: mp4, mpeg, mov, webm. For Google Gemini on AI Studio, YouTube links are also supported. Mutually exclusive with video_url.',
+    }),
+  ),
+  system_prompt: z.optional(
+    z.string().register(z.globalRegistry, {
+      description:
+        'System prompt to provide context or instructions to the model',
+    }),
+  ),
+  reasoning: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Should reasoning be the part of the final answer.',
+      }),
+    )
+    .default(false),
+  model: z.string().register(z.globalRegistry, {
+    description:
+      'Name of the model to use. Charged based on actual token usage.',
+  }),
+  max_tokens: z.optional(
+    z.int().gte(1).register(z.globalRegistry, {
+      description:
+        "This sets the upper limit for the number of tokens the model can generate in response. It won't produce more than this limit. The maximum value is the context length minus the prompt length.",
+    }),
+  ),
+  temperature: z
+    .optional(
+      z.number().gte(0).lte(2).register(z.globalRegistry, {
+        description:
+          "This setting influences the variety in the model's responses. Lower values lead to more predictable and typical responses, while higher values encourage more diverse and less common responses. At 0, the model always gives the same response for a given input.",
+      }),
+    )
+    .default(1),
+})
+
+export const zSchemaQueueStatus = z.object({
+  status: z.enum(['IN_QUEUE', 'IN_PROGRESS', 'COMPLETED']),
+  request_id: z.string().register(z.globalRegistry, {
+    description: 'The request id.',
+  }),
+  response_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The response url.',
+    }),
+  ),
+  status_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The status url.',
+    }),
+  ),
+  cancel_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The cancel url.',
+    }),
+  ),
+  logs: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The logs.',
+    }),
+  ),
+  metrics: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The metrics.',
+    }),
+  ),
+  queue_position: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The queue position.',
+    }),
+  ),
+})
+
+export const zGetOpenrouterRouterVideoEnterpriseRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetOpenrouterRouterVideoEnterpriseRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutOpenrouterRouterVideoEnterpriseRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutOpenrouterRouterVideoEnterpriseRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostOpenrouterRouterVideoEnterpriseData = z.object({
+  body: zSchemaRouterVideoEnterpriseInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostOpenrouterRouterVideoEnterpriseResponse = zSchemaQueueStatus
+
+export const zGetOpenrouterRouterVideoEnterpriseRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetOpenrouterRouterVideoEnterpriseRequestsByRequestIdResponse =
+  zSchemaRouterVideoEnterpriseOutput
+
+export const zGetOpenrouterRouterVideoRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetOpenrouterRouterVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutOpenrouterRouterVideoRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutOpenrouterRouterVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostOpenrouterRouterVideoData = z.object({
+  body: zSchemaRouterVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostOpenrouterRouterVideoResponse = zSchemaQueueStatus
+
+export const zGetOpenrouterRouterVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetOpenrouterRouterVideoRequestsByRequestIdResponse =
+  zSchemaRouterVideoOutput

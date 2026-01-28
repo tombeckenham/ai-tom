@@ -2,16 +2,22 @@
 
 import { z } from 'zod'
 
-export const zFile = z.object({
-  url: z.url(),
-  content_type: z.optional(z.string()),
-  file_name: z.optional(z.string()),
-  file_size: z.optional(z.int()),
-})
-
-export const zQueueStatus = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'FAILED']),
-  response_url: z.optional(z.url()),
+/**
+ * TextOutput
+ */
+export const zBagelUnderstandOutput = z.object({
+  text: z.string().register(z.globalRegistry, {
+    description: 'The answer to the query.',
+  }),
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The query used for the generation.',
+  }),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for the generation.',
+  }),
+  timings: z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+    description: 'The timings of the generation.',
+  }),
 })
 
 /**
@@ -31,20 +37,116 @@ export const zBagelUnderstandInput = z.object({
   }),
 })
 
-/**
- * TextOutput
- */
-export const zBagelUnderstandOutput = z.object({
-  text: z.string().register(z.globalRegistry, {
-    description: 'The answer to the query.',
+export const zQueueStatus = z.object({
+  status: z.enum(['IN_QUEUE', 'IN_PROGRESS', 'COMPLETED']),
+  request_id: z.string().register(z.globalRegistry, {
+    description: 'The request id.',
   }),
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The query used for the generation.',
-  }),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for the generation.',
-  }),
-  timings: z.record(z.string(), z.unknown()).register(z.globalRegistry, {
-    description: 'The timings of the generation.',
-  }),
+  response_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The response url.',
+    }),
+  ),
+  status_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The status url.',
+    }),
+  ),
+  cancel_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The cancel url.',
+    }),
+  ),
+  logs: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The logs.',
+    }),
+  ),
+  metrics: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The metrics.',
+    }),
+  ),
+  queue_position: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The queue position.',
+    }),
+  ),
 })
+
+export const zGetFalAiBagelUnderstandRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiBagelUnderstandRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
+export const zPutFalAiBagelUnderstandRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiBagelUnderstandRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiBagelUnderstandData = z.object({
+  body: zBagelUnderstandInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiBagelUnderstandResponse = zQueueStatus
+
+export const zGetFalAiBagelUnderstandRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiBagelUnderstandRequestsByRequestIdResponse =
+  zBagelUnderstandOutput

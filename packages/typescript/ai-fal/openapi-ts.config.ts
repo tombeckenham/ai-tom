@@ -102,7 +102,7 @@ function resolveMissingRefs(spec: any): {
 function getFalCategoryFiles(): Array<string> {
   const categoryDir = join(__dirname, 'json')
   const files = readdirSync(categoryDir)
-    .filter((file) => file.endsWith('fal.models.image-to-video.json'))
+    .filter((file) => file.endsWith('.json'))
     .sort()
   return files
 }
@@ -141,16 +141,22 @@ export default [
   ...getFalCategoryFiles().map((file) => ({
     input: getFalModelOpenApiObjects(file),
     output: {
-      path: `./src/generated/${file.replace('.json', '')}`,
+      path: `./src/generated/${file.replace(/fal\.models\.([^.]+)\.json/, '$1')}`,
       indexFile: false,
       postProcess: ['prettier'],
     },
     plugins: ['@hey-api/typescript', { name: 'zod', metadata: true }],
-    filters: {
-      schemas: {
-        include: '/Input$|Output$/',
+    parser: {
+      filters: {
+        schemas: {
+          include: '/Input$|Output$|^Post.*Data$/',
+        },
+        operations: {
+          include: ['/post .*/'],
+          exclude: ['/get .*/'],
+        },
+        orphans: false,
       },
-      orphans: false,
     },
   })),
 ]

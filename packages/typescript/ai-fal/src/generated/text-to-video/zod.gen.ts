@@ -2,173 +2,119 @@
 
 import { z } from 'zod'
 
-export const zFile = z.object({
-  url: z.url(),
-  content_type: z.optional(z.string()),
-  file_name: z.optional(z.string()),
-  file_size: z.optional(z.int()),
-})
-
-export const zQueueStatus = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'FAILED']),
-  response_url: z.optional(z.url()),
-})
-
-/**
- * TextToVideoV25ProRequest
- */
-export const zKlingVideoV25TurboProTextToVideoInput = z.object({
-  prompt: z.string().max(2500),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video frame',
-    }),
-  ),
-  duration: z.optional(
-    z.enum(['5', '10']).register(z.globalRegistry, {
-      description: 'The duration of the generated video in seconds',
-    }),
-  ),
-  negative_prompt: z
-    .optional(z.string().max(2500))
-    .default('blur, distort, and low quality'),
-  cfg_scale: z
-    .optional(
-      z.number().gte(0).lte(1).register(z.globalRegistry, {
-        description:
-          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
-      }),
-    )
-    .default(0.5),
-})
-
 /**
  * File
  */
-export const zFalAiKlingVideoV25TurboProTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
+export const zSchemaFile = z.object({
+  file_size: z.int().register(z.globalRegistry, {
+    description: 'The size of the file in bytes.',
+  }),
+  file_name: z.string().register(z.globalRegistry, {
+    description:
+      'The name of the file. It will be auto-generated if not provided.',
+  }),
+  content_type: z.string().register(z.globalRegistry, {
+    description: 'The mime type of the file.',
+  }),
   url: z.string().register(z.globalRegistry, {
     description: 'The URL where the file can be downloaded from.',
   }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
 })
 
 /**
- * TextToVideoV25ProOutput
+ * AnimatediffLCMOutput
  */
-export const zKlingVideoV25TurboProTextToVideoOutput = z.object({
-  video: zFalAiKlingVideoV25TurboProTextToVideoFile,
-})
-
-/**
- * Veo3TextToVideoInput
- */
-export const zVeo3FastInput = z.object({
-  prompt: z.string().max(20000).register(z.globalRegistry, {
-    description: 'The text prompt describing the video you want to generate',
+export const zSchemaAnimatediffSparsectrlLcmOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used to generate the video.',
   }),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video.',
-    }),
-  ),
-  duration: z.optional(
-    z.enum(['4s', '6s', '8s']).register(z.globalRegistry, {
-      description: 'The duration of the generated video.',
-    }),
-  ),
-  generate_audio: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to generate audio for the video.',
-      }),
-    )
-    .default(true),
-  auto_fix: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to automatically attempt to fix prompts that fail content policy or other validation checks by rewriting them.',
-      }),
-    )
-    .default(true),
-  resolution: z.optional(
-    z.enum(['720p', '1080p']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video.',
-    }),
-  ),
+  video: zSchemaFile,
+})
+
+/**
+ * AnimatediffLCMInput
+ */
+export const zSchemaAnimatediffSparsectrlLcmInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description:
+      'The prompt to use for generating the image. Be as descriptive as possible for best results.',
+  }),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
-      description: 'The seed for the random number generator.',
-    }),
-  ),
-  negative_prompt: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'A negative prompt to guide the video generation.',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiVeo3FastFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
       description:
-        'The name of the file. It will be auto-generated if not provided.',
+        '\n        The same seed and the same prompt given to the same version of Stable\n        Diffusion will output the same image every time.\n        ',
     }),
   ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
+  controlnet_type: z.optional(
+    z.enum(['scribble', 'rgb']).register(z.globalRegistry, {
+      description:
+        'The type of controlnet to use for generating the video. The controlnet determines how the video will be animated.',
     }),
   ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
+  keyframe_2_index: z
+    .optional(
+      z.int().register(z.globalRegistry, {
+        description:
+          'The frame index of the third keyframe to use for the generation.',
+      }),
+    )
+    .default(0),
+  keyframe_0_index: z
+    .optional(
+      z.int().register(z.globalRegistry, {
+        description:
+          'The frame index of the first keyframe to use for the generation.',
+      }),
+    )
+    .default(0),
+  keyframe_1_image_url: z.optional(z.union([z.string(), z.null()])),
+  keyframe_1_index: z
+    .optional(
+      z.int().register(z.globalRegistry, {
+        description:
+          'The frame index of the second keyframe to use for the generation.',
+      }),
+    )
+    .default(0),
+  guidance_scale: z
+    .optional(
+      z.int().gte(0).lte(2).register(z.globalRegistry, {
+        description:
+          'The CFG (Classifier Free Guidance) scale is a measure of how close you want the model to stick to your prompt when looking for a related image to show you.',
+      }),
+    )
+    .default(1),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(1).lte(12).register(z.globalRegistry, {
+        description:
+          'Increasing the amount of steps tells Stable Diffusion that it should take more steps to generate your final result which can increase the amount of detail in your image.',
+      }),
+    )
+    .default(4),
+  keyframe_2_image_url: z.optional(z.union([z.string(), z.null()])),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description:
+          "\n            The negative prompt to use. Use it to specify what you don't want.\n        ",
+      }),
+    )
+    .default(''),
+  keyframe_0_image_url: z.optional(z.union([z.string(), z.null()])),
 })
 
 /**
- * Veo3TextToVideoOutput
+ * VideoOutput
  */
-export const zVeo3FastOutput = z.object({
-  video: zFalAiVeo3FastFile,
+export const zSchemaMinimaxVideo01Output = z.object({
+  video: zSchemaFile,
 })
 
 /**
- * StandardTextToVideoHailuo02Input
+ * TextToVideoRequest
  */
-export const zMinimaxHailuo02StandardTextToVideoInput = z.object({
+export const zSchemaMinimaxVideo01Input = z.object({
   prompt_optimizer: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -176,563 +122,63 @@ export const zMinimaxHailuo02StandardTextToVideoInput = z.object({
       }),
     )
     .default(true),
-  duration: z.optional(
-    z.enum(['6', '10']).register(z.globalRegistry, {
-      description:
-        'The duration of the video in seconds. 10 seconds videos are not supported for 1080p resolution.',
-    }),
-  ),
-  prompt: z.string().min(1).max(2000),
+  prompt: z.string().max(2000),
 })
 
 /**
- * File
+ * AnimateDiffT2VOutput
  */
-export const zFalAiMinimaxHailuo02StandardTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+export const zSchemaFastAnimatediffTurboTextToVideoOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'Seed used for generating the video.',
   }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
+  video: zSchemaFile,
 })
 
 /**
- * TextToVideoHailuo02Output
+ * ImageSize
  */
-export const zMinimaxHailuo02StandardTextToVideoOutput = z.object({
-  video: zFalAiMinimaxHailuo02StandardTextToVideoFile,
-})
-
-/**
- * Veo3TextToVideoInput
- */
-export const zVeo3Input = z.object({
-  prompt: z.string().max(20000).register(z.globalRegistry, {
-    description: 'The text prompt describing the video you want to generate',
-  }),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video.',
-    }),
-  ),
-  duration: z.optional(
-    z.enum(['4s', '6s', '8s']).register(z.globalRegistry, {
-      description: 'The duration of the generated video.',
-    }),
-  ),
-  generate_audio: z
+export const zSchemaImageSize = z.object({
+  height: z
     .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to generate audio for the video.',
+      z.int().lte(14142).register(z.globalRegistry, {
+        description: 'The height of the generated image.',
       }),
     )
-    .default(true),
-  auto_fix: z
+    .default(512),
+  width: z
     .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to automatically attempt to fix prompts that fail content policy or other validation checks by rewriting them.',
+      z.int().lte(14142).register(z.globalRegistry, {
+        description: 'The width of the generated image.',
       }),
     )
-    .default(true),
-  resolution: z.optional(
-    z.enum(['720p', '1080p']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video.',
-    }),
-  ),
+    .default(512),
+})
+
+/**
+ * AnimateDiffT2VTurboInput
+ */
+export const zSchemaFastAnimatediffTurboTextToVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description:
+      'The prompt to use for generating the video. Be as descriptive as possible for best results.',
+  }),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
-      description: 'The seed for the random number generator.',
-    }),
-  ),
-  negative_prompt: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'A negative prompt to guide the video generation.',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiVeo3File = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
       description:
-        'The name of the file. It will be auto-generated if not provided.',
+        '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
     }),
   ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * Veo3TextToVideoOutput
- */
-export const zVeo3Output = z.object({
-  video: zFalAiVeo3File,
-})
-
-/**
- * TextToVideoV2MasterRequest
- */
-export const zKlingVideoV2MasterTextToVideoInput = z.object({
-  prompt: z.string().max(2500),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video frame',
-    }),
-  ),
-  duration: z.optional(
-    z.enum(['5', '10']).register(z.globalRegistry, {
-      description: 'The duration of the generated video in seconds',
-    }),
-  ),
-  negative_prompt: z
-    .optional(z.string().max(2500))
-    .default('blur, distort, and low quality'),
-  cfg_scale: z
-    .optional(
-      z.number().gte(0).lte(1).register(z.globalRegistry, {
-        description:
-          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
-      }),
-    )
-    .default(0.5),
-})
-
-/**
- * File
- */
-export const zFalAiKlingVideoV2MasterTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * TextToVideoV2MasterOutput
- */
-export const zKlingVideoV2MasterTextToVideoOutput = z.object({
-  video: zFalAiKlingVideoV2MasterTextToVideoFile,
-})
-
-/**
- * LoRAInput
- *
- * LoRA weight configuration.
- */
-export const zLoRaInput = z
-  .object({
-    path: z.string().register(z.globalRegistry, {
-      description: 'URL, HuggingFace repo ID (owner/repo) to lora weights.',
-    }),
-    scale: z
-      .optional(
-        z.number().gte(0).lte(4).register(z.globalRegistry, {
-          description: 'Scale factor for LoRA application (0.0 to 4.0).',
-        }),
-      )
-      .default(1),
-    weight_name: z.optional(z.union([z.string(), z.unknown()])),
-  })
-  .register(z.globalRegistry, {
-    description: 'LoRA weight configuration.',
-  })
-
-/**
- * VideoFile
- */
-export const zVideoFile = z.object({
-  height: z.optional(z.union([z.int(), z.unknown()])),
-  duration: z.optional(z.union([z.number(), z.unknown()])),
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  fps: z.optional(z.union([z.number(), z.unknown()])),
-  width: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  num_frames: z.optional(z.union([z.int(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * LTX2TextToVideoOutput
- */
-export const zLtx219bDistilledTextToVideoLoraOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for the generation.',
-  }),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for the random number generator.',
-  }),
-  video: zVideoFile,
-})
-
-/**
- * ImageSize
- */
-export const zImageSize = z.object({
-  height: z
-    .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The height of the generated image.',
-      }),
-    )
-    .default(512),
-  width: z
-    .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The width of the generated image.',
-      }),
-    )
-    .default(512),
-})
-
-/**
- * LTX2DistilledTextToVideoInput
- */
-export const zLtx219bDistilledTextToVideoInput = z.object({
-  use_multiscale: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to use multi-scale generation. If True, the model will generate the video at a smaller scale first, then use the smaller video to guide the generation of a video at or above your requested size. This results in better coherence and details.',
-      }),
-    )
-    .default(true),
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to generate the video from.',
-  }),
-  acceleration: z.optional(
-    z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
-      description: 'The acceleration level to use.',
-    }),
-  ),
-  generate_audio: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to generate audio for the video.',
-      }),
-    )
-    .default(true),
   fps: z
     .optional(
-      z.number().gte(1).lte(60).register(z.globalRegistry, {
-        description: 'The frames per second of the generated video.',
+      z.int().gte(1).lte(16).register(z.globalRegistry, {
+        description: 'Number of frames per second to extract from the video.',
       }),
     )
-    .default(25),
-  camera_lora: z.optional(
-    z
-      .enum([
-        'dolly_in',
-        'dolly_out',
-        'dolly_left',
-        'dolly_right',
-        'jib_up',
-        'jib_down',
-        'static',
-        'none',
-      ])
-      .register(z.globalRegistry, {
-        description:
-          'The camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
-      }),
-  ),
+    .default(8),
   video_size: z.optional(
     z.union([
-      zImageSize,
-      z.enum([
-        'square_hd',
-        'square',
-        'portrait_4_3',
-        'portrait_16_9',
-        'landscape_4_3',
-        'landscape_16_9',
-      ]),
-    ]),
-  ),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable the safety checker.',
-      }),
-    )
-    .default(true),
-  num_frames: z
-    .optional(
-      z.int().gte(9).lte(481).register(z.globalRegistry, {
-        description: 'The number of frames to generate.',
-      }),
-    )
-    .default(121),
-  camera_lora_scale: z
-    .optional(
-      z.number().gte(0).lte(1).register(z.globalRegistry, {
-        description:
-          'The scale of the camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
-      }),
-    )
-    .default(1),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The negative prompt to generate the video from.',
-      }),
-    )
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  video_write_mode: z.optional(
-    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
-      description: 'The write mode of the generated video.',
-    }),
-  ),
-  video_output_type: z.optional(
-    z
-      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-      .register(z.globalRegistry, {
-        description: 'The output type of the generated video.',
-      }),
-  ),
-  video_quality: z.optional(
-    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
-      description: 'The quality of the generated video.',
-    }),
-  ),
-  sync_mode: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
-      }),
-    )
-    .default(false),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable prompt expansion.',
-      }),
-    )
-    .default(false),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
-})
-
-/**
- * VideoFile
- */
-export const zFalAiLtx219bDistilledTextToVideoVideoFile = z.object({
-  height: z.optional(z.union([z.int(), z.unknown()])),
-  duration: z.optional(z.union([z.number(), z.unknown()])),
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  fps: z.optional(z.union([z.number(), z.unknown()])),
-  width: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  num_frames: z.optional(z.union([z.int(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * LTX2TextToVideoOutput
- */
-export const zLtx219bDistilledTextToVideoOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for the generation.',
-  }),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for the random number generator.',
-  }),
-  video: zFalAiLtx219bDistilledTextToVideoVideoFile,
-})
-
-/**
- * LoRAInput
- *
- * LoRA weight configuration.
- */
-export const zFalAiLtx219bTextToVideoLoraLoRaInput = z
-  .object({
-    path: z.string().register(z.globalRegistry, {
-      description: 'URL, HuggingFace repo ID (owner/repo) to lora weights.',
-    }),
-    scale: z
-      .optional(
-        z.number().gte(0).lte(4).register(z.globalRegistry, {
-          description: 'Scale factor for LoRA application (0.0 to 4.0).',
-        }),
-      )
-      .default(1),
-    weight_name: z.optional(z.union([z.string(), z.unknown()])),
-  })
-  .register(z.globalRegistry, {
-    description: 'LoRA weight configuration.',
-  })
-
-/**
- * VideoFile
- */
-export const zFalAiLtx219bTextToVideoLoraVideoFile = z.object({
-  height: z.optional(z.union([z.int(), z.unknown()])),
-  duration: z.optional(z.union([z.number(), z.unknown()])),
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  fps: z.optional(z.union([z.number(), z.unknown()])),
-  width: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  num_frames: z.optional(z.union([z.int(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * LTX2TextToVideoOutput
- */
-export const zLtx219bTextToVideoLoraOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for the generation.',
-  }),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for the random number generator.',
-  }),
-  video: zFalAiLtx219bTextToVideoLoraVideoFile,
-})
-
-/**
- * ImageSize
- */
-export const zFalAiLtx219bTextToVideoImageSize = z.object({
-  height: z
-    .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The height of the generated image.',
-      }),
-    )
-    .default(512),
-  width: z
-    .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The width of the generated image.',
-      }),
-    )
-    .default(512),
-})
-
-/**
- * LTX2TextToVideoInput
- */
-export const zLtx219bTextToVideoInput = z.object({
-  use_multiscale: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to use multi-scale generation. If True, the model will generate the video at a smaller scale first, then use the smaller video to guide the generation of a video at or above your requested size. This results in better coherence and details.',
-      }),
-    )
-    .default(true),
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to generate the video from.',
-  }),
-  acceleration: z.optional(
-    z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
-      description: 'The acceleration level to use.',
-    }),
-  ),
-  generate_audio: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to generate audio for the video.',
-      }),
-    )
-    .default(true),
-  fps: z
-    .optional(
-      z.number().gte(1).lte(60).register(z.globalRegistry, {
-        description: 'The frames per second of the generated video.',
-      }),
-    )
-    .default(25),
-  camera_lora: z.optional(
-    z
-      .enum([
-        'dolly_in',
-        'dolly_out',
-        'dolly_left',
-        'dolly_right',
-        'jib_up',
-        'jib_down',
-        'static',
-        'none',
-      ])
-      .register(z.globalRegistry, {
-        description:
-          'The camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
-      }),
-  ),
-  video_size: z.optional(
-    z.union([
-      zFalAiLtx219bTextToVideoImageSize,
+      zSchemaImageSize,
       z.enum([
         'square_hd',
         'square',
@@ -745,26 +191,384 @@ export const zLtx219bTextToVideoInput = z.object({
   ),
   guidance_scale: z
     .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
+      z.number().gte(0).lte(20).register(z.globalRegistry, {
+        description:
+          'The CFG (Classifier Free Guidance) scale is a measure of how close you want the model to stick to your prompt when looking for a related image to show you.',
+      }),
+    )
+    .default(1),
+  num_frames: z
+    .optional(
+      z.int().gte(1).lte(64).register(z.globalRegistry, {
+        description: 'The number of frames to generate for the video.',
+      }),
+    )
+    .default(16),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(1).lte(8).register(z.globalRegistry, {
+        description:
+          'The number of inference steps to perform. 4-12 is recommended for turbo mode.',
+      }),
+    )
+    .default(4),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description:
+          "\n            The negative prompt to use. Use it to address details that you don't want\n            in the image. This could be colors, objects, scenery and even the small details\n            (e.g. moustache, blurry, low resolution).\n        ",
+      }),
+    )
+    .default('(bad quality, worst quality:1.2), ugly faces, bad anime'),
+  motions: z.optional(
+    z
+      .array(
+        z.enum([
+          'zoom-out',
+          'zoom-in',
+          'pan-left',
+          'pan-right',
+          'tilt-up',
+          'tilt-down',
+        ]),
+      )
+      .register(z.globalRegistry, {
+        description: 'The motions to apply to the video.',
+      }),
+  ),
+})
+
+/**
+ * AnimateDiffT2VOutput
+ */
+export const zSchemaFastAnimatediffTextToVideoOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'Seed used for generating the video.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * AnimateDiffT2VInput
+ */
+export const zSchemaFastAnimatediffTextToVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description:
+      'The prompt to use for generating the video. Be as descriptive as possible for best results.',
+  }),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
+    }),
+  ),
+  fps: z
+    .optional(
+      z.int().gte(1).lte(16).register(z.globalRegistry, {
+        description: 'Number of frames per second to extract from the video.',
+      }),
+    )
+    .default(8),
+  video_size: z.optional(
+    z.union([
+      zSchemaImageSize,
+      z.enum([
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ]),
+  ),
+  guidance_scale: z
+    .optional(
+      z.number().gte(0).lte(20).register(z.globalRegistry, {
+        description:
+          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt when looking for a related image to show you.\n        ',
+      }),
+    )
+    .default(7.5),
+  num_frames: z
+    .optional(
+      z.int().gte(1).lte(32).register(z.globalRegistry, {
+        description: 'The number of frames to generate for the video.',
+      }),
+    )
+    .default(16),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(1).lte(50).register(z.globalRegistry, {
+        description: 'The number of inference steps to perform.',
+      }),
+    )
+    .default(25),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description:
+          "\n            The negative prompt to use. Use it to address details that you don't want\n            in the image. This could be colors, objects, scenery and even the small details\n            (e.g. moustache, blurry, low resolution).\n        ",
+      }),
+    )
+    .default('(bad quality, worst quality:1.2), ugly faces, bad anime'),
+  motions: z.optional(
+    z
+      .array(
+        z.enum([
+          'zoom-out',
+          'zoom-in',
+          'pan-left',
+          'pan-right',
+          'tilt-up',
+          'tilt-down',
+        ]),
+      )
+      .register(z.globalRegistry, {
+        description: 'The motions to apply to the video.',
+      }),
+  ),
+})
+
+/**
+ * Output
+ */
+export const zSchemaT2vTurboOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * Input
+ */
+export const zSchemaT2vTurboInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate images from',
+  }),
+  guidance_scale: z
+    .optional(
+      z.number().gte(0.1).lte(30).register(z.globalRegistry, {
+        description: 'The guidance scale',
+      }),
+    )
+    .default(7.5),
+  seed: z.optional(z.union([z.int().gte(0).lte(203279), z.unknown()])),
+  export_fps: z
+    .optional(
+      z.int().gte(1).lte(24).register(z.globalRegistry, {
+        description: 'The FPS of the exported video',
+      }),
+    )
+    .default(8),
+  num_frames: z
+    .optional(
+      z.int().gte(16).lte(32).register(z.globalRegistry, {
+        description: 'The number of frames to generate',
+      }),
+    )
+    .default(16),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(1).lte(12).register(z.globalRegistry, {
+        description: 'The number of steps to sample',
+      }),
+    )
+    .default(4),
+})
+
+/**
+ * FastSVDOutput
+ */
+export const zSchemaFastSvdLcmTextToVideoOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description:
+      '\n            Seed of the generated Image. It will be the same value of the one passed in the\n            input or the randomly generated that was used in case none was passed.\n\n        ',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * FastSVDTextInput
+ */
+export const zSchemaFastSvdLcmTextToVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to use as a starting point for the generation.',
+  }),
+  cond_aug: z
+    .optional(
+      z.number().gte(0).lte(10).register(z.globalRegistry, {
+        description:
+          '\n            The conditoning augmentation determines the amount of noise that will be\n            added to the conditioning frame. The higher the number, the more noise\n            there will be, and the less the video will look like the initial image.\n            Increase it for more motion.\n        ',
+      }),
+    )
+    .default(0.02),
+  fps: z
+    .optional(
+      z.int().gte(1).lte(25).register(z.globalRegistry, {
+        description:
+          '\n            The FPS of the generated video. The higher the number, the faster the video will\n            play. Total video length is 25 frames.\n        ',
+      }),
+    )
+    .default(10),
+  motion_bucket_id: z
+    .optional(
+      z.int().gte(1).lte(255).register(z.globalRegistry, {
+        description:
+          '\n            The motion bucket id determines the motion of the generated video. The\n            higher the number, the more motion there will be.\n        ',
+      }),
+    )
+    .default(127),
+  video_size: z.optional(
+    z.union([
+      zSchemaImageSize,
+      z.enum([
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ]),
+  ),
+  steps: z
+    .optional(
+      z.int().gte(1).lte(20).register(z.globalRegistry, {
+        description:
+          '\n            The number of steps to run the model for. The higher the number the better\n            the quality and longer it will take to generate.\n        ',
+      }),
+    )
+    .default(4),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
+    }),
+  ),
+})
+
+/**
+ * FastSVDOutput
+ */
+export const zSchemaFastSvdTextToVideoOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description:
+      '\n            Seed of the generated Image. It will be the same value of the one passed in the\n            input or the randomly generated that was used in case none was passed.\n\n        ',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * FastSVDTextInput
+ */
+export const zSchemaFastSvdTextToVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to use as a starting point for the generation.',
+  }),
+  cond_aug: z
+    .optional(
+      z.number().gte(0).lte(10).register(z.globalRegistry, {
+        description:
+          '\n            The conditoning augmentation determines the amount of noise that will be\n            added to the conditioning frame. The higher the number, the more noise\n            there will be, and the less the video will look like the initial image.\n            Increase it for more motion.\n        ',
+      }),
+    )
+    .default(0.02),
+  deep_cache: z.optional(
+    z.enum(['none', 'minimum', 'medium', 'high']).register(z.globalRegistry, {
+      description:
+        '\n            Enabling [DeepCache](https://github.com/horseee/DeepCache) will make the execution\n            faster, but might sometimes degrade overall quality. The higher the setting, the\n            faster the execution will be, but the more quality might be lost.\n        ',
+    }),
+  ),
+  fps: z
+    .optional(
+      z.int().gte(1).lte(25).register(z.globalRegistry, {
+        description:
+          '\n            The FPS of the generated video. The higher the number, the faster the video will\n            play. Total video length is 25 frames.\n        ',
+      }),
+    )
+    .default(10),
+  motion_bucket_id: z
+    .optional(
+      z.int().gte(1).lte(255).register(z.globalRegistry, {
+        description:
+          '\n            The motion bucket id determines the motion of the generated video. The\n            higher the number, the more motion there will be.\n        ',
+      }),
+    )
+    .default(127),
+  video_size: z.optional(
+    z.union([
+      zSchemaImageSize,
+      z.enum([
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ]),
+  ),
+  steps: z
+    .optional(
+      z.int().gte(1).lte(100).register(z.globalRegistry, {
+        description:
+          '\n            The number of steps to run the model for. The higher the number the better\n            the quality and longer it will take to generate.\n        ',
+      }),
+    )
+    .default(20),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
+    }),
+  ),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description:
+          'The negative prompt to use as a starting point for the generation.',
+      }),
+    )
+    .default(
+      'unrealistic, saturated, high contrast, big nose, painting, drawing, sketch, cartoon, anime, manga, render, CG, 3d, watermark, signature, label',
+    ),
+})
+
+/**
+ * Output
+ */
+export const zSchemaLtxVideoOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for random number generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoInput
+ */
+export const zSchemaLtxVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video from.',
+  }),
+  guidance_scale: z
+    .optional(
+      z.number().lte(10).register(z.globalRegistry, {
         description: 'The guidance scale to use.',
       }),
     )
     .default(3),
-  num_frames: z
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The seed to use for random number generation.',
+    }),
+  ),
+  num_inference_steps: z
     .optional(
-      z.int().gte(9).lte(481).register(z.globalRegistry, {
-        description: 'The number of frames to generate.',
+      z.int().gte(1).lte(50).register(z.globalRegistry, {
+        description: 'The number of inference steps to take.',
       }),
     )
-    .default(121),
-  camera_lora_scale: z
-    .optional(
-      z.number().gte(0).lte(1).register(z.globalRegistry, {
-        description:
-          'The scale of the camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
-      }),
-    )
-    .default(1),
+    .default(30),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -772,194 +576,36 @@ export const zLtx219bTextToVideoInput = z.object({
       }),
     )
     .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+      'low quality, worst quality, deformed, distorted, disfigured, motion smear, motion artifacts, fused fingers, bad anatomy, weird hand, ugly',
     ),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable the safety checker.',
-      }),
-    )
-    .default(true),
-  video_write_mode: z.optional(
-    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
-      description: 'The write mode of the generated video.',
-    }),
-  ),
-  video_output_type: z.optional(
-    z
-      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-      .register(z.globalRegistry, {
-        description: 'The output type of the generated video.',
-      }),
-  ),
-  video_quality: z.optional(
-    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
-      description: 'The quality of the generated video.',
-    }),
-  ),
-  sync_mode: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
-      }),
-    )
-    .default(false),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable prompt expansion.',
-      }),
-    )
-    .default(false),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(8).lte(50).register(z.globalRegistry, {
-        description: 'The number of inference steps to use.',
-      }),
-    )
-    .default(40),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
 })
 
 /**
- * VideoFile
+ * HunyuanT2VResponse
  */
-export const zFalAiLtx219bTextToVideoVideoFile = z.object({
-  height: z.optional(z.union([z.int(), z.unknown()])),
-  duration: z.optional(z.union([z.number(), z.unknown()])),
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  fps: z.optional(z.union([z.number(), z.unknown()])),
-  width: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  num_frames: z.optional(z.union([z.int(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * LTX2TextToVideoOutput
- */
-export const zLtx219bTextToVideoOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for the generation.',
-  }),
+export const zSchemaHunyuanVideoOutput = z.object({
   seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for the random number generator.',
+    description: 'The seed used for generating the video.',
   }),
-  video: zFalAiLtx219bTextToVideoVideoFile,
+  video: zSchemaFile,
 })
 
 /**
- * KandinskyT2VRequest
+ * HunyuanVideoRequest
  */
-export const zKandinsky5ProTextToVideoInput = z.object({
+export const zSchemaHunyuanVideoInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
+    description: 'The prompt to generate the video from.',
   }),
-  resolution: z.optional(
-    z.enum(['512P', '1024P']).register(z.globalRegistry, {
-      description: 'Video resolution: 512p or 1024p.',
-    }),
-  ),
-  acceleration: z.optional(
-    z.enum(['none', 'regular']).register(z.globalRegistry, {
-      description: 'Acceleration level for faster generation.',
-    }),
-  ),
   aspect_ratio: z.optional(
-    z.enum(['3:2', '1:1', '2:3']).register(z.globalRegistry, {
-      description:
-        'Aspect ratio of the generated video. One of (3:2, 1:1, 2:3).',
+    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the video to generate.',
     }),
   ),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(1).lte(50).register(z.globalRegistry, {
-        description: 'The number of inference steps.',
-      }),
-    )
-    .default(28),
-  duration: z.optional(
-    z.enum(['5s']).register(z.globalRegistry, {
-      description: 'The length of the video to generate (5s or 10s)',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiKandinsky5ProTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * KandinskyT2VResponse
- */
-export const zKandinsky5ProTextToVideoOutput = z.object({
-  video: z.optional(zFalAiKandinsky5ProTextToVideoFile),
-})
-
-/**
- * SeedanceProv15TextToVideoInput
- */
-export const zBytedanceSeedanceV15ProTextToVideoInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt used to generate the video',
-  }),
   resolution: z.optional(
-    z.enum(['480p', '720p', '1080p']).register(z.globalRegistry, {
-      description:
-        'Video resolution - 480p for faster generation, 720p for balance, 1080p for higher quality',
+    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
+      description: 'The resolution of the video to generate.',
     }),
-  ),
-  aspect_ratio: z.optional(
-    z
-      .enum(['21:9', '16:9', '4:3', '1:1', '3:4', '9:16'])
-      .register(z.globalRegistry, {
-        description: 'The aspect ratio of the generated video',
-      }),
-  ),
-  generate_audio: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to generate audio for the video',
-      }),
-    )
-    .default(true),
-  duration: z.optional(
-    z
-      .enum(['4', '5', '6', '7', '8', '9', '10', '11', '12'])
-      .register(z.globalRegistry, {
-        description: 'Duration of the video in seconds',
-      }),
   ),
   enable_safety_checker: z
     .optional(
@@ -967,269 +613,92 @@ export const zBytedanceSeedanceV15ProTextToVideoInput = z.object({
         description: 'If set to true, the safety checker will be enabled.',
       }),
     )
-    .default(true),
-  camera_fixed: z
+    .default(false),
+  num_inference_steps: z
     .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to fix the camera position',
+      z.int().gte(2).lte(30).register(z.globalRegistry, {
+        description:
+          'The number of inference steps to run. Lower gets faster results, higher gets better results.',
       }),
     )
-    .default(false),
+    .default(30),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
-      description:
-        'Random seed to control video generation. Use -1 for random.',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiBytedanceSeedanceV15ProTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * SeedanceProv15T2VVideoOutput
- */
-export const zBytedanceSeedanceV15ProTextToVideoOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'Seed used for generation',
-  }),
-  video: zFalAiBytedanceSeedanceV15ProTextToVideoFile,
-})
-
-/**
- * TextToVideoInput
- *
- * Input for Wan 2.6 text-to-video generation
- */
-export const zV26TextToVideoInput = z
-  .object({
-    prompt: z.string().min(1).register(z.globalRegistry, {
-      description:
-        "The text prompt for video generation. Supports Chinese and English, max 800 characters. For multi-shot videos, use format: 'Overall description. First shot [0-3s] content. Second shot [3-5s] content.'",
-    }),
-    aspect_ratio: z.optional(
-      z.enum(['16:9', '9:16', '1:1', '4:3', '3:4']).register(z.globalRegistry, {
-        description:
-          'The aspect ratio of the generated video. Wan 2.6 supports additional ratios.',
-      }),
-    ),
-    resolution: z.optional(
-      z.enum(['720p', '1080p']).register(z.globalRegistry, {
-        description:
-          'Video resolution tier. Wan 2.6 T2V only supports 720p and 1080p (no 480p).',
-      }),
-    ),
-    duration: z.optional(
-      z.enum(['5', '10', '15']).register(z.globalRegistry, {
-        description:
-          'Duration of the generated video in seconds. Choose between 5, 10, or 15 seconds.',
-      }),
-    ),
-    enable_safety_checker: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description: 'If set to true, the safety checker will be enabled.',
-        }),
-      )
-      .default(true),
-    audio_url: z.optional(
-      z.string().register(z.globalRegistry, {
-        description:
-          '\nURL of the audio to use as the background music. Must be publicly accessible.\nLimit handling: If the audio duration exceeds the duration value (5, 10, or 15 seconds),\nthe audio is truncated to the first N seconds, and the rest is discarded. If\nthe audio is shorter than the video, the remaining part of the video will be silent.\nFor example, if the audio is 3 seconds long and the video duration is 5 seconds, the\nfirst 3 seconds of the output video will have sound, and the last 2 seconds will be silent.\n- Format: WAV, MP3.\n- Duration: 3 to 30 s.\n- File size: Up to 15 MB.\n',
-      }),
-    ),
-    seed: z.optional(
-      z.int().register(z.globalRegistry, {
-        description:
-          'Random seed for reproducibility. If None, a random seed is chosen.',
-      }),
-    ),
-    multi_shots: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description:
-            'When true, enables intelligent multi-shot segmentation for coherent narrative videos. Only active when enable_prompt_expansion is True. Set to false for single-shot generation.',
-        }),
-      )
-      .default(true),
-    negative_prompt: z
-      .optional(
-        z.string().register(z.globalRegistry, {
-          description:
-            'Negative prompt to describe content to avoid. Max 500 characters.',
-        }),
-      )
-      .default(''),
-    enable_prompt_expansion: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description:
-            'Whether to enable prompt rewriting using LLM. Improves results for short prompts but increases processing time.',
-        }),
-      )
-      .default(true),
-  })
-  .register(z.globalRegistry, {
-    description: 'Input for Wan 2.6 text-to-video generation',
-  })
-
-/**
- * VideoFile
- */
-export const zWanV26TextToVideoVideoFile = z.object({
-  height: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The height of the video',
-    }),
-  ),
-  duration: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The duration of the video',
-    }),
-  ),
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  fps: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The FPS of the video',
-    }),
-  ),
-  width: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The width of the video',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
+      description: 'The seed to use for generating the video.',
     }),
   ),
   num_frames: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The number of frames in the video',
+    z.enum(['129', '85']).register(z.globalRegistry, {
+      description: 'The number of frames to generate.',
     }),
   ),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * TextToVideoOutput
- *
- * Output for text-to-video generation
- */
-export const zV26TextToVideoOutput = z
-  .object({
-    actual_prompt: z.optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The actual prompt used if prompt rewriting was enabled',
+  pro_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'By default, generations are done with 35 steps. Pro mode does 55 steps which results in higher quality videos but will take more time and cost 2x more billing units.',
       }),
-    ),
-    seed: z.int().register(z.globalRegistry, {
-      description: 'The seed used for generation',
-    }),
-    video: zWanV26TextToVideoVideoFile,
-  })
-  .register(z.globalRegistry, {
-    description: 'Output for text-to-video generation',
-  })
+    )
+    .default(false),
+})
 
 /**
- * FabricOneTextInput
+ * MochiT2VOutput
  */
-export const zFabric10TextInput = z.object({
-  text: z.string().min(1).max(2000),
-  resolution: z.enum(['720p', '480p']).register(z.globalRegistry, {
-    description: 'Resolution',
+export const zSchemaMochiV1Output = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * MochiT2VInput
+ */
+export const zSchemaMochiV1Input = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate a video from.',
   }),
-  voice_description: z.optional(z.union([z.string(), z.unknown()])),
-  image_url: z.url().min(1).max(2083),
-})
-
-/**
- * File
- */
-export const zVeedFabric10TextFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * FabricOneTextOutput
- */
-export const zFabric10TextOutput = z.object({
-  video: zVeedFabric10TextFile,
-})
-
-/**
- * TextToVideoV26ProRequest
- */
-export const zKlingVideoV26ProTextToVideoInput = z.object({
-  prompt: z.string().max(2500),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video frame',
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable prompt expansion.',
+      }),
+    )
+    .default(true),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The seed to use for generating the video.',
     }),
   ),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The negative prompt for the video.',
+      }),
+    )
+    .default(''),
+})
+
+/**
+ * T2VOutput
+ */
+export const zSchemaKlingVideoV15ProTextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoRequest
+ */
+export const zSchemaKlingVideoV15ProTextToVideoInput = z.object({
+  prompt: z.string().max(2500),
   duration: z.optional(
     z.enum(['5', '10']).register(z.globalRegistry, {
       description: 'The duration of the generated video in seconds',
     }),
   ),
-  generate_audio: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to generate native audio for the video. Supports Chinese and English voice output. Other languages are automatically translated to English. For English speech, use lowercase letters; for acronyms or proper nouns, use uppercase.',
-      }),
-    )
-    .default(true),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video frame',
+    }),
+  ),
   negative_prompt: z
     .optional(z.string().max(2500))
     .default('blur, distort, and low quality'),
@@ -1244,69 +713,405 @@ export const zKlingVideoV26ProTextToVideoInput = z.object({
 })
 
 /**
- * File
+ * CameraControl
  */
-export const zFalAiKlingVideoV26ProTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
+export const zSchemaCameraControl = z.object({
+  movement_type: z
+    .enum(['horizontal', 'vertical', 'pan', 'tilt', 'roll', 'zoom'])
+    .register(z.globalRegistry, {
+      description: 'The type of camera movement',
     }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+  movement_value: z.int().gte(-10).lte(10).register(z.globalRegistry, {
+    description: 'The value of the camera movement',
   }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
+})
+
+/**
+ * T2VOutput
+ */
+export const zSchemaKlingVideoV1StandardTextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * V1TextToVideoRequest
+ */
+export const zSchemaKlingVideoV1StandardTextToVideoInput = z.object({
+  prompt: z.string().max(2500),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video frame',
+    }),
+  ),
+  advanced_camera_control: z.optional(zSchemaCameraControl),
+  cfg_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
+      }),
+    )
+    .default(0.5),
+  duration: z.optional(
+    z.enum(['5', '10']).register(z.globalRegistry, {
+      description: 'The duration of the generated video in seconds',
+    }),
+  ),
+  negative_prompt: z
+    .optional(z.string().max(2500))
+    .default('blur, distort, and low quality'),
+  camera_control: z.optional(
+    z
+      .enum([
+        'down_back',
+        'forward_up',
+        'right_turn_forward',
+        'left_turn_forward',
+      ])
+      .register(z.globalRegistry, {
+        description: 'Camera control parameters',
+      }),
+  ),
+})
+
+/**
+ * T2VLiveOutput
+ */
+export const zSchemaMinimaxVideo01LiveOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoLiveRequest
+ */
+export const zSchemaMinimaxVideo01LiveInput = z.object({
+  prompt_optimizer: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: "Whether to use the model's prompt optimizer",
+      }),
+    )
+    .default(true),
+  prompt: z.string().max(2000),
+})
+
+/**
+ * T2VOutput
+ */
+export const zSchemaKlingVideoV16StandardTextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoRequest
+ */
+export const zSchemaKlingVideoV16StandardTextToVideoInput = z.object({
+  prompt: z.string().max(2500),
+  duration: z.optional(
+    z.enum(['5', '10']).register(z.globalRegistry, {
+      description: 'The duration of the generated video in seconds',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video frame',
+    }),
+  ),
+  negative_prompt: z
+    .optional(z.string().max(2500))
+    .default('blur, distort, and low quality'),
+  cfg_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
+      }),
+    )
+    .default(0.5),
+})
+
+/**
+ * Output
+ */
+export const zSchemaCogvideox5bOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for generating the video.',
+  }),
+  timings: z.record(z.string(), z.number()),
+  seed: z.int().register(z.globalRegistry, {
+    description:
+      '\n            Seed of the generated video. It will be the same value of the one passed in the\n            input or the randomly generated that was used in case none was passed.\n        ',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * LoraWeight
+ */
+export const zSchemaLoraWeight = z.object({
+  path: z.string().register(z.globalRegistry, {
+    description: 'URL or the path to the LoRA weights.',
+  }),
+  scale: z
+    .optional(
+      z.number().gte(0).lte(4).register(z.globalRegistry, {
+        description:
+          '\n            The scale of the LoRA weight. This is used to scale the LoRA weight\n            before merging it with the base model.\n        ',
+      }),
+    )
+    .default(1),
+})
+
+/**
+ * BaseInput
+ */
+export const zSchemaCogvideox5bInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video from.',
+  }),
+  use_rife: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Use RIFE for video interpolation',
+      }),
+    )
+    .default(true),
+  loras: z
+    .optional(
+      z.array(zSchemaLoraWeight).register(z.globalRegistry, {
+        description:
+          '\n            The LoRAs to use for the image generation. We currently support one lora.\n        ',
+      }),
+    )
+    .default([]),
+  video_size: z.optional(
+    z.union([
+      zSchemaImageSize,
+      z.enum([
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ]),
+  ),
+  guidance_scale: z
+    .optional(
+      z.number().gte(0).lte(20).register(z.globalRegistry, {
+        description:
+          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt when looking for a related video to show you.\n        ',
+      }),
+    )
+    .default(7),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(1).lte(50).register(z.globalRegistry, {
+        description: 'The number of inference steps to perform.',
+      }),
+    )
+    .default(50),
+  export_fps: z
+    .optional(
+      z.int().gte(4).lte(32).register(z.globalRegistry, {
+        description: 'The target FPS of the video',
+      }),
+    )
+    .default(16),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The negative prompt to generate video from',
+      }),
+    )
+    .default(''),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
     }),
   ),
 })
 
 /**
- * TextToVideoV26ProOutput
+ * Output
  */
-export const zKlingVideoV26ProTextToVideoOutput = z.object({
-  video: zFalAiKlingVideoV26ProTextToVideoFile,
+export const zSchemaTranspixarOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for generating the video.',
+  }),
+  videos: z.array(zSchemaFile).register(z.globalRegistry, {
+    description: 'The URL to the generated video',
+  }),
+  timings: z.record(z.string(), z.number()),
+  seed: z.int().register(z.globalRegistry, {
+    description:
+      '\n            Seed of the generated video. It will be the same value of the one passed in the\n            input or the randomly generated that was used in case none was passed.\n        ',
+  }),
 })
 
 /**
- * TextToVideoRequestV5_5
+ * BaseInput
  */
-export const zPixverseV55TextToVideoInput = z.object({
+export const zSchemaTranspixarInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video from.',
+  }),
+  guidance_scale: z
+    .optional(
+      z.number().gte(0).lte(20).register(z.globalRegistry, {
+        description:
+          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt when looking for a related video to show you.\n        ',
+      }),
+    )
+    .default(7),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(1).lte(50).register(z.globalRegistry, {
+        description: 'The number of inference steps to perform.',
+      }),
+    )
+    .default(24),
+  export_fps: z
+    .optional(
+      z.int().gte(4).lte(32).register(z.globalRegistry, {
+        description: 'The target FPS of the video',
+      }),
+    )
+    .default(8),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The negative prompt to generate video from',
+      }),
+    )
+    .default(''),
+  seed: z.optional(z.union([z.int(), z.unknown()])),
+})
+
+/**
+ * HunyuanT2VResponse
+ */
+export const zSchemaHunyuanVideoLoraOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generating the video.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * HunyuanT2VRequest
+ */
+export const zSchemaHunyuanVideoLoraInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video from.',
+  }),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the video to generate.',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
+      description: 'The resolution of the video to generate.',
+    }),
+  ),
+  loras: z
+    .optional(
+      z.array(zSchemaLoraWeight).register(z.globalRegistry, {
+        description:
+          '\n            The LoRAs to use for the image generation. You can use any number of LoRAs\n            and they will be merged together to generate the final image.\n        ',
+      }),
+    )
+    .default([]),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'If set to true, the safety checker will be enabled.',
+      }),
+    )
+    .default(false),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The seed to use for generating the video.',
+    }),
+  ),
+  num_frames: z.optional(
+    z.enum(['129', '85']).register(z.globalRegistry, {
+      description: 'The number of frames to generate.',
+    }),
+  ),
+  pro_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'By default, generations are done with 35 steps. Pro mode does 55 steps which results in higher quality videos but will take more time and cost 2x more billing units.',
+      }),
+    )
+    .default(false),
+})
+
+/**
+ * Ray2T2VOutput
+ */
+export const zSchemaLumaDreamMachineRay2Output = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * Ray2TextToVideoRequest
+ */
+export const zSchemaLumaDreamMachineRay2Input = z.object({
+  prompt: z.string().min(3).max(5000),
+  aspect_ratio: z.optional(
+    z
+      .enum(['16:9', '9:16', '4:3', '3:4', '21:9', '9:21'])
+      .register(z.globalRegistry, {
+        description: 'The aspect ratio of the generated video',
+      }),
+  ),
+  resolution: z.optional(
+    z.enum(['540p', '720p', '1080p']).register(z.globalRegistry, {
+      description:
+        'The resolution of the generated video (720p costs 2x more, 1080p costs 4x more)',
+    }),
+  ),
+  loop: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether the video should loop (end of video is blended with the beginning)',
+      }),
+    )
+    .default(false),
+  duration: z.optional(
+    z.enum(['5s', '9s']).register(z.globalRegistry, {
+      description: 'The duration of the generated video (9s costs 2x more)',
+    }),
+  ),
+})
+
+/**
+ * VideoOutput
+ */
+export const zSchemaPixverseV35TextToVideoFastOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * FastTextToVideoRequest
+ */
+export const zSchemaPixverseV35TextToVideoFastInput = z.object({
   prompt: z.string(),
   aspect_ratio: z.optional(
     z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
       description: 'The aspect ratio of the generated video',
     }),
   ),
-  duration: z.optional(
-    z.enum(['5', '8', '10']).register(z.globalRegistry, {
-      description:
-        'The duration of the generated video in seconds. Longer durations cost more. 1080p videos are limited to 5 or 8 seconds',
-    }),
-  ),
-  generate_multi_clip_switch: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Enable multi-clip generation with dynamic camera changes',
-      }),
-    )
-    .default(false),
-  thinking_type: z.optional(
-    z.enum(['enabled', 'disabled', 'auto']).register(z.globalRegistry, {
-      description:
-        "Prompt optimization mode: 'enabled' to optimize, 'disabled' to turn off, 'auto' for model decision",
+  resolution: z.optional(
+    z.enum(['360p', '540p', '720p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video',
     }),
   ),
   style: z.optional(
@@ -1316,18 +1121,6 @@ export const zPixverseV55TextToVideoInput = z.object({
         description: 'The style of the generated video',
       }),
   ),
-  resolution: z.optional(
-    z.enum(['360p', '540p', '720p', '1080p']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video',
-    }),
-  ),
-  generate_audio_switch: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Enable audio generation (BGM, SFX, dialogue)',
-      }),
-    )
-    .default(false),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -1344,647 +1137,1539 @@ export const zPixverseV55TextToVideoInput = z.object({
 })
 
 /**
- * File
+ * VideoOutput
  */
-export const zFalAiPixverseV55TextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
+export const zSchemaPixverseV35TextToVideoOutput = z.object({
+  video: zSchemaFile,
 })
 
 /**
- * VideoOutputV5_5
+ * TextToVideoRequest
  */
-export const zPixverseV55TextToVideoOutput = z.object({
-  video: zFalAiPixverseV55TextToVideoFile,
-})
-
-/**
- * LTXVTextToVideoFastRequest
- */
-export const zLtx2TextToVideoFastInput = z.object({
-  prompt: z.string().min(1).max(5000).register(z.globalRegistry, {
-    description: 'The prompt to generate the video from',
-  }),
+export const zSchemaPixverseV35TextToVideoInput = z.object({
+  prompt: z.string(),
   aspect_ratio: z.optional(
-    z.enum(['16:9']).register(z.globalRegistry, {
+    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
       description: 'The aspect ratio of the generated video',
     }),
   ),
-  duration: z.optional(
-    z
-      .union([
-        z.literal(6),
-        z.literal(8),
-        z.literal(10),
-        z.literal(12),
-        z.literal(14),
-        z.literal(16),
-        z.literal(18),
-        z.literal(20),
-      ])
-      .register(z.globalRegistry, {
-        description:
-          'The duration of the generated video in seconds. The fast model supports 6-20 seconds. Note: Durations longer than 10 seconds (12, 14, 16, 18, 20) are only supported with 25 FPS and 1080p resolution.',
-      }),
-  ),
-  generate_audio: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to generate audio for the generated video',
-      }),
-    )
-    .default(true),
   resolution: z.optional(
-    z.enum(['1080p', '1440p', '2160p']).register(z.globalRegistry, {
+    z.enum(['360p', '540p', '720p', '1080p']).register(z.globalRegistry, {
       description: 'The resolution of the generated video',
     }),
   ),
-  fps: z.optional(
-    z.union([z.literal(25), z.literal(50)]).register(z.globalRegistry, {
-      description: 'The frames per second of the generated video',
-    }),
-  ),
-})
-
-/**
- * VideoFile
- */
-export const zFalAiLtx2TextToVideoFastVideoFile = z.object({
-  height: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The height of the video',
-    }),
-  ),
-  duration: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The duration of the video',
-    }),
-  ),
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  fps: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The FPS of the video',
-    }),
-  ),
-  width: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The width of the video',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  num_frames: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The number of frames in the video',
-    }),
-  ),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * LTXVTextToVideoResponse
- */
-export const zLtx2TextToVideoFastOutput = z.object({
-  video: zFalAiLtx2TextToVideoFastVideoFile,
-})
-
-/**
- * LTXVTextToVideoRequest
- */
-export const zLtx2TextToVideoInput = z.object({
-  prompt: z.string().min(1).max(5000).register(z.globalRegistry, {
-    description: 'The prompt to generate the video from',
-  }),
-  aspect_ratio: z.optional(
-    z.enum(['16:9']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video',
-    }),
-  ),
-  duration: z.optional(
+  style: z.optional(
     z
-      .union([z.literal(6), z.literal(8), z.literal(10)])
+      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
       .register(z.globalRegistry, {
-        description: 'The duration of the generated video in seconds',
+        description: 'The style of the generated video',
       }),
   ),
-  generate_audio: z
+  duration: z.optional(
+    z.enum(['5', '8']).register(z.globalRegistry, {
+      description:
+        'The duration of the generated video in seconds. 8s videos cost double. 1080p videos are limited to 5 seconds',
+    }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
+    }),
+  ),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt to be used for the generation',
+      }),
+    )
+    .default(''),
+})
+
+/**
+ * T2VDirectorOutput
+ */
+export const zSchemaMinimaxVideo01DirectorOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoDirectorRequest
+ */
+export const zSchemaMinimaxVideo01DirectorInput = z.object({
+  prompt_optimizer: z
     .optional(
       z.boolean().register(z.globalRegistry, {
-        description: 'Whether to generate audio for the generated video',
+        description: "Whether to use the model's prompt optimizer",
       }),
     )
     .default(true),
-  resolution: z.optional(
-    z.enum(['1080p', '1440p', '2160p']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video',
-    }),
-  ),
-  fps: z.optional(
-    z.union([z.literal(25), z.literal(50)]).register(z.globalRegistry, {
-      description: 'The frames per second of the generated video',
-    }),
-  ),
+  prompt: z.string().max(2000).register(z.globalRegistry, {
+    description:
+      'Text prompt for video generation. Camera movement instructions can be added using square brackets (e.g. [Pan left] or [Zoom in]). You can use up to 3 combined movements per prompt. Supported movements: Truck left/right, Pan left/right, Push in/Pull out, Pedestal up/down, Tilt up/down, Zoom in/out, Shake, Tracking shot, Static shot. For example: [Truck left, Pan right, Zoom in]. For a more detailed guide, refer https://sixth-switch-2ac.notion.site/T2V-01-Director-Model-Tutorial-with-camera-movement-1886c20a98eb80f395b8e05291ad8645',
+  }),
 })
 
 /**
- * VideoFile
+ * TextToVideoOutput
  */
-export const zFalAiLtx2TextToVideoVideoFile = z.object({
-  height: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The height of the video',
-    }),
-  ),
+export const zSchemaVeo2Output = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoInput
+ */
+export const zSchemaVeo2Input = z.object({
+  prompt: z.string().min(1).register(z.globalRegistry, {
+    description: 'The text prompt describing the video you want to generate',
+  }),
   duration: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The duration of the video',
+    z.enum(['5s', '6s', '7s', '8s']).register(z.globalRegistry, {
+      description: 'The duration of the generated video in seconds',
     }),
   ),
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  fps: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The FPS of the video',
-    }),
-  ),
-  width: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The width of the video',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  num_frames: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The number of frames in the video',
-    }),
-  ),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * LTXVTextToVideoResponse
- */
-export const zLtx2TextToVideoOutput = z.object({
-  video: zFalAiLtx2TextToVideoVideoFile,
-})
-
-/**
- * HunyuanVideo15T2VRequest
- */
-export const zHunyuanVideoV15TextToVideoInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to generate the video.',
-  }),
   aspect_ratio: z.optional(
     z.enum(['16:9', '9:16']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the video.',
+      description: 'The aspect ratio of the generated video',
+    }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'A seed to use for the video generation',
+    }),
+  ),
+  negative_prompt: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'A negative prompt to guide the video generation',
+    }),
+  ),
+  enhance_prompt: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enhance the video generation',
+      }),
+    )
+    .default(true),
+})
+
+/**
+ * WanT2VResponse
+ */
+export const zSchemaWanT2vOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * WanT2VRequest
+ */
+export const zSchemaWanT2vInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt to guide video generation.',
+  }),
+  aspect_ratio: z.optional(
+    z.enum(['9:16', '16:9']).register(z.globalRegistry, {
+      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
     }),
   ),
   resolution: z.optional(
-    z.enum(['480p']).register(z.globalRegistry, {
-      description: 'The resolution of the video.',
+    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
+      description: 'Resolution of the generated video (480p, 580p, or 720p).',
     }),
   ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        'Random seed for reproducibility. If None, a random seed is chosen.',
+    }),
+  ),
+  turbo_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If true, the video will be generated faster with no noticeable degradation in the visual quality.',
+      }),
+    )
+    .default(false),
+  frames_per_second: z
+    .optional(
+      z.int().gte(5).lte(24).register(z.globalRegistry, {
+        description:
+          'Frames per second of the generated video. Must be between 5 to 24.',
+      }),
+    )
+    .default(16),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'If set to true, the safety checker will be enabled.',
+      }),
+    )
+    .default(false),
+  num_frames: z
+    .optional(
+      z.int().gte(81).lte(100).register(z.globalRegistry, {
+        description:
+          'Number of frames to generate. Must be between 81 to 100 (inclusive).',
+      }),
+    )
+    .default(81),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(2).lte(40).register(z.globalRegistry, {
+        description:
+          'Number of inference steps for sampling. Higher values give better quality but take longer.',
+      }),
+    )
+    .default(30),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt for video generation.',
+      }),
+    )
+    .default(
+      'bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
+    ),
   enable_prompt_expansion: z
     .optional(
       z.boolean().register(z.globalRegistry, {
-        description: 'Enable prompt expansion to enhance the input prompt.',
+        description: 'Whether to enable prompt expansion.',
+      }),
+    )
+    .default(false),
+})
+
+/**
+ * T2VOutput
+ */
+export const zSchemaKlingVideoV16ProTextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoRequest
+ */
+export const zSchemaKlingVideoV16ProTextToVideoInput = z.object({
+  prompt: z.string().max(2500),
+  duration: z.optional(
+    z.enum(['5', '10']).register(z.globalRegistry, {
+      description: 'The duration of the generated video in seconds',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video frame',
+    }),
+  ),
+  negative_prompt: z
+    .optional(z.string().max(2500))
+    .default('blur, distort, and low quality'),
+  cfg_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
+      }),
+    )
+    .default(0.5),
+})
+
+/**
+ * TextToVideoOutput
+ */
+export const zSchemaLtxVideoV095Output = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoInput
+ */
+export const zSchemaLtxVideoV095Input = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'Text prompt to guide generation',
+  }),
+  resolution: z.optional(
+    z.enum(['480p', '720p']).register(z.globalRegistry, {
+      description: 'Resolution of the generated video (480p or 720p).',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['9:16', '16:9']).register(z.globalRegistry, {
+      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
+    }),
+  ),
+  expand_prompt: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "Whether to expand the prompt using the model's own capabilities.",
       }),
     )
     .default(true),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
-      description: 'Random seed for reproducibility.',
+      description: 'Random seed for generation',
     }),
   ),
   num_inference_steps: z
     .optional(
-      z.int().gte(1).lte(50).register(z.globalRegistry, {
-        description: 'The number of inference steps.',
+      z.int().gte(2).lte(50).register(z.globalRegistry, {
+        description: 'Number of inference steps',
       }),
     )
-    .default(28),
+    .default(40),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
-        description: 'The negative prompt to guide what not to generate.',
+        description: 'Negative prompt for generation',
       }),
     )
-    .default(''),
-  num_frames: z
-    .optional(
-      z.int().gte(1).lte(121).register(z.globalRegistry, {
-        description: 'The number of frames to generate.',
-      }),
-    )
-    .default(121),
+    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
 })
 
 /**
- * File
+ * VideoEffectsOutput
  */
-export const zFalAiHunyuanVideoV15TextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
+export const zSchemaKlingVideoV16StandardEffectsOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * VideoEffectsRequest
+ */
+export const zSchemaKlingVideoV16StandardEffectsInput = z.object({
+  duration: z.optional(
+    z.enum(['5', '10']).register(z.globalRegistry, {
+      description: 'The duration of the generated video in seconds',
     }),
   ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
+  input_image_urls: z.optional(
+    z.array(z.string()).register(z.globalRegistry, {
       description:
-        'The name of the file. It will be auto-generated if not provided.',
+        'URL of images to be used for hug, kiss or heart_gesture video.',
     }),
   ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
+  effect_scene: z
+    .enum([
+      'hug',
+      'kiss',
+      'heart_gesture',
+      'squish',
+      'expansion',
+      'fuzzyfuzzy',
+      'bloombloom',
+      'dizzydizzy',
+      'jelly_press',
+      'jelly_slice',
+      'jelly_squish',
+      'jelly_jiggle',
+      'pixelpixel',
+      'yearbook',
+      'instant_film',
+      'anime_figure',
+      'rocketrocket',
+      'fly_fly',
+      'disappear',
+      'lightning_power',
+      'bullet_time',
+      'bullet_time_360',
+      'media_interview',
+      'day_to_night',
+      "let's_ride",
+      'jumpdrop',
+      'swish_swish',
+      'running_man',
+      'jazz_jazz',
+      'swing_swing',
+      'skateskate',
+      'building_sweater',
+      'pure_white_wings',
+      'black_wings',
+      'golden_wing',
+      'pink_pink_wings',
+      'rampage_ape',
+      'a_list_look',
+      'countdown_teleport',
+      'firework_2026',
+      'instant_christmas',
+      'birthday_star',
+      'firework',
+      'celebration',
+      'tiger_hug_pro',
+      'pet_lion_pro',
+      'guardian_spirit',
+      'squeeze_scream',
+      'inner_voice',
+      'memory_alive',
+      'guess_what',
+      'eagle_snatch',
+      'hug_from_past',
+      'instant_kid',
+      'dollar_rain',
+      'cry_cry',
+      'building_collapse',
+      'mushroom',
+      'jesus_hug',
+      'shark_alert',
+      'lie_flat',
+      'polar_bear_hug',
+      'brown_bear_hug',
+      'office_escape_plow',
+      'watermelon_bomb',
+      'boss_coming',
+      'wig_out',
+      'car_explosion',
+      'tiger_hug',
+      'siblings',
+      'construction_worker',
+      'snatched',
+      'felt_felt',
+      'plushcut',
+      'drunk_dance',
+      'drunk_dance_pet',
+      'daoma_dance',
+      'bouncy_dance',
+      'smooth_sailing_dance',
+      'new_year_greeting',
+      'lion_dance',
+      'prosperity',
+      'great_success',
+      'golden_horse_fortune',
+      'red_packet_box',
+      'lucky_horse_year',
+      'lucky_red_packet',
+      'lucky_money_come',
+      'lion_dance_pet',
+      'dumpling_making_pet',
+      'fish_making_pet',
+      'pet_red_packet',
+      'lantern_glow',
+      'expression_challenge',
+      'overdrive',
+      'heart_gesture_dance',
+      'poping',
+      'martial_arts',
+      'running',
+      'nezha',
+      'motorcycle_dance',
+      'subject_3_dance',
+      'ghost_step_dance',
+      'phantom_jewel',
+      'zoom_out',
+      'cheers_2026',
+      'kiss_pro',
+      'fight_pro',
+      'hug_pro',
+      'heart_gesture_pro',
+      'dollar_rain_pro',
+      'pet_bee_pro',
+      'santa_random_surprise',
+      'magic_match_tree',
+      'happy_birthday',
+      'thumbs_up_pro',
+      'surprise_bouquet',
+      'bouquet_drop',
+      '3d_cartoon_1_pro',
+      'glamour_photo_shoot',
+      'box_of_joy',
+      'first_toast_of_the_year',
+      'my_santa_pic',
+      'santa_gift',
+      'steampunk_christmas',
+      'snowglobe',
+      'christmas_photo_shoot',
+      'ornament_crash',
+      'santa_express',
+      'particle_santa_surround',
+      'coronation_of_frost',
+      'spark_in_the_snow',
+      'scarlet_and_snow',
+      'cozy_toon_wrap',
+      'bullet_time_lite',
+      'magic_cloak',
+      'balloon_parade',
+      'jumping_ginger_joy',
+      'c4d_cartoon_pro',
+      'venomous_spider',
+      'throne_of_king',
+      'luminous_elf',
+      'woodland_elf',
+      'japanese_anime_1',
+      'american_comics',
+      'snowboarding',
+      'witch_transform',
+      'vampire_transform',
+      'pumpkin_head_transform',
+      'demon_transform',
+      'mummy_transform',
+      'zombie_transform',
+      'cute_pumpkin_transform',
+      'cute_ghost_transform',
+      'knock_knock_halloween',
+      'halloween_escape',
+      'baseball',
+      'trampoline',
+      'trampoline_night',
+      'pucker_up',
+      'feed_mooncake',
+      'flyer',
+      'dishwasher',
+      'pet_chinese_opera',
+      'magic_fireball',
+      'gallery_ring',
+      'pet_moto_rider',
+      'muscle_pet',
+      'pet_delivery',
+      'mythic_style',
+      'steampunk',
+      '3d_cartoon_2',
+      'pet_chef',
+      'santa_gifts',
+      'santa_hug',
+      'girlfriend',
+      'boyfriend',
+      'heart_gesture_1',
+      'pet_wizard',
+      'smoke_smoke',
+      'gun_shot',
+      'double_gun',
+      'pet_warrior',
+      'long_hair',
+      'pet_dance',
+      'wool_curly',
+      'pet_bee',
+      'marry_me',
+      'piggy_morph',
+      'ski_ski',
+      'magic_broom',
+      'splashsplash',
+      'surfsurf',
+      'fairy_wing',
+      'angel_wing',
+      'dark_wing',
+      'emoji',
+    ])
+    .register(z.globalRegistry, {
+      description: 'The effect scene to use for the video generation',
     }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
 })
 
 /**
- * HunyuanVideo15Response
+ * VideoEffectsOutput
  */
-export const zHunyuanVideoV15TextToVideoOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiHunyuanVideoV15TextToVideoFile,
+export const zSchemaKlingVideoV1StandardEffectsOutput = z.object({
+  video: zSchemaFile,
 })
 
 /**
- * GenerationInput
+ * VideoEffectsRequest
+ */
+export const zSchemaKlingVideoV1StandardEffectsInput = z.object({
+  duration: z.optional(
+    z.enum(['5', '10']).register(z.globalRegistry, {
+      description: 'The duration of the generated video in seconds',
+    }),
+  ),
+  input_image_urls: z.optional(
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URL of images to be used for hug, kiss or heart_gesture video.',
+    }),
+  ),
+  effect_scene: z
+    .enum([
+      'hug',
+      'kiss',
+      'heart_gesture',
+      'squish',
+      'expansion',
+      'fuzzyfuzzy',
+      'bloombloom',
+      'dizzydizzy',
+      'jelly_press',
+      'jelly_slice',
+      'jelly_squish',
+      'jelly_jiggle',
+      'pixelpixel',
+      'yearbook',
+      'instant_film',
+      'anime_figure',
+      'rocketrocket',
+      'fly_fly',
+      'disappear',
+      'lightning_power',
+      'bullet_time',
+      'bullet_time_360',
+      'media_interview',
+      'day_to_night',
+      "let's_ride",
+      'jumpdrop',
+      'swish_swish',
+      'running_man',
+      'jazz_jazz',
+      'swing_swing',
+      'skateskate',
+      'building_sweater',
+      'pure_white_wings',
+      'black_wings',
+      'golden_wing',
+      'pink_pink_wings',
+      'rampage_ape',
+      'a_list_look',
+      'countdown_teleport',
+      'firework_2026',
+      'instant_christmas',
+      'birthday_star',
+      'firework',
+      'celebration',
+      'tiger_hug_pro',
+      'pet_lion_pro',
+      'guardian_spirit',
+      'squeeze_scream',
+      'inner_voice',
+      'memory_alive',
+      'guess_what',
+      'eagle_snatch',
+      'hug_from_past',
+      'instant_kid',
+      'dollar_rain',
+      'cry_cry',
+      'building_collapse',
+      'mushroom',
+      'jesus_hug',
+      'shark_alert',
+      'lie_flat',
+      'polar_bear_hug',
+      'brown_bear_hug',
+      'office_escape_plow',
+      'watermelon_bomb',
+      'boss_coming',
+      'wig_out',
+      'car_explosion',
+      'tiger_hug',
+      'siblings',
+      'construction_worker',
+      'snatched',
+      'felt_felt',
+      'plushcut',
+      'drunk_dance',
+      'drunk_dance_pet',
+      'daoma_dance',
+      'bouncy_dance',
+      'smooth_sailing_dance',
+      'new_year_greeting',
+      'lion_dance',
+      'prosperity',
+      'great_success',
+      'golden_horse_fortune',
+      'red_packet_box',
+      'lucky_horse_year',
+      'lucky_red_packet',
+      'lucky_money_come',
+      'lion_dance_pet',
+      'dumpling_making_pet',
+      'fish_making_pet',
+      'pet_red_packet',
+      'lantern_glow',
+      'expression_challenge',
+      'overdrive',
+      'heart_gesture_dance',
+      'poping',
+      'martial_arts',
+      'running',
+      'nezha',
+      'motorcycle_dance',
+      'subject_3_dance',
+      'ghost_step_dance',
+      'phantom_jewel',
+      'zoom_out',
+      'cheers_2026',
+      'kiss_pro',
+      'fight_pro',
+      'hug_pro',
+      'heart_gesture_pro',
+      'dollar_rain_pro',
+      'pet_bee_pro',
+      'santa_random_surprise',
+      'magic_match_tree',
+      'happy_birthday',
+      'thumbs_up_pro',
+      'surprise_bouquet',
+      'bouquet_drop',
+      '3d_cartoon_1_pro',
+      'glamour_photo_shoot',
+      'box_of_joy',
+      'first_toast_of_the_year',
+      'my_santa_pic',
+      'santa_gift',
+      'steampunk_christmas',
+      'snowglobe',
+      'christmas_photo_shoot',
+      'ornament_crash',
+      'santa_express',
+      'particle_santa_surround',
+      'coronation_of_frost',
+      'spark_in_the_snow',
+      'scarlet_and_snow',
+      'cozy_toon_wrap',
+      'bullet_time_lite',
+      'magic_cloak',
+      'balloon_parade',
+      'jumping_ginger_joy',
+      'c4d_cartoon_pro',
+      'venomous_spider',
+      'throne_of_king',
+      'luminous_elf',
+      'woodland_elf',
+      'japanese_anime_1',
+      'american_comics',
+      'snowboarding',
+      'witch_transform',
+      'vampire_transform',
+      'pumpkin_head_transform',
+      'demon_transform',
+      'mummy_transform',
+      'zombie_transform',
+      'cute_pumpkin_transform',
+      'cute_ghost_transform',
+      'knock_knock_halloween',
+      'halloween_escape',
+      'baseball',
+      'trampoline',
+      'trampoline_night',
+      'pucker_up',
+      'feed_mooncake',
+      'flyer',
+      'dishwasher',
+      'pet_chinese_opera',
+      'magic_fireball',
+      'gallery_ring',
+      'pet_moto_rider',
+      'muscle_pet',
+      'pet_delivery',
+      'mythic_style',
+      'steampunk',
+      '3d_cartoon_2',
+      'pet_chef',
+      'santa_gifts',
+      'santa_hug',
+      'girlfriend',
+      'boyfriend',
+      'heart_gesture_1',
+      'pet_wizard',
+      'smoke_smoke',
+      'gun_shot',
+      'double_gun',
+      'pet_warrior',
+      'long_hair',
+      'pet_dance',
+      'wool_curly',
+      'pet_bee',
+      'marry_me',
+      'piggy_morph',
+      'ski_ski',
+      'magic_broom',
+      'splashsplash',
+      'surfsurf',
+      'fairy_wing',
+      'angel_wing',
+      'dark_wing',
+      'emoji',
+    ])
+    .register(z.globalRegistry, {
+      description: 'The effect scene to use for the video generation',
+    }),
+})
+
+/**
+ * VideoEffectsOutput
+ */
+export const zSchemaKlingVideoV16ProEffectsOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * VideoEffectsRequest
+ */
+export const zSchemaKlingVideoV16ProEffectsInput = z.object({
+  duration: z.optional(
+    z.enum(['5', '10']).register(z.globalRegistry, {
+      description: 'The duration of the generated video in seconds',
+    }),
+  ),
+  input_image_urls: z.optional(
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URL of images to be used for hug, kiss or heart_gesture video.',
+    }),
+  ),
+  effect_scene: z
+    .enum([
+      'hug',
+      'kiss',
+      'heart_gesture',
+      'squish',
+      'expansion',
+      'fuzzyfuzzy',
+      'bloombloom',
+      'dizzydizzy',
+      'jelly_press',
+      'jelly_slice',
+      'jelly_squish',
+      'jelly_jiggle',
+      'pixelpixel',
+      'yearbook',
+      'instant_film',
+      'anime_figure',
+      'rocketrocket',
+      'fly_fly',
+      'disappear',
+      'lightning_power',
+      'bullet_time',
+      'bullet_time_360',
+      'media_interview',
+      'day_to_night',
+      "let's_ride",
+      'jumpdrop',
+      'swish_swish',
+      'running_man',
+      'jazz_jazz',
+      'swing_swing',
+      'skateskate',
+      'building_sweater',
+      'pure_white_wings',
+      'black_wings',
+      'golden_wing',
+      'pink_pink_wings',
+      'rampage_ape',
+      'a_list_look',
+      'countdown_teleport',
+      'firework_2026',
+      'instant_christmas',
+      'birthday_star',
+      'firework',
+      'celebration',
+      'tiger_hug_pro',
+      'pet_lion_pro',
+      'guardian_spirit',
+      'squeeze_scream',
+      'inner_voice',
+      'memory_alive',
+      'guess_what',
+      'eagle_snatch',
+      'hug_from_past',
+      'instant_kid',
+      'dollar_rain',
+      'cry_cry',
+      'building_collapse',
+      'mushroom',
+      'jesus_hug',
+      'shark_alert',
+      'lie_flat',
+      'polar_bear_hug',
+      'brown_bear_hug',
+      'office_escape_plow',
+      'watermelon_bomb',
+      'boss_coming',
+      'wig_out',
+      'car_explosion',
+      'tiger_hug',
+      'siblings',
+      'construction_worker',
+      'snatched',
+      'felt_felt',
+      'plushcut',
+      'drunk_dance',
+      'drunk_dance_pet',
+      'daoma_dance',
+      'bouncy_dance',
+      'smooth_sailing_dance',
+      'new_year_greeting',
+      'lion_dance',
+      'prosperity',
+      'great_success',
+      'golden_horse_fortune',
+      'red_packet_box',
+      'lucky_horse_year',
+      'lucky_red_packet',
+      'lucky_money_come',
+      'lion_dance_pet',
+      'dumpling_making_pet',
+      'fish_making_pet',
+      'pet_red_packet',
+      'lantern_glow',
+      'expression_challenge',
+      'overdrive',
+      'heart_gesture_dance',
+      'poping',
+      'martial_arts',
+      'running',
+      'nezha',
+      'motorcycle_dance',
+      'subject_3_dance',
+      'ghost_step_dance',
+      'phantom_jewel',
+      'zoom_out',
+      'cheers_2026',
+      'kiss_pro',
+      'fight_pro',
+      'hug_pro',
+      'heart_gesture_pro',
+      'dollar_rain_pro',
+      'pet_bee_pro',
+      'santa_random_surprise',
+      'magic_match_tree',
+      'happy_birthday',
+      'thumbs_up_pro',
+      'surprise_bouquet',
+      'bouquet_drop',
+      '3d_cartoon_1_pro',
+      'glamour_photo_shoot',
+      'box_of_joy',
+      'first_toast_of_the_year',
+      'my_santa_pic',
+      'santa_gift',
+      'steampunk_christmas',
+      'snowglobe',
+      'christmas_photo_shoot',
+      'ornament_crash',
+      'santa_express',
+      'particle_santa_surround',
+      'coronation_of_frost',
+      'spark_in_the_snow',
+      'scarlet_and_snow',
+      'cozy_toon_wrap',
+      'bullet_time_lite',
+      'magic_cloak',
+      'balloon_parade',
+      'jumping_ginger_joy',
+      'c4d_cartoon_pro',
+      'venomous_spider',
+      'throne_of_king',
+      'luminous_elf',
+      'woodland_elf',
+      'japanese_anime_1',
+      'american_comics',
+      'snowboarding',
+      'witch_transform',
+      'vampire_transform',
+      'pumpkin_head_transform',
+      'demon_transform',
+      'mummy_transform',
+      'zombie_transform',
+      'cute_pumpkin_transform',
+      'cute_ghost_transform',
+      'knock_knock_halloween',
+      'halloween_escape',
+      'baseball',
+      'trampoline',
+      'trampoline_night',
+      'pucker_up',
+      'feed_mooncake',
+      'flyer',
+      'dishwasher',
+      'pet_chinese_opera',
+      'magic_fireball',
+      'gallery_ring',
+      'pet_moto_rider',
+      'muscle_pet',
+      'pet_delivery',
+      'mythic_style',
+      'steampunk',
+      '3d_cartoon_2',
+      'pet_chef',
+      'santa_gifts',
+      'santa_hug',
+      'girlfriend',
+      'boyfriend',
+      'heart_gesture_1',
+      'pet_wizard',
+      'smoke_smoke',
+      'gun_shot',
+      'double_gun',
+      'pet_warrior',
+      'long_hair',
+      'pet_dance',
+      'wool_curly',
+      'pet_bee',
+      'marry_me',
+      'piggy_morph',
+      'ski_ski',
+      'magic_broom',
+      'splashsplash',
+      'surfsurf',
+      'fairy_wing',
+      'angel_wing',
+      'dark_wing',
+      'emoji',
+    ])
+    .register(z.globalRegistry, {
+      description: 'The effect scene to use for the video generation',
+    }),
+})
+
+/**
+ * VideoEffectsOutput
+ */
+export const zSchemaKlingVideoV15ProEffectsOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * VideoEffectsRequest
+ */
+export const zSchemaKlingVideoV15ProEffectsInput = z.object({
+  duration: z.optional(
+    z.enum(['5', '10']).register(z.globalRegistry, {
+      description: 'The duration of the generated video in seconds',
+    }),
+  ),
+  input_image_urls: z.optional(
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URL of images to be used for hug, kiss or heart_gesture video.',
+    }),
+  ),
+  effect_scene: z
+    .enum([
+      'hug',
+      'kiss',
+      'heart_gesture',
+      'squish',
+      'expansion',
+      'fuzzyfuzzy',
+      'bloombloom',
+      'dizzydizzy',
+      'jelly_press',
+      'jelly_slice',
+      'jelly_squish',
+      'jelly_jiggle',
+      'pixelpixel',
+      'yearbook',
+      'instant_film',
+      'anime_figure',
+      'rocketrocket',
+      'fly_fly',
+      'disappear',
+      'lightning_power',
+      'bullet_time',
+      'bullet_time_360',
+      'media_interview',
+      'day_to_night',
+      "let's_ride",
+      'jumpdrop',
+      'swish_swish',
+      'running_man',
+      'jazz_jazz',
+      'swing_swing',
+      'skateskate',
+      'building_sweater',
+      'pure_white_wings',
+      'black_wings',
+      'golden_wing',
+      'pink_pink_wings',
+      'rampage_ape',
+      'a_list_look',
+      'countdown_teleport',
+      'firework_2026',
+      'instant_christmas',
+      'birthday_star',
+      'firework',
+      'celebration',
+      'tiger_hug_pro',
+      'pet_lion_pro',
+      'guardian_spirit',
+      'squeeze_scream',
+      'inner_voice',
+      'memory_alive',
+      'guess_what',
+      'eagle_snatch',
+      'hug_from_past',
+      'instant_kid',
+      'dollar_rain',
+      'cry_cry',
+      'building_collapse',
+      'mushroom',
+      'jesus_hug',
+      'shark_alert',
+      'lie_flat',
+      'polar_bear_hug',
+      'brown_bear_hug',
+      'office_escape_plow',
+      'watermelon_bomb',
+      'boss_coming',
+      'wig_out',
+      'car_explosion',
+      'tiger_hug',
+      'siblings',
+      'construction_worker',
+      'snatched',
+      'felt_felt',
+      'plushcut',
+      'drunk_dance',
+      'drunk_dance_pet',
+      'daoma_dance',
+      'bouncy_dance',
+      'smooth_sailing_dance',
+      'new_year_greeting',
+      'lion_dance',
+      'prosperity',
+      'great_success',
+      'golden_horse_fortune',
+      'red_packet_box',
+      'lucky_horse_year',
+      'lucky_red_packet',
+      'lucky_money_come',
+      'lion_dance_pet',
+      'dumpling_making_pet',
+      'fish_making_pet',
+      'pet_red_packet',
+      'lantern_glow',
+      'expression_challenge',
+      'overdrive',
+      'heart_gesture_dance',
+      'poping',
+      'martial_arts',
+      'running',
+      'nezha',
+      'motorcycle_dance',
+      'subject_3_dance',
+      'ghost_step_dance',
+      'phantom_jewel',
+      'zoom_out',
+      'cheers_2026',
+      'kiss_pro',
+      'fight_pro',
+      'hug_pro',
+      'heart_gesture_pro',
+      'dollar_rain_pro',
+      'pet_bee_pro',
+      'santa_random_surprise',
+      'magic_match_tree',
+      'happy_birthday',
+      'thumbs_up_pro',
+      'surprise_bouquet',
+      'bouquet_drop',
+      '3d_cartoon_1_pro',
+      'glamour_photo_shoot',
+      'box_of_joy',
+      'first_toast_of_the_year',
+      'my_santa_pic',
+      'santa_gift',
+      'steampunk_christmas',
+      'snowglobe',
+      'christmas_photo_shoot',
+      'ornament_crash',
+      'santa_express',
+      'particle_santa_surround',
+      'coronation_of_frost',
+      'spark_in_the_snow',
+      'scarlet_and_snow',
+      'cozy_toon_wrap',
+      'bullet_time_lite',
+      'magic_cloak',
+      'balloon_parade',
+      'jumping_ginger_joy',
+      'c4d_cartoon_pro',
+      'venomous_spider',
+      'throne_of_king',
+      'luminous_elf',
+      'woodland_elf',
+      'japanese_anime_1',
+      'american_comics',
+      'snowboarding',
+      'witch_transform',
+      'vampire_transform',
+      'pumpkin_head_transform',
+      'demon_transform',
+      'mummy_transform',
+      'zombie_transform',
+      'cute_pumpkin_transform',
+      'cute_ghost_transform',
+      'knock_knock_halloween',
+      'halloween_escape',
+      'baseball',
+      'trampoline',
+      'trampoline_night',
+      'pucker_up',
+      'feed_mooncake',
+      'flyer',
+      'dishwasher',
+      'pet_chinese_opera',
+      'magic_fireball',
+      'gallery_ring',
+      'pet_moto_rider',
+      'muscle_pet',
+      'pet_delivery',
+      'mythic_style',
+      'steampunk',
+      '3d_cartoon_2',
+      'pet_chef',
+      'santa_gifts',
+      'santa_hug',
+      'girlfriend',
+      'boyfriend',
+      'heart_gesture_1',
+      'pet_wizard',
+      'smoke_smoke',
+      'gun_shot',
+      'double_gun',
+      'pet_warrior',
+      'long_hair',
+      'pet_dance',
+      'wool_curly',
+      'pet_bee',
+      'marry_me',
+      'piggy_morph',
+      'ski_ski',
+      'magic_broom',
+      'splashsplash',
+      'surfsurf',
+      'fairy_wing',
+      'angel_wing',
+      'dark_wing',
+      'emoji',
+    ])
+    .register(z.globalRegistry, {
+      description: 'The effect scene to use for the video generation',
+    }),
+})
+
+/**
+ * WanProT2VResponse
+ */
+export const zSchemaWanProTextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * WanProT2VRequest
+ */
+export const zSchemaWanProTextToVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video',
+  }),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable the safety checker',
+      }),
+    )
+    .default(true),
+  seed: z.optional(z.union([z.int(), z.unknown()])),
+})
+
+/**
+ * Pika22TextToVideoOutput
  *
- * Input model for text-to-video generation
+ * Output model for Pika 2.2 text-to-video generation
  */
-export const zInfinityStarTextToVideoInput = z
+export const zSchemaPikaV22TextToVideoOutput = z
   .object({
-    prompt: z.string().register(z.globalRegistry, {
-      description: 'Text prompt for generating the video',
-    }),
-    aspect_ratio: z.optional(
-      z.enum(['16:9', '1:1', '9:16']).register(z.globalRegistry, {
-        description: 'Aspect ratio of the generated output',
+    video: zSchemaFile,
+  })
+  .register(z.globalRegistry, {
+    description: 'Output model for Pika 2.2 text-to-video generation',
+  })
+
+/**
+ * Pika22TextToVideoRequest
+ *
+ * Request model for Pika 2.2 text-to-video generation
+ */
+export const zSchemaPikaV22TextToVideoInput = z
+  .object({
+    prompt: z.string(),
+    resolution: z.optional(
+      z.enum(['1080p', '720p']).register(z.globalRegistry, {
+        description: 'The resolution of the generated video',
       }),
     ),
-    enhance_prompt: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description: 'Whether to use an LLM to enhance the prompt.',
+    aspect_ratio: z.optional(
+      z
+        .enum(['16:9', '9:16', '1:1', '4:5', '5:4', '3:2', '2:3'])
+        .register(z.globalRegistry, {
+          description: 'The aspect ratio of the generated video',
         }),
-      )
-      .default(true),
-    use_apg: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description: 'Whether to use APG',
-        }),
-      )
-      .default(true),
-    guidance_scale: z
-      .optional(
-        z.number().gte(1).lte(40).register(z.globalRegistry, {
-          description: 'Guidance scale for generation',
-        }),
-      )
-      .default(7.5),
-    num_inference_steps: z
-      .optional(
-        z.int().gte(1).lte(100).register(z.globalRegistry, {
-          description: 'Number of inference steps',
-        }),
-      )
-      .default(50),
+    ),
+    duration: z.optional(
+      z.union([z.literal(5), z.literal(10)]).register(z.globalRegistry, {
+        description: 'The duration of the generated video in seconds',
+      }),
+    ),
     seed: z.optional(
       z.int().register(z.globalRegistry, {
-        description:
-          'Random seed for reproducibility. Leave empty for random generation.',
+        description: 'The seed for the random number generator',
       }),
     ),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
-          description: 'Negative prompt to guide what to avoid in generation',
+          description: 'A negative prompt to guide the model',
+        }),
+      )
+      .default('ugly, bad, terrible'),
+  })
+  .register(z.globalRegistry, {
+    description: 'Request model for Pika 2.2 text-to-video generation',
+  })
+
+/**
+ * TextToVideoV21Output
+ *
+ * Output from text-to-video generation
+ */
+export const zSchemaPikaV21TextToVideoOutput = z
+  .object({
+    video: zSchemaFile,
+  })
+  .register(z.globalRegistry, {
+    description: 'Output from text-to-video generation',
+  })
+
+/**
+ * TextToVideov21Input
+ *
+ * Base request for text-to-video generation
+ */
+export const zSchemaPikaV21TextToVideoInput = z
+  .object({
+    prompt: z.string(),
+    resolution: z.optional(
+      z.enum(['720p', '1080p']).register(z.globalRegistry, {
+        description: 'The resolution of the generated video',
+      }),
+    ),
+    aspect_ratio: z.optional(
+      z
+        .enum(['16:9', '9:16', '1:1', '4:5', '5:4', '3:2', '2:3'])
+        .register(z.globalRegistry, {
+          description: 'The aspect ratio of the generated video',
+        }),
+    ),
+    duration: z
+      .optional(
+        z.int().register(z.globalRegistry, {
+          description: 'The duration of the generated video in seconds',
+        }),
+      )
+      .default(5),
+    seed: z.optional(
+      z.int().register(z.globalRegistry, {
+        description: 'The seed for the random number generator',
+      }),
+    ),
+    negative_prompt: z
+      .optional(
+        z.string().register(z.globalRegistry, {
+          description: 'A negative prompt to guide the model',
         }),
       )
       .default(''),
-    tau_video: z
-      .optional(
-        z.number().gte(0.1).lte(1).register(z.globalRegistry, {
-          description: 'Tau value for video scale',
-        }),
-      )
-      .default(0.4),
   })
   .register(z.globalRegistry, {
-    description: 'Input model for text-to-video generation',
+    description: 'Base request for text-to-video generation',
   })
 
 /**
- * File
+ * TurboTextToVideoOutput
+ *
+ * Output from text-to-video generation
  */
-export const zFalAiInfinityStarTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
+export const zSchemaPikaV2TurboTextToVideoOutput = z
+  .object({
+    video: zSchemaFile,
+  })
+  .register(z.globalRegistry, {
+    description: 'Output from text-to-video generation',
+  })
+
+/**
+ * TextToVideoTurboInput
+ *
+ * Base request for text-to-video generation
+ */
+export const zSchemaPikaV2TurboTextToVideoInput = z
+  .object({
+    prompt: z.string(),
+    resolution: z.optional(
+      z.enum(['720p', '1080p']).register(z.globalRegistry, {
+        description: 'The resolution of the generated video',
+      }),
+    ),
+    aspect_ratio: z.optional(
+      z
+        .enum(['16:9', '9:16', '1:1', '4:5', '5:4', '3:2', '2:3'])
+        .register(z.globalRegistry, {
+          description: 'The aspect ratio of the generated video',
+        }),
+    ),
+    duration: z
+      .optional(
+        z.int().register(z.globalRegistry, {
+          description: 'The duration of the generated video in seconds',
+        }),
+      )
+      .default(5),
+    seed: z.optional(
+      z.int().register(z.globalRegistry, {
+        description: 'The seed for the random number generator',
+      }),
+    ),
+    negative_prompt: z
+      .optional(
+        z.string().register(z.globalRegistry, {
+          description: 'A negative prompt to guide the model',
+        }),
+      )
+      .default(''),
+  })
+  .register(z.globalRegistry, {
+    description: 'Base request for text-to-video generation',
+  })
+
+/**
+ * Ray2T2VOutput
+ */
+export const zSchemaLumaDreamMachineRay2FlashOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * Ray2TextToVideoRequest
+ */
+export const zSchemaLumaDreamMachineRay2FlashInput = z.object({
+  prompt: z.string().min(3).max(5000),
+  aspect_ratio: z.optional(
+    z
+      .enum(['16:9', '9:16', '4:3', '3:4', '21:9', '9:21'])
+      .register(z.globalRegistry, {
+        description: 'The aspect ratio of the generated video',
+      }),
   ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
+  resolution: z.optional(
+    z.enum(['540p', '720p', '1080p']).register(z.globalRegistry, {
       description:
-        'The name of the file. It will be auto-generated if not provided.',
+        'The resolution of the generated video (720p costs 2x more, 1080p costs 4x more)',
     }),
   ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
+  loop: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether the video should loop (end of video is blended with the beginning)',
+      }),
+    )
+    .default(false),
+  duration: z.optional(
+    z.enum(['5s', '9s']).register(z.globalRegistry, {
+      description: 'The duration of the generated video (9s costs 2x more)',
     }),
   ),
 })
 
 /**
- * GenerationOutput
- *
- * Output model for text-to-video generation
+ * WanT2VResponse
  */
-export const zInfinityStarTextToVideoOutput = z
-  .object({
-    video: zFalAiInfinityStarTextToVideoFile,
-  })
-  .register(z.globalRegistry, {
-    description: 'Output model for text-to-video generation',
-  })
+export const zSchemaWanT2vLoraOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
 
 /**
- * SanaVideoInput
+ * WanLoRARequest
  */
-export const zSanaVideoInput = z.object({
+export const zSchemaWanT2vLoraInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt describing the video to generate',
+    description: 'The text prompt to guide video generation.',
   }),
   resolution: z.optional(
-    z.enum(['480p']).register(z.globalRegistry, {
-      description: 'The resolution of the output video',
+    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
+      description: 'Resolution of the generated video (480p,580p, or 720p).',
     }),
   ),
-  fps: z
+  reverse_video: z
     .optional(
-      z.int().gte(8).lte(30).register(z.globalRegistry, {
-        description: 'Frames per second for the output video',
+      z.boolean().register(z.globalRegistry, {
+        description: 'If true, the video will be reversed.',
+      }),
+    )
+    .default(false),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        'Random seed for reproducibility. If None, a random seed is chosen.',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['9:16', '16:9']).register(z.globalRegistry, {
+      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
+    }),
+  ),
+  loras: z
+    .optional(
+      z.array(zSchemaLoraWeight).register(z.globalRegistry, {
+        description: 'LoRA weights to be used in the inference.',
+      }),
+    )
+    .default([]),
+  frames_per_second: z
+    .optional(
+      z.int().gte(5).lte(24).register(z.globalRegistry, {
+        description:
+          'Frames per second of the generated video. Must be between 5 to 24.',
       }),
     )
     .default(16),
-  motion_score: z
+  turbo_mode: z
     .optional(
-      z.int().gte(0).lte(100).register(z.globalRegistry, {
-        description: 'Motion intensity score (higher = more motion)',
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If true, the video will be generated faster with no noticeable degradation in the visual quality.',
+      }),
+    )
+    .default(true),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'If set to true, the safety checker will be enabled.',
+      }),
+    )
+    .default(false),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(2).lte(40).register(z.globalRegistry, {
+        description:
+          'Number of inference steps for sampling. Higher values give better quality but take longer.',
       }),
     )
     .default(30),
-  guidance_scale: z
-    .optional(
-      z.number().gte(1).lte(20).register(z.globalRegistry, {
-        description:
-          'Guidance scale for generation (higher = more prompt adherence)',
-      }),
-    )
-    .default(6),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(1).lte(50).register(z.globalRegistry, {
-        description: 'Number of denoising steps',
-      }),
-    )
-    .default(28),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        'Random seed for reproducible generation. If not provided, a random seed will be used.',
-    }),
-  ),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description:
-          'The negative prompt describing what to avoid in the generation',
-      }),
-    )
-    .default(
-      'A chaotic sequence with misshapen, deformed limbs in heavy motion blur, sudden disappearance, jump cuts, jerky movements, rapid shot changes, frames out of sync, inconsistent character shapes, temporal artifacts, jitter, and ghosting effects, creating a disorienting visual experience.',
-    ),
   num_frames: z
     .optional(
-      z.int().gte(16).lte(200).register(z.globalRegistry, {
-        description: 'Number of frames to generate',
+      z.int().gte(81).lte(100).register(z.globalRegistry, {
+        description:
+          'Number of frames to generate. Must be between 81 to 100 (inclusive).',
       }),
     )
     .default(81),
-})
-
-/**
- * File
- */
-export const zFalAiSanaVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * SanaVideoOutput
- */
-export const zSanaVideoOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The random seed used for the generation process',
-  }),
-  video: zFalAiSanaVideoFile,
-})
-
-/**
- * LongCat720PCFGVideoRequest
- */
-export const zLongcatVideoTextToVideo720pInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to guide the video generation.',
-  }),
-  acceleration: z.optional(
-    z.enum(['none', 'regular']).register(z.globalRegistry, {
-      description: 'The acceleration level to use for the video generation.',
-    }),
-  ),
-  fps: z
-    .optional(
-      z.int().gte(1).lte(60).register(z.globalRegistry, {
-        description: 'The frame rate of the generated video.',
-      }),
-    )
-    .default(30),
-  num_refine_inference_steps: z
-    .optional(
-      z.int().gte(8).lte(50).register(z.globalRegistry, {
-        description: 'The number of inference steps to use for refinement.',
-      }),
-    )
-    .default(40),
-  guidance_scale: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description: 'The guidance scale to use for the video generation.',
-      }),
-    )
-    .default(4),
-  num_frames: z
-    .optional(
-      z.int().gte(17).lte(961).register(z.globalRegistry, {
-        description: 'The number of frames to generate.',
-      }),
-    )
-    .default(162),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable safety checker.',
-      }),
-    )
-    .default(true),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
-        description: 'The negative prompt to use for the video generation.',
+        description: 'Negative prompt for video generation.',
       }),
     )
     .default(
-      'Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
+      'bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  video_write_mode: z.optional(
-    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
-      description: 'The write mode of the generated video.',
-    }),
-  ),
-  video_output_type: z.optional(
-    z
-      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-      .register(z.globalRegistry, {
-        description: 'The output type of the generated video.',
-      }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video.',
-    }),
-  ),
-  sync_mode: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
-      }),
-    )
-    .default(false),
-  video_quality: z.optional(
-    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
-      description: 'The quality of the generated video.',
-    }),
-  ),
   enable_prompt_expansion: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -1992,572 +2677,835 @@ export const zLongcatVideoTextToVideo720pInput = z.object({
       }),
     )
     .default(false),
-  num_inference_steps: z
+})
+
+/**
+ * LipsyncOutput
+ */
+export const zSchemaKlingVideoLipsyncTextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * LipsyncT2VRequest
+ */
+export const zSchemaKlingVideoLipsyncTextToVideoInput = z.object({
+  text: z.string().max(120).register(z.globalRegistry, {
+    description:
+      'Text content for lip-sync video generation. Max 120 characters.',
+  }),
+  video_url: z.string().register(z.globalRegistry, {
+    description:
+      'The URL of the video to generate the lip sync for. Supports .mp4/.mov, ≤100MB, 2-60s, 720p/1080p only, width/height 720–1920px. If validation fails, an error is returned.',
+  }),
+  voice_id: z
+    .enum([
+      'genshin_vindi2',
+      'zhinen_xuesheng',
+      'AOT',
+      'ai_shatang',
+      'genshin_klee2',
+      'genshin_kirara',
+      'ai_kaiya',
+      'oversea_male1',
+      'ai_chenjiahao_712',
+      'girlfriend_4_speech02',
+      'chat1_female_new-3',
+      'chat_0407_5-1',
+      'cartoon-boy-07',
+      'uk_boy1',
+      'cartoon-girl-01',
+      'PeppaPig_platform',
+      'ai_huangzhong_712',
+      'ai_huangyaoshi_712',
+      'ai_laoguowang_712',
+      'chengshu_jiejie',
+      'you_pingjing',
+      'calm_story1',
+      'uk_man2',
+      'laopopo_speech02',
+      'heainainai_speech02',
+      'reader_en_m-v1',
+      'commercial_lady_en_f-v1',
+      'tiyuxi_xuedi',
+      'tiexin_nanyou',
+      'girlfriend_1_speech02',
+      'girlfriend_2_speech02',
+      'zhuxi_speech02',
+      'uk_oldman3',
+      'dongbeilaotie_speech02',
+      'chongqingxiaohuo_speech02',
+      'chuanmeizi_speech02',
+      'chaoshandashu_speech02',
+      'ai_taiwan_man2_speech02',
+      'xianzhanggui_speech02',
+      'tianjinjiejie_speech02',
+      'diyinnansang_DB_CN_M_04-v2',
+      'yizhipiannan-v1',
+      'guanxiaofang-v2',
+      'tianmeixuemei-v1',
+      'daopianyansang-v1',
+      'mengwa-v1',
+    ])
+    .register(z.globalRegistry, {
+      description: 'Voice ID to use for speech synthesis',
+    }),
+  voice_language: z.optional(
+    z.enum(['zh', 'en']).register(z.globalRegistry, {
+      description: 'The voice language corresponding to the Voice ID',
+    }),
+  ),
+  voice_speed: z
     .optional(
-      z.int().gte(8).lte(50).register(z.globalRegistry, {
-        description:
-          'The number of inference steps to use for the video generation.',
+      z.number().gte(0.8).lte(2).register(z.globalRegistry, {
+        description: 'Speech rate for Text to Video generation',
       }),
     )
-    .default(40),
+    .default(1),
+})
+
+/**
+ * LipsyncA2VOutput
+ */
+export const zSchemaKlingVideoLipsyncAudioToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * LipsyncA2VRequest
+ */
+export const zSchemaKlingVideoLipsyncAudioToVideoInput = z.object({
+  video_url: z.string().register(z.globalRegistry, {
+    description:
+      'The URL of the video to generate the lip sync for. Supports .mp4/.mov, ≤100MB, 2–10s, 720p/1080p only, width/height 720–1920px.',
+  }),
+  audio_url: z.string().register(z.globalRegistry, {
+    description:
+      'The URL of the audio to generate the lip sync for. Minimum duration is 2s and maximum duration is 60s. Maximum file size is 5MB.',
+  }),
+})
+
+/**
+ * VideoOutputV4
+ */
+export const zSchemaPixverseV4TextToVideoFastOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * FastTextToVideoRequest
+ */
+export const zSchemaPixverseV4TextToVideoFastInput = z.object({
+  prompt: z.string(),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['360p', '540p', '720p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video',
+    }),
+  ),
+  style: z.optional(
+    z
+      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
+      .register(z.globalRegistry, {
+        description: 'The style of the generated video',
+      }),
+  ),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
-      description: 'The seed for the random number generator.',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiLongcatVideoTextToVideo720pFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
       description:
-        'The name of the file. It will be auto-generated if not provided.',
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
     }),
   ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * LongCatVideoResponse
- */
-export const zLongcatVideoTextToVideo720pOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for generation.',
-  }),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiLongcatVideoTextToVideo720pFile,
-})
-
-/**
- * LongCatCFGVideoRequest
- */
-export const zLongcatVideoTextToVideo480pInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to guide the video generation.',
-  }),
-  acceleration: z.optional(
-    z.enum(['none', 'regular']).register(z.globalRegistry, {
-      description: 'The acceleration level to use for the video generation.',
-    }),
-  ),
-  fps: z
-    .optional(
-      z.int().gte(1).lte(60).register(z.globalRegistry, {
-        description: 'The frame rate of the generated video.',
-      }),
-    )
-    .default(15),
-  guidance_scale: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description: 'The guidance scale to use for the video generation.',
-      }),
-    )
-    .default(4),
-  num_frames: z
-    .optional(
-      z.int().gte(17).lte(961).register(z.globalRegistry, {
-        description: 'The number of frames to generate.',
-      }),
-    )
-    .default(162),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable safety checker.',
-      }),
-    )
-    .default(true),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
-        description: 'The negative prompt to use for the video generation.',
+        description: 'Negative prompt to be used for the generation',
       }),
     )
-    .default(
-      'Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
-    ),
-  video_write_mode: z.optional(
-    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
-      description: 'The write mode of the generated video.',
-    }),
-  ),
-  video_output_type: z.optional(
-    z
-      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-      .register(z.globalRegistry, {
-        description: 'The output type of the generated video.',
-      }),
-  ),
+    .default(''),
+})
+
+/**
+ * VideoOutputV4
+ */
+export const zSchemaPixverseV4TextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoRequest
+ */
+export const zSchemaPixverseV4TextToVideoInput = z.object({
+  prompt: z.string(),
   aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video.',
+    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video',
     }),
   ),
-  sync_mode: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
-      }),
-    )
-    .default(false),
-  video_quality: z.optional(
-    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
-      description: 'The quality of the generated video.',
+  resolution: z.optional(
+    z.enum(['360p', '540p', '720p', '1080p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video',
     }),
   ),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable prompt expansion.',
-      }),
-    )
-    .default(false),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The seed for the random number generator.',
-    }),
-  ),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(8).lte(50).register(z.globalRegistry, {
-        description:
-          'The number of inference steps to use for the video generation.',
-      }),
-    )
-    .default(40),
-})
-
-/**
- * File
- */
-export const zFalAiLongcatVideoTextToVideo480pFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * LongCatVideoResponse
- */
-export const zLongcatVideoTextToVideo480pOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for generation.',
-  }),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiLongcatVideoTextToVideo480pFile,
-})
-
-/**
- * LongCat720PVideoRequest
- */
-export const zLongcatVideoDistilledTextToVideo720pInput = z.object({
-  video_write_mode: z.optional(
-    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
-      description: 'The write mode of the generated video.',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video.',
-    }),
-  ),
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to guide the video generation.',
-  }),
-  video_output_type: z.optional(
+  style: z.optional(
     z
-      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
       .register(z.globalRegistry, {
-        description: 'The output type of the generated video.',
+        description: 'The style of the generated video',
       }),
   ),
-  fps: z
-    .optional(
-      z.int().gte(1).lte(60).register(z.globalRegistry, {
-        description: 'The frame rate of the generated video.',
-      }),
-    )
-    .default(30),
-  sync_mode: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
-      }),
-    )
-    .default(false),
-  num_refine_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(16).register(z.globalRegistry, {
-        description: 'The number of inference steps to use for refinement.',
-      }),
-    )
-    .default(12),
-  video_quality: z.optional(
-    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
-      description: 'The quality of the generated video.',
-    }),
-  ),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable safety checker.',
-      }),
-    )
-    .default(true),
-  num_frames: z
-    .optional(
-      z.int().gte(17).lte(961).register(z.globalRegistry, {
-        description: 'The number of frames to generate.',
-      }),
-    )
-    .default(162),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(16).register(z.globalRegistry, {
-        description: 'The number of inference steps to use.',
-      }),
-    )
-    .default(12),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The seed for the random number generator.',
-    }),
-  ),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable prompt expansion.',
-      }),
-    )
-    .default(false),
-})
-
-/**
- * File
- */
-export const zFalAiLongcatVideoDistilledTextToVideo720pFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * LongCatVideoResponse
- */
-export const zLongcatVideoDistilledTextToVideo720pOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for generation.',
-  }),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiLongcatVideoDistilledTextToVideo720pFile,
-})
-
-/**
- * LongCatVideoRequest
- */
-export const zLongcatVideoDistilledTextToVideo480pInput = z.object({
-  video_write_mode: z.optional(
-    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
-      description: 'The write mode of the generated video.',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video.',
-    }),
-  ),
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to guide the video generation.',
-  }),
-  video_output_type: z.optional(
-    z
-      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-      .register(z.globalRegistry, {
-        description: 'The output type of the generated video.',
-      }),
-  ),
-  fps: z
-    .optional(
-      z.int().gte(1).lte(60).register(z.globalRegistry, {
-        description: 'The frame rate of the generated video.',
-      }),
-    )
-    .default(15),
-  sync_mode: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
-      }),
-    )
-    .default(false),
-  video_quality: z.optional(
-    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
-      description: 'The quality of the generated video.',
-    }),
-  ),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable safety checker.',
-      }),
-    )
-    .default(true),
-  num_frames: z
-    .optional(
-      z.int().gte(17).lte(961).register(z.globalRegistry, {
-        description: 'The number of frames to generate.',
-      }),
-    )
-    .default(162),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(16).register(z.globalRegistry, {
-        description: 'The number of inference steps to use.',
-      }),
-    )
-    .default(12),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The seed for the random number generator.',
-    }),
-  ),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable prompt expansion.',
-      }),
-    )
-    .default(false),
-})
-
-/**
- * File
- */
-export const zFalAiLongcatVideoDistilledTextToVideo480pFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * LongCatVideoResponse
- */
-export const zLongcatVideoDistilledTextToVideo480pOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for generation.',
-  }),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiLongcatVideoDistilledTextToVideo480pFile,
-})
-
-/**
- * StandardTextToVideoHailuo23Input
- */
-export const zMinimaxHailuo23StandardTextToVideoInput = z.object({
-  prompt_optimizer: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: "Whether to use the model's prompt optimizer",
-      }),
-    )
-    .default(true),
   duration: z.optional(
-    z.enum(['6', '10']).register(z.globalRegistry, {
-      description: 'The duration of the video in seconds.',
-    }),
-  ),
-  prompt: z.string().min(1).max(2000),
-})
-
-/**
- * File
- */
-export const zFalAiMinimaxHailuo23StandardTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
+    z.enum(['5', '8']).register(z.globalRegistry, {
       description:
-        'The name of the file. It will be auto-generated if not provided.',
+        'The duration of the generated video in seconds. 8s videos cost double. 1080p videos are limited to 5 seconds',
     }),
   ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
     }),
   ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt to be used for the generation',
+      }),
+    )
+    .default(''),
+})
+
+/**
+ * MagiResponse
+ */
+export const zSchemaMagiDistilledOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
   }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
+  video: zSchemaFile,
+})
+
+/**
+ * MagiTextToVideoRequest
+ */
+export const zSchemaMagiDistilledInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt to guide video generation.',
+  }),
+  resolution: z.optional(
+    z.enum(['480p', '720p']).register(z.globalRegistry, {
+      description:
+        'Resolution of the generated video (480p or 720p). 480p is 0.5 billing units, and 720p is 1 billing unit.',
     }),
   ),
-})
-
-/**
- * StandardTextToVideoHailuo23Output
- */
-export const zMinimaxHailuo23StandardTextToVideoOutput = z.object({
-  video: zFalAiMinimaxHailuo23StandardTextToVideoFile,
-})
-
-/**
- * ProTextToVideoHailuo23Input
- */
-export const zMinimaxHailuo23ProTextToVideoInput = z.object({
-  prompt_optimizer: z
+  aspect_ratio: z.optional(
+    z.enum(['auto', '16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description:
+        "Aspect ratio of the generated video. If 'auto', the aspect ratio will be determined automatically based on the input image.",
+    }),
+  ),
+  enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
-        description: "Whether to use the model's prompt optimizer",
+        description: 'If set to true, the safety checker will be enabled.',
       }),
     )
     .default(true),
-  prompt: z.string().min(1).max(2000).register(z.globalRegistry, {
-    description: 'Text prompt for video generation',
-  }),
+  num_inference_steps: z.optional(
+    z
+      .union([z.literal(4), z.literal(8), z.literal(16), z.literal(32)])
+      .register(z.globalRegistry, {
+        description:
+          'Number of inference steps for sampling. Higher values give better quality but take longer.',
+      }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        'Random seed for reproducibility. If None, a random seed is chosen.',
+    }),
+  ),
+  num_frames: z
+    .optional(
+      z.int().gte(96).lte(192).register(z.globalRegistry, {
+        description:
+          'Number of frames to generate. Must be between 96 and 192 (inclusive). Each additional 24 frames beyond 96 incurs an additional billing unit.',
+      }),
+    )
+    .default(96),
 })
 
 /**
- * File
+ * MagiResponse
  */
-export const zFalAiMinimaxHailuo23ProTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
+export const zSchemaMagiOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * MagiTextToVideoRequest
+ */
+export const zSchemaMagiInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt to guide video generation.',
+  }),
+  resolution: z.optional(
+    z.enum(['480p', '720p']).register(z.globalRegistry, {
+      description:
+        'Resolution of the generated video (480p or 720p). 480p is 0.5 billing units, and 720p is 1 billing unit.',
     }),
   ),
-  file_name: z.optional(
+  aspect_ratio: z.optional(
+    z.enum(['auto', '16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description:
+        "Aspect ratio of the generated video. If 'auto', the aspect ratio will be determined automatically based on the input image.",
+    }),
+  ),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'If set to true, the safety checker will be enabled.',
+      }),
+    )
+    .default(true),
+  num_inference_steps: z.optional(
+    z
+      .union([
+        z.literal(4),
+        z.literal(8),
+        z.literal(16),
+        z.literal(32),
+        z.literal(64),
+      ])
+      .register(z.globalRegistry, {
+        description:
+          'Number of inference steps for sampling. Higher values give better quality but take longer.',
+      }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        'Random seed for reproducibility. If None, a random seed is chosen.',
+    }),
+  ),
+  num_frames: z
+    .optional(
+      z.int().gte(96).lte(192).register(z.globalRegistry, {
+        description:
+          'Number of frames to generate. Must be between 96 and 192 (inclusive). Each additional 24 frames beyond 96 incurs an additional billing unit.',
+      }),
+    )
+    .default(96),
+})
+
+/**
+ * Q1TextToVideoOutput
+ */
+export const zSchemaViduQ1TextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * Q1TextToVideoRequest
+ */
+export const zSchemaViduQ1TextToVideoInput = z.object({
+  prompt: z.string().max(1500).register(z.globalRegistry, {
+    description: 'Text prompt for video generation, max 1500 characters',
+  }),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the output video',
+    }),
+  ),
+  style: z.optional(
+    z.enum(['general', 'anime']).register(z.globalRegistry, {
+      description: 'The style of output video',
+    }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'Seed for the random number generator',
+    }),
+  ),
+  movement_amplitude: z.optional(
+    z.enum(['auto', 'small', 'medium', 'large']).register(z.globalRegistry, {
+      description: 'The movement amplitude of objects in the frame',
+    }),
+  ),
+})
+
+/**
+ * VideoOutputV4
+ */
+export const zSchemaPixverseV45TextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoRequest
+ */
+export const zSchemaPixverseV45TextToVideoInput = z.object({
+  prompt: z.string(),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['360p', '540p', '720p', '1080p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video',
+    }),
+  ),
+  style: z.optional(
+    z
+      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
+      .register(z.globalRegistry, {
+        description: 'The style of the generated video',
+      }),
+  ),
+  duration: z.optional(
+    z.enum(['5', '8']).register(z.globalRegistry, {
+      description:
+        'The duration of the generated video in seconds. 8s videos cost double. 1080p videos are limited to 5 seconds',
+    }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
+    }),
+  ),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt to be used for the generation',
+      }),
+    )
+    .default(''),
+})
+
+/**
+ * VideoOutputV4
+ */
+export const zSchemaPixverseV45TextToVideoFastOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * FastTextToVideoRequest
+ */
+export const zSchemaPixverseV45TextToVideoFastInput = z.object({
+  prompt: z.string(),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['360p', '540p', '720p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video',
+    }),
+  ),
+  style: z.optional(
+    z
+      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
+      .register(z.globalRegistry, {
+        description: 'The style of the generated video',
+      }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
+    }),
+  ),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt to be used for the generation',
+      }),
+    )
+    .default(''),
+})
+
+/**
+ * TextToVideoOutput
+ */
+export const zSchemaLtxVideo13bDistilledOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for generation.',
+  }),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * LoRAWeight
+ */
+export const zSchemaLoRaWeight = z.object({
+  path: z.string().register(z.globalRegistry, {
+    description: 'URL or path to the LoRA weights.',
+  }),
+  scale: z
+    .optional(
+      z.number().gte(0).lte(4).register(z.globalRegistry, {
+        description:
+          'Scale of the LoRA weight. This is a multiplier applied to the LoRA weight when loading it.',
+      }),
+    )
+    .default(1),
+  weight_name: z.optional(
     z.string().register(z.globalRegistry, {
       description:
-        'The name of the file. It will be auto-generated if not provided.',
+        'Name of the LoRA weight. Only used if `path` is a HuggingFace repository, and is only required when the repository contains multiple LoRA weights.',
     }),
   ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
+})
+
+/**
+ * DistilledTextToVideoInput
+ *
+ * Distilled model input
+ */
+export const zSchemaLtxVideo13bDistilledInput = z
+  .object({
+    second_pass_skip_initial_steps: z
+      .optional(
+        z.int().gte(1).lte(20).register(z.globalRegistry, {
+          description:
+            'The number of inference steps to skip in the initial steps of the second pass. By skipping some steps at the beginning, the second pass can focus on smaller details instead of larger changes.',
+        }),
+      )
+      .default(5),
+    first_pass_num_inference_steps: z
+      .optional(
+        z.int().gte(2).lte(20).register(z.globalRegistry, {
+          description: 'Number of inference steps during the first pass.',
+        }),
+      )
+      .default(8),
+    frame_rate: z
+      .optional(
+        z.int().gte(1).lte(60).register(z.globalRegistry, {
+          description: 'The frame rate of the video.',
+        }),
+      )
+      .default(30),
+    reverse_video: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether to reverse the video.',
+        }),
+      )
+      .default(false),
+    prompt: z.string().register(z.globalRegistry, {
+      description: 'Text prompt to guide generation',
     }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+    expand_prompt: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether to expand the prompt using a language model.',
+        }),
+      )
+      .default(false),
+    loras: z
+      .optional(
+        z.array(zSchemaLoRaWeight).register(z.globalRegistry, {
+          description: 'LoRA weights to use for generation',
+        }),
+      )
+      .default([]),
+    enable_safety_checker: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether to enable the safety checker.',
+        }),
+      )
+      .default(true),
+    num_frames: z
+      .optional(
+        z.int().gte(9).lte(161).register(z.globalRegistry, {
+          description: 'The number of frames in the video.',
+        }),
+      )
+      .default(121),
+    second_pass_num_inference_steps: z
+      .optional(
+        z.int().gte(2).lte(20).register(z.globalRegistry, {
+          description: 'Number of inference steps during the second pass.',
+        }),
+      )
+      .default(8),
+    negative_prompt: z
+      .optional(
+        z.string().register(z.globalRegistry, {
+          description: 'Negative prompt for generation',
+        }),
+      )
+      .default(
+        'worst quality, inconsistent motion, blurry, jittery, distorted',
+      ),
+    resolution: z.optional(
+      z.enum(['480p', '720p']).register(z.globalRegistry, {
+        description: 'Resolution of the generated video (480p or 720p).',
+      }),
+    ),
+    aspect_ratio: z.optional(
+      z.enum(['9:16', '1:1', '16:9']).register(z.globalRegistry, {
+        description: 'Aspect ratio of the generated video (16:9, 1:1 or 9:16).',
+      }),
+    ),
+    first_pass_skip_final_steps: z
+      .optional(
+        z.int().gte(0).lte(20).register(z.globalRegistry, {
+          description:
+            'Number of inference steps to skip in the final steps of the first pass. By skipping some steps at the end, the first pass can focus on larger changes instead of smaller details.',
+        }),
+      )
+      .default(1),
+    seed: z.optional(
+      z.int().register(z.globalRegistry, {
+        description: 'Random seed for generation',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'Distilled model input',
+  })
+
+/**
+ * TextToVideoOutput
+ */
+export const zSchemaLtxVideo13bDevOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for generation.',
   }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoInput
+ */
+export const zSchemaLtxVideo13bDevInput = z.object({
+  second_pass_skip_initial_steps: z
+    .optional(
+      z.int().gte(1).lte(50).register(z.globalRegistry, {
+        description:
+          'The number of inference steps to skip in the initial steps of the second pass. By skipping some steps at the beginning, the second pass can focus on smaller details instead of larger changes.',
+      }),
+    )
+    .default(17),
+  first_pass_num_inference_steps: z
+    .optional(
+      z.int().gte(2).lte(50).register(z.globalRegistry, {
+        description: 'Number of inference steps during the first pass.',
+      }),
+    )
+    .default(30),
+  frame_rate: z
+    .optional(
+      z.int().gte(1).lte(60).register(z.globalRegistry, {
+        description: 'The frame rate of the video.',
+      }),
+    )
+    .default(30),
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'Text prompt to guide generation',
+  }),
+  reverse_video: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to reverse the video.',
+      }),
+    )
+    .default(false),
+  expand_prompt: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to expand the prompt using a language model.',
+      }),
+    )
+    .default(false),
+  loras: z
+    .optional(
+      z.array(zSchemaLoRaWeight).register(z.globalRegistry, {
+        description: 'LoRA weights to use for generation',
+      }),
+    )
+    .default([]),
+  second_pass_num_inference_steps: z
+    .optional(
+      z.int().gte(2).lte(50).register(z.globalRegistry, {
+        description: 'Number of inference steps during the second pass.',
+      }),
+    )
+    .default(30),
+  num_frames: z
+    .optional(
+      z.int().gte(9).lte(161).register(z.globalRegistry, {
+        description: 'The number of frames in the video.',
+      }),
+    )
+    .default(121),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable the safety checker.',
+      }),
+    )
+    .default(true),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt for generation',
+      }),
+    )
+    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
+  resolution: z.optional(
+    z.enum(['480p', '720p']).register(z.globalRegistry, {
+      description: 'Resolution of the generated video (480p or 720p).',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['9:16', '1:1', '16:9']).register(z.globalRegistry, {
+      description: 'Aspect ratio of the generated video (16:9, 1:1 or 9:16).',
+    }),
+  ),
+  first_pass_skip_final_steps: z
+    .optional(
+      z.int().gte(0).lte(50).register(z.globalRegistry, {
+        description:
+          'Number of inference steps to skip in the final steps of the first pass. By skipping some steps at the end, the first pass can focus on larger changes instead of smaller details.',
+      }),
+    )
+    .default(3),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'Random seed for generation',
     }),
   ),
 })
 
 /**
- * ProTextToVideoHailuo23Output
+ * TextToVideoV21MasterOutput
  */
-export const zMinimaxHailuo23ProTextToVideoOutput = z.object({
-  video: zFalAiMinimaxHailuo23ProTextToVideoFile,
+export const zSchemaKlingVideoV21MasterTextToVideoOutput = z.object({
+  video: zSchemaFile,
 })
 
 /**
- * SeedanceProFastTextToVideoInput
+ * TextToVideoV21MasterRequest
  */
-export const zBytedanceSeedanceV1ProFastTextToVideoInput = z.object({
+export const zSchemaKlingVideoV21MasterTextToVideoInput = z.object({
+  prompt: z.string().max(2500),
+  duration: z.optional(
+    z.enum(['5', '10']).register(z.globalRegistry, {
+      description: 'The duration of the generated video in seconds',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video frame',
+    }),
+  ),
+  negative_prompt: z
+    .optional(z.string().max(2500))
+    .default('blur, distort, and low quality'),
+  cfg_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
+      }),
+    )
+    .default(0.5),
+})
+
+/**
+ * SeedanceVideoOutput
+ */
+export const zSchemaBytedanceSeedanceV1LiteTextToVideoOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'Seed used for generation',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * SeedanceTextToVideoInput
+ */
+export const zSchemaBytedanceSeedanceV1LiteTextToVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt used to generate the video',
+  }),
+  resolution: z.optional(
+    z.enum(['480p', '720p', '1080p']).register(z.globalRegistry, {
+      description:
+        'Video resolution - 480p for faster generation, 720p for higher quality',
+    }),
+  ),
+  duration: z.optional(
+    z
+      .enum(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'])
+      .register(z.globalRegistry, {
+        description: 'Duration of the video in seconds',
+      }),
+  ),
+  aspect_ratio: z.optional(
+    z
+      .enum(['21:9', '16:9', '4:3', '1:1', '3:4', '9:16', '9:21'])
+      .register(z.globalRegistry, {
+        description: 'The aspect ratio of the generated video',
+      }),
+  ),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'If set to true, the safety checker will be enabled.',
+      }),
+    )
+    .default(true),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        'Random seed to control video generation. Use -1 for random.',
+    }),
+  ),
+  camera_fixed: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to fix the camera position',
+      }),
+    )
+    .default(false),
+})
+
+/**
+ * SeedanceProT2VVideoOutput
+ */
+export const zSchemaBytedanceSeedanceV1ProTextToVideoOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'Seed used for generation',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * SeedanceProTextToVideoInput
+ */
+export const zSchemaBytedanceSeedanceV1ProTextToVideoInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt used to generate the video',
   }),
@@ -2604,82 +3552,537 @@ export const zBytedanceSeedanceV1ProFastTextToVideoInput = z.object({
 })
 
 /**
- * File
+ * TextToVideoHailuo02Output
  */
-export const zFalAiBytedanceSeedanceV1ProFastTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
+export const zSchemaMinimaxHailuo02ProTextToVideoOutput = z.object({
+  video: zSchemaFile,
 })
 
 /**
- * SeedanceFastT2VVideoOutput
+ * ProTextToVideoHailuo02Input
  */
-export const zBytedanceSeedanceV1ProFastTextToVideoOutput = z.object({
+export const zSchemaMinimaxHailuo02ProTextToVideoInput = z.object({
+  prompt_optimizer: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: "Whether to use the model's prompt optimizer",
+      }),
+    )
+    .default(true),
+  prompt: z.string().min(1).max(2000),
+})
+
+/**
+ * TextToVideoOutput
+ */
+export const zSchemaLtxv13B098DistilledOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for generation.',
+  }),
   seed: z.int().register(z.globalRegistry, {
-    description: 'Seed used for generation',
+    description: 'The seed used for generation.',
   }),
-  video: zFalAiBytedanceSeedanceV1ProFastTextToVideoFile,
+  video: zSchemaFile,
 })
 
 /**
- * Q2TextToVideoRequest
+ * DistilledTextToVideoInput
+ *
+ * Distilled model input
  */
-export const zViduQ2TextToVideoInput = z.object({
-  prompt: z.string().max(3000).register(z.globalRegistry, {
-    description: 'Text prompt for video generation, max 3000 characters',
+export const zSchemaLtxv13B098DistilledInput = z
+  .object({
+    second_pass_skip_initial_steps: z
+      .optional(
+        z.int().gte(1).lte(11).register(z.globalRegistry, {
+          description:
+            'The number of inference steps to skip in the initial steps of the second pass. By skipping some steps at the beginning, the second pass can focus on smaller details instead of larger changes.',
+        }),
+      )
+      .default(5),
+    first_pass_num_inference_steps: z
+      .optional(
+        z.int().gte(2).lte(12).register(z.globalRegistry, {
+          description: 'Number of inference steps during the first pass.',
+        }),
+      )
+      .default(8),
+    frame_rate: z
+      .optional(
+        z.int().gte(1).lte(60).register(z.globalRegistry, {
+          description: 'The frame rate of the video.',
+        }),
+      )
+      .default(24),
+    reverse_video: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether to reverse the video.',
+        }),
+      )
+      .default(false),
+    prompt: z.string().register(z.globalRegistry, {
+      description: 'Text prompt to guide generation',
+    }),
+    expand_prompt: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether to expand the prompt using a language model.',
+        }),
+      )
+      .default(false),
+    temporal_adain_factor: z
+      .optional(
+        z.number().gte(0).lte(1).register(z.globalRegistry, {
+          description:
+            'The factor for adaptive instance normalization (AdaIN) applied to generated video chunks after the first. This can help deal with a gradual increase in saturation/contrast in the generated video by normalizing the color distribution across the video. A high value will ensure the color distribution is more consistent across the video, while a low value will allow for more variation in color distribution.',
+        }),
+      )
+      .default(0.5),
+    loras: z
+      .optional(
+        z.array(zSchemaLoRaWeight).register(z.globalRegistry, {
+          description: 'LoRA weights to use for generation',
+        }),
+      )
+      .default([]),
+    enable_safety_checker: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether to enable the safety checker.',
+        }),
+      )
+      .default(true),
+    num_frames: z
+      .optional(
+        z.int().gte(9).lte(1441).register(z.globalRegistry, {
+          description: 'The number of frames in the video.',
+        }),
+      )
+      .default(121),
+    second_pass_num_inference_steps: z
+      .optional(
+        z.int().gte(2).lte(12).register(z.globalRegistry, {
+          description: 'Number of inference steps during the second pass.',
+        }),
+      )
+      .default(8),
+    negative_prompt: z
+      .optional(
+        z.string().register(z.globalRegistry, {
+          description: 'Negative prompt for generation',
+        }),
+      )
+      .default(
+        'worst quality, inconsistent motion, blurry, jittery, distorted',
+      ),
+    enable_detail_pass: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description:
+            'Whether to use a detail pass. If True, the model will perform a second pass to refine the video and enhance details. This incurs a 2.0x cost multiplier on the base price.',
+        }),
+      )
+      .default(false),
+    resolution: z.optional(
+      z.enum(['480p', '720p']).register(z.globalRegistry, {
+        description: 'Resolution of the generated video.',
+      }),
+    ),
+    aspect_ratio: z.optional(
+      z.enum(['9:16', '1:1', '16:9']).register(z.globalRegistry, {
+        description: 'Aspect ratio of the generated video.',
+      }),
+    ),
+    tone_map_compression_ratio: z
+      .optional(
+        z.number().gte(0).lte(1).register(z.globalRegistry, {
+          description:
+            'The compression ratio for tone mapping. This is used to compress the dynamic range of the video to improve visual quality. A value of 0.0 means no compression, while a value of 1.0 means maximum compression.',
+        }),
+      )
+      .default(0),
+    seed: z.optional(
+      z.int().register(z.globalRegistry, {
+        description: 'Random seed for generation',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'Distilled model input',
+  })
+
+/**
+ * WanT2VResponse
+ */
+export const zSchemaWanV22A14bTextToVideoOutput = z.object({
+  prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The text prompt used for video generation.',
+      }),
+    )
+    .default(''),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
   }),
+  video: zSchemaFile,
+})
+
+/**
+ * WanT2VRequest
+ */
+export const zSchemaWanV22A14bTextToVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt to guide video generation.',
+  }),
+  shift: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description: 'Shift value for the video. Must be between 1.0 and 10.0.',
+      }),
+    )
+    .default(5),
+  acceleration: z.optional(
+    z.enum(['none', 'regular']).register(z.globalRegistry, {
+      description:
+        "Acceleration level to use. The more acceleration, the faster the generation, but with lower quality. The recommended value is 'regular'.",
+    }),
+  ),
+  num_interpolated_frames: z
+    .optional(
+      z.int().gte(0).lte(4).register(z.globalRegistry, {
+        description:
+          'Number of frames to interpolate between each pair of generated frames. Must be between 0 and 4.',
+      }),
+    )
+    .default(1),
+  frames_per_second: z
+    .optional(
+      z.int().gte(4).lte(60).register(z.globalRegistry, {
+        description:
+          'Frames per second of the generated video. Must be between 4 to 60. When using interpolation and `adjust_fps_for_interpolation` is set to true (default true,) the final FPS will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If `adjust_fps_for_interpolation` is set to false, this value will be used as-is.',
+      }),
+    )
+    .default(16),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description:
+          'Classifier-free guidance scale. Higher values give better adherence to the prompt but may decrease quality.',
+      }),
+    )
+    .default(3.5),
+  num_frames: z
+    .optional(
+      z.int().gte(17).lte(161).register(z.globalRegistry, {
+        description:
+          'Number of frames to generate. Must be between 17 to 161 (inclusive).',
+      }),
+    )
+    .default(81),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If set to true, input data will be checked for safety before processing.',
+      }),
+    )
+    .default(false),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt for video generation.',
+      }),
+    )
+    .default(''),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description:
+        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
+    }),
+  ),
   resolution: z.optional(
-    z.enum(['360p', '520p', '720p', '1080p']).register(z.globalRegistry, {
-      description: 'Output video resolution',
+    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
+      description: 'Resolution of the generated video (480p, 580p, or 720p).',
     }),
   ),
   aspect_ratio: z.optional(
     z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the output video',
+      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
     }),
   ),
-  duration: z.optional(
-    z
-      .union([
-        z.literal(2),
-        z.literal(3),
-        z.literal(4),
-        z.literal(5),
-        z.literal(6),
-        z.literal(7),
-        z.literal(8),
-      ])
-      .register(z.globalRegistry, {
-        description: 'Duration of the video in seconds',
-      }),
-  ),
-  bgm: z
+  enable_output_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
         description:
-          'Whether to add background music to the video (only for 4-second videos)',
+          'If set to true, output video will be checked for safety after generation.',
+      }),
+    )
+    .default(false),
+  guidance_scale_2: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description:
+          'Guidance scale for the second stage of the model. This is used to control the adherence to the prompt in the second stage of the model.',
+      }),
+    )
+    .default(4),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description:
+        'The quality of the output video. Higher quality means better visual quality but larger file size.',
+    }),
+  ),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
+      }),
+    )
+    .default(false),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(2).lte(40).register(z.globalRegistry, {
+        description:
+          'Number of inference steps for sampling. Higher values give better quality but take longer.',
+      }),
+    )
+    .default(27),
+  interpolator_model: z.optional(
+    z.enum(['none', 'film', 'rife']).register(z.globalRegistry, {
+      description:
+        'The model to use for frame interpolation. If None, no interpolation is applied.',
+    }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        'Random seed for reproducibility. If None, a random seed is chosen.',
+    }),
+  ),
+  adjust_fps_for_interpolation: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If true, the number of frames per second will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If false, the passed frames per second will be used as-is.',
+      }),
+    )
+    .default(true),
+})
+
+/**
+ * WanSmallT2VResponse
+ */
+export const zSchemaWanV225bTextToVideoOutput = z.object({
+  prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The text prompt used for video generation.',
+      }),
+    )
+    .default(''),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * WanSmallT2VRequest
+ */
+export const zSchemaWanV225bTextToVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt to guide video generation.',
+  }),
+  shift: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description: 'Shift value for the video. Must be between 1.0 and 10.0.',
+      }),
+    )
+    .default(5),
+  num_interpolated_frames: z
+    .optional(
+      z.int().gte(0).lte(4).register(z.globalRegistry, {
+        description:
+          'Number of frames to interpolate between each pair of generated frames. Must be between 0 and 4.',
+      }),
+    )
+    .default(0),
+  frames_per_second: z
+    .optional(
+      z.int().gte(4).lte(60).register(z.globalRegistry, {
+        description:
+          'Frames per second of the generated video. Must be between 4 to 60. When using interpolation and `adjust_fps_for_interpolation` is set to true (default true,) the final FPS will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If `adjust_fps_for_interpolation` is set to false, this value will be used as-is.',
+      }),
+    )
+    .default(24),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description:
+          'Classifier-free guidance scale. Higher values give better adherence to the prompt but may decrease quality.',
+      }),
+    )
+    .default(3.5),
+  num_frames: z
+    .optional(
+      z.int().gte(17).lte(161).register(z.globalRegistry, {
+        description:
+          'Number of frames to generate. Must be between 17 to 161 (inclusive).',
+      }),
+    )
+    .default(81),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If set to true, input data will be checked for safety before processing.',
+      }),
+    )
+    .default(false),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt for video generation.',
+      }),
+    )
+    .default(''),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description:
+        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['580p', '720p']).register(z.globalRegistry, {
+      description: 'Resolution of the generated video (580p or 720p).',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
+    }),
+  ),
+  enable_output_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If set to true, output video will be checked for safety after generation.',
+      }),
+    )
+    .default(false),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description:
+        'The quality of the output video. Higher quality means better visual quality but larger file size.',
+    }),
+  ),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
+      }),
+    )
+    .default(false),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(2).lte(50).register(z.globalRegistry, {
+        description:
+          'Number of inference steps for sampling. Higher values give better quality but take longer.',
+      }),
+    )
+    .default(40),
+  interpolator_model: z.optional(
+    z.enum(['none', 'film', 'rife']).register(z.globalRegistry, {
+      description:
+        'The model to use for frame interpolation. If None, no interpolation is applied.',
+    }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        'Random seed for reproducibility. If None, a random seed is chosen.',
+    }),
+  ),
+  adjust_fps_for_interpolation: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If true, the number of frames per second will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If false, the passed frames per second will be used as-is.',
+      }),
+    )
+    .default(true),
+})
+
+/**
+ * WanTurboT2VResponse
+ */
+export const zSchemaWanV22A14bTextToVideoTurboOutput = z.object({
+  prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The text prompt used for video generation.',
+      }),
+    )
+    .default(''),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * WanTurboT2VRequest
+ */
+export const zSchemaWanV22A14bTextToVideoTurboInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt to guide video generation.',
+  }),
+  resolution: z.optional(
+    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
+      description: 'Resolution of the generated video (480p, 580p, or 720p).',
+    }),
+  ),
+  acceleration: z.optional(
+    z.enum(['none', 'regular']).register(z.globalRegistry, {
+      description:
+        "Acceleration level to use. The more acceleration, the faster the generation, but with lower quality. The recommended value is 'regular'.",
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
+    }),
+  ),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description:
+        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
+    }),
+  ),
+  enable_output_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If set to true, output video will be checked for safety after generation.',
+      }),
+    )
+    .default(false),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description:
+        'The quality of the output video. Higher quality means better visual quality but larger file size.',
+    }),
+  ),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If set to true, input data will be checked for safety before processing.',
       }),
     )
     .default(false),
@@ -2689,20 +4092,698 @@ export const zViduQ2TextToVideoInput = z.object({
         'Random seed for reproducibility. If None, a random seed is chosen.',
     }),
   ),
-  movement_amplitude: z.optional(
-    z.enum(['auto', 'small', 'medium', 'large']).register(z.globalRegistry, {
-      description: 'The movement amplitude of objects in the frame',
-    }),
-  ),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
+      }),
+    )
+    .default(false),
 })
 
 /**
- * File
+ * WanSmallFastVideoT2VResponse
  */
-export const zFalAiViduQ2TextToVideoFile = z.object({
+export const zSchemaWanV225bTextToVideoFastWanOutput = z.object({
+  prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The text prompt used for video generation.',
+      }),
+    )
+    .default(''),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * WanSmallFastVideoT2VRequest
+ */
+export const zSchemaWanV225bTextToVideoFastWanInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt to guide video generation.',
+  }),
+  num_interpolated_frames: z
+    .optional(
+      z.int().gte(0).lte(4).register(z.globalRegistry, {
+        description:
+          'Number of frames to interpolate between each pair of generated frames. Must be between 0 and 4.',
+      }),
+    )
+    .default(0),
+  frames_per_second: z
+    .optional(
+      z.int().gte(4).lte(60).register(z.globalRegistry, {
+        description:
+          'Frames per second of the generated video. Must be between 4 to 60. When using interpolation and `adjust_fps_for_interpolation` is set to true (default true,) the final FPS will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If `adjust_fps_for_interpolation` is set to false, this value will be used as-is.',
+      }),
+    )
+    .default(24),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If set to true, input data will be checked for safety before processing.',
+      }),
+    )
+    .default(false),
+  num_frames: z
+    .optional(
+      z.int().gte(17).lte(161).register(z.globalRegistry, {
+        description:
+          'Number of frames to generate. Must be between 17 to 161 (inclusive).',
+      }),
+    )
+    .default(81),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description:
+          'Classifier-free guidance scale. Higher values give better adherence to the prompt but may decrease quality.',
+      }),
+    )
+    .default(3.5),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt for video generation.',
+      }),
+    )
+    .default(''),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description:
+        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
+      description: 'Resolution of the generated video (580p or 720p).',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
+    }),
+  ),
+  enable_output_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If set to true, output video will be checked for safety after generation.',
+      }),
+    )
+    .default(false),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description:
+        'The quality of the output video. Higher quality means better visual quality but larger file size.',
+    }),
+  ),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
+      }),
+    )
+    .default(false),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        'Random seed for reproducibility. If None, a random seed is chosen.',
+    }),
+  ),
+  interpolator_model: z.optional(
+    z.enum(['none', 'film', 'rife']).register(z.globalRegistry, {
+      description:
+        'The model to use for frame interpolation. If None, no interpolation is applied.',
+    }),
+  ),
+  adjust_fps_for_interpolation: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If true, the number of frames per second will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If false, the passed frames per second will be used as-is.',
+      }),
+    )
+    .default(true),
+})
+
+/**
+ * WanSmallT2VResponse
+ */
+export const zSchemaWanV225bTextToVideoDistillOutput = z.object({
+  prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The text prompt used for video generation.',
+      }),
+    )
+    .default(''),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * WanDistillT2VRequest
+ */
+export const zSchemaWanV225bTextToVideoDistillInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt to guide video generation.',
+  }),
+  shift: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description: 'Shift value for the video. Must be between 1.0 and 10.0.',
+      }),
+    )
+    .default(5),
+  num_interpolated_frames: z
+    .optional(
+      z.int().gte(0).lte(4).register(z.globalRegistry, {
+        description:
+          'Number of frames to interpolate between each pair of generated frames. Must be between 0 and 4.',
+      }),
+    )
+    .default(0),
+  frames_per_second: z
+    .optional(
+      z.int().gte(4).lte(60).register(z.globalRegistry, {
+        description:
+          'Frames per second of the generated video. Must be between 4 to 60. When using interpolation and `adjust_fps_for_interpolation` is set to true (default true,) the final FPS will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If `adjust_fps_for_interpolation` is set to false, this value will be used as-is.',
+      }),
+    )
+    .default(24),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description:
+          'Classifier-free guidance scale. Higher values give better adherence to the prompt but may decrease quality.',
+      }),
+    )
+    .default(1),
+  num_frames: z
+    .optional(
+      z.int().gte(17).lte(161).register(z.globalRegistry, {
+        description:
+          'Number of frames to generate. Must be between 17 to 161 (inclusive).',
+      }),
+    )
+    .default(81),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If set to true, input data will be checked for safety before processing.',
+      }),
+    )
+    .default(false),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description:
+        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['580p', '720p']).register(z.globalRegistry, {
+      description: 'Resolution of the generated video (580p or 720p).',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
+    }),
+  ),
+  enable_output_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If set to true, output video will be checked for safety after generation.',
+      }),
+    )
+    .default(false),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description:
+        'The quality of the output video. Higher quality means better visual quality but larger file size.',
+    }),
+  ),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
+      }),
+    )
+    .default(false),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(2).lte(50).register(z.globalRegistry, {
+        description:
+          'Number of inference steps for sampling. Higher values give better quality but take longer.',
+      }),
+    )
+    .default(40),
+  interpolator_model: z.optional(
+    z.enum(['none', 'film', 'rife']).register(z.globalRegistry, {
+      description:
+        'The model to use for frame interpolation. If None, no interpolation is applied.',
+    }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        'Random seed for reproducibility. If None, a random seed is chosen.',
+    }),
+  ),
+  adjust_fps_for_interpolation: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If true, the number of frames per second will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If false, the passed frames per second will be used as-is.',
+      }),
+    )
+    .default(true),
+})
+
+/**
+ * WanT2VResponse
+ */
+export const zSchemaWanV22A14bTextToVideoLoraOutput = z.object({
+  prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The text prompt used for video generation.',
+      }),
+    )
+    .default(''),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * WanLoRAT2VRequest
+ */
+export const zSchemaWanV22A14bTextToVideoLoraInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt to guide video generation.',
+  }),
+  shift: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description: 'Shift value for the video. Must be between 1.0 and 10.0.',
+      }),
+    )
+    .default(5),
+  acceleration: z.optional(
+    z.enum(['none', 'regular']).register(z.globalRegistry, {
+      description:
+        "Acceleration level to use. The more acceleration, the faster the generation, but with lower quality. The recommended value is 'regular'.",
+    }),
+  ),
+  num_interpolated_frames: z
+    .optional(
+      z.int().gte(0).lte(4).register(z.globalRegistry, {
+        description:
+          'Number of frames to interpolate between each pair of generated frames. Must be between 0 and 4.',
+      }),
+    )
+    .default(1),
+  reverse_video: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'If true, the video will be reversed.',
+      }),
+    )
+    .default(false),
+  loras: z
+    .optional(
+      z.array(zSchemaLoRaWeight).register(z.globalRegistry, {
+        description: 'LoRA weights to be used in the inference.',
+      }),
+    )
+    .default([]),
+  frames_per_second: z
+    .optional(
+      z.int().gte(4).lte(60).register(z.globalRegistry, {
+        description:
+          'Frames per second of the generated video. Must be between 4 to 60. When using interpolation and `adjust_fps_for_interpolation` is set to true (default true,) the final FPS will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If `adjust_fps_for_interpolation` is set to false, this value will be used as-is.',
+      }),
+    )
+    .default(16),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If set to true, input data will be checked for safety before processing.',
+      }),
+    )
+    .default(false),
+  num_frames: z
+    .optional(
+      z.int().gte(17).lte(161).register(z.globalRegistry, {
+        description:
+          'Number of frames to generate. Must be between 17 to 161 (inclusive).',
+      }),
+    )
+    .default(81),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description:
+          'Classifier-free guidance scale. Higher values give better adherence to the prompt but may decrease quality.',
+      }),
+    )
+    .default(3.5),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt for video generation.',
+      }),
+    )
+    .default(''),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description:
+        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
+      description: 'Resolution of the generated video (480p, 580p, or 720p).',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
+    }),
+  ),
+  enable_output_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If set to true, output video will be checked for safety after generation.',
+      }),
+    )
+    .default(false),
+  guidance_scale_2: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description:
+          'Guidance scale for the second stage of the model. This is used to control the adherence to the prompt in the second stage of the model.',
+      }),
+    )
+    .default(4),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description:
+        'The quality of the output video. Higher quality means better visual quality but larger file size.',
+    }),
+  ),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
+      }),
+    )
+    .default(false),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(2).lte(40).register(z.globalRegistry, {
+        description:
+          'Number of inference steps for sampling. Higher values give better quality but take longer.',
+      }),
+    )
+    .default(27),
+  interpolator_model: z.optional(
+    z.enum(['none', 'film', 'rife']).register(z.globalRegistry, {
+      description:
+        'The model to use for frame interpolation. If None, no interpolation is applied.',
+    }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        'Random seed for reproducibility. If None, a random seed is chosen.',
+    }),
+  ),
+  adjust_fps_for_interpolation: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If true, the number of frames per second will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If false, the passed frames per second will be used as-is.',
+      }),
+    )
+    .default(true),
+})
+
+/**
+ * MareyOutput
+ */
+export const zSchemaMareyT2vOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * MareyInputT2V
+ */
+export const zSchemaMareyT2vInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate a video from',
+  }),
+  duration: z.optional(
+    z.enum(['5s', '10s']).register(z.globalRegistry, {
+      description: 'The duration of the generated video.',
+    }),
+  ),
+  dimensions: z.optional(
+    z
+      .enum(['1920x1080', '1152x1152', '1536x1152', '1152x1536'])
+      .register(z.globalRegistry, {
+        description:
+          'The dimensions of the generated video in width x height format.',
+      }),
+  ),
+  guidance_scale: z.optional(z.union([z.number(), z.unknown()])),
+  seed: z.optional(z.union([z.int(), z.unknown()])),
+  negative_prompt: z.optional(z.union([z.string(), z.unknown()])),
+})
+
+/**
+ * AvatarSingleTextResponse
+ */
+export const zSchemaInfinitalkSingleTextOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * InfiniTalkSingleTextRequest
+ */
+export const zSchemaInfinitalkSingleTextInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt to guide video generation.',
+  }),
+  resolution: z.optional(
+    z.enum(['480p', '720p']).register(z.globalRegistry, {
+      description:
+        'Resolution of the video to generate. Must be either 480p or 720p.',
+    }),
+  ),
+  acceleration: z.optional(
+    z.enum(['none', 'regular', 'high']).register(z.globalRegistry, {
+      description: 'The acceleration level to use for generation.',
+    }),
+  ),
+  text_input: z.string().register(z.globalRegistry, {
+    description: 'The text input to guide video generation.',
+  }),
+  image_url: z.string().register(z.globalRegistry, {
+    description:
+      'URL of the input image. If the input image does not match the chosen aspect ratio, it is resized and center cropped.',
+  }),
+  voice: z
+    .enum([
+      'Aria',
+      'Roger',
+      'Sarah',
+      'Laura',
+      'Charlie',
+      'George',
+      'Callum',
+      'River',
+      'Liam',
+      'Charlotte',
+      'Alice',
+      'Matilda',
+      'Will',
+      'Jessica',
+      'Eric',
+      'Chris',
+      'Brian',
+      'Daniel',
+      'Lily',
+      'Bill',
+    ])
+    .register(z.globalRegistry, {
+      description: 'The voice to use for speech generation',
+    }),
+  num_frames: z
+    .optional(
+      z.int().gte(41).lte(721).register(z.globalRegistry, {
+        description: 'Number of frames to generate. Must be between 41 to 721.',
+      }),
+    )
+    .default(145),
+  seed: z
+    .optional(
+      z.int().register(z.globalRegistry, {
+        description:
+          'Random seed for reproducibility. If None, a random seed is chosen.',
+      }),
+    )
+    .default(42),
+})
+
+/**
+ * VideoOutputV5
+ */
+export const zSchemaPixverseV5TextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoRequest
+ */
+export const zSchemaPixverseV5TextToVideoInput = z.object({
+  prompt: z.string(),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['360p', '540p', '720p', '1080p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video',
+    }),
+  ),
+  style: z.optional(
+    z
+      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
+      .register(z.globalRegistry, {
+        description: 'The style of the generated video',
+      }),
+  ),
+  duration: z.optional(
+    z.enum(['5', '8']).register(z.globalRegistry, {
+      description:
+        'The duration of the generated video in seconds. 8s videos cost double. 1080p videos are limited to 5 seconds',
+    }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
+    }),
+  ),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt to be used for the generation',
+      }),
+    )
+    .default(''),
+})
+
+/**
+ * AvatarsAppOutput
+ */
+export const zSchemaAvatarsTextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * Text2VideoInput
+ */
+export const zSchemaAvatarsTextToVideoInput = z.object({
+  text: z.string(),
+  avatar_id: z
+    .enum([
+      'emily_vertical_primary',
+      'emily_vertical_secondary',
+      'marcus_vertical_primary',
+      'marcus_vertical_secondary',
+      'mira_vertical_primary',
+      'mira_vertical_secondary',
+      'jasmine_vertical_primary',
+      'jasmine_vertical_secondary',
+      'jasmine_vertical_walking',
+      'aisha_vertical_walking',
+      'elena_vertical_primary',
+      'elena_vertical_secondary',
+      'any_male_vertical_primary',
+      'any_female_vertical_primary',
+      'any_male_vertical_secondary',
+      'any_female_vertical_secondary',
+      'any_female_vertical_walking',
+      'emily_primary',
+      'emily_side',
+      'marcus_primary',
+      'marcus_side',
+      'aisha_walking',
+      'elena_primary',
+      'elena_side',
+      'any_male_primary',
+      'any_female_primary',
+      'any_male_side',
+      'any_female_side',
+    ])
+    .register(z.globalRegistry, {
+      description: 'The avatar to use for the video',
+    }),
+})
+
+/**
+ * VideoFile
+ */
+export const zSchemaVideoFile = z.object({
   file_size: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'The size of the file in bytes.',
+    }),
+  ),
+  duration: z.optional(
+    z.number().register(z.globalRegistry, {
+      description: 'The duration of the video',
+    }),
+  ),
+  height: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The height of the video',
+    }),
+  ),
+  url: z.string().register(z.globalRegistry, {
+    description: 'The URL where the file can be downloaded from.',
+  }),
+  fps: z.optional(
+    z.number().register(z.globalRegistry, {
+      description: 'The FPS of the video',
+    }),
+  ),
+  width: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The width of the video',
     }),
   ),
   file_name: z.optional(
@@ -2716,9 +4797,11 @@ export const zFalAiViduQ2TextToVideoFile = z.object({
       description: 'The mime type of the file.',
     }),
   ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
+  num_frames: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The number of frames in the video',
+    }),
+  ),
   file_data: z.optional(
     z.string().register(z.globalRegistry, {
       description: 'File data',
@@ -2727,61 +4810,492 @@ export const zFalAiViduQ2TextToVideoFile = z.object({
 })
 
 /**
- * Q2TextToVideoOutput
+ * VideoOutput
+ *
+ * Base output for video generation
  */
-export const zViduQ2TextToVideoOutput = z.object({
-  video: zFalAiViduQ2TextToVideoFile,
+export const zSchemaWan25PreviewTextToVideoOutput = z
+  .object({
+    actual_prompt: z.optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The actual prompt used if prompt rewriting was enabled',
+      }),
+    ),
+    seed: z.int().register(z.globalRegistry, {
+      description: 'The seed used for generation',
+    }),
+    video: zSchemaVideoFile,
+  })
+  .register(z.globalRegistry, {
+    description: 'Base output for video generation',
+  })
+
+/**
+ * TextToVideoInput
+ *
+ * Input for text-to-video generation
+ */
+export const zSchemaWan25PreviewTextToVideoInput = z
+  .object({
+    prompt: z.string().min(1).register(z.globalRegistry, {
+      description:
+        'The text prompt for video generation. Supports Chinese and English, max 800 characters.',
+    }),
+    resolution: z.optional(
+      z.enum(['480p', '720p', '1080p']).register(z.globalRegistry, {
+        description: 'Video resolution tier',
+      }),
+    ),
+    aspect_ratio: z.optional(
+      z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+        description: 'The aspect ratio of the generated video',
+      }),
+    ),
+    duration: z.optional(
+      z.enum(['5', '10']).register(z.globalRegistry, {
+        description:
+          'Duration of the generated video in seconds. Choose between 5 or 10 seconds.',
+      }),
+    ),
+    enable_safety_checker: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'If set to true, the safety checker will be enabled.',
+        }),
+      )
+      .default(true),
+    seed: z.optional(
+      z.int().register(z.globalRegistry, {
+        description:
+          'Random seed for reproducibility. If None, a random seed is chosen.',
+      }),
+    ),
+    audio_url: z.optional(
+      z.string().register(z.globalRegistry, {
+        description:
+          '\nURL of the audio to use as the background music. Must be publicly accessible.\nLimit handling: If the audio duration exceeds the duration value (5 or 10 seconds),\nthe audio is truncated to the first 5 or 10 seconds, and the rest is discarded. If\nthe audio is shorter than the video, the remaining part of the video will be silent.\nFor example, if the audio is 3 seconds long and the video duration is 5 seconds, the\nfirst 3 seconds of the output video will have sound, and the last 2 seconds will be silent.\n- Format: WAV, MP3.\n- Duration: 3 to 30 s.\n- File size: Up to 15 MB.\n',
+      }),
+    ),
+    negative_prompt: z.optional(
+      z.string().register(z.globalRegistry, {
+        description:
+          'Negative prompt to describe content to avoid. Max 500 characters.',
+      }),
+    ),
+    enable_prompt_expansion: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description:
+            'Whether to enable prompt rewriting using LLM. Improves results for short prompts but increases processing time.',
+        }),
+      )
+      .default(true),
+  })
+  .register(z.globalRegistry, {
+    description: 'Input for text-to-video generation',
+  })
+
+/**
+ * OviT2VResponse
+ */
+export const zSchemaOviOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: z.optional(z.union([zSchemaFile, z.unknown()])),
+})
+
+/**
+ * OviT2VRequest
+ */
+export const zSchemaOviInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt to guide video generation.',
+  }),
+  resolution: z.optional(
+    z
+      .enum([
+        '512x992',
+        '992x512',
+        '960x512',
+        '512x960',
+        '720x720',
+        '448x1120',
+        '1120x448',
+      ])
+      .register(z.globalRegistry, {
+        description:
+          'Resolution of the generated video in W:H format. One of (512x992, 992x512, 960x512, 512x960, 720x720, or 448x1120).',
+      }),
+  ),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(1).lte(50).register(z.globalRegistry, {
+        description: 'The number of inference steps.',
+      }),
+    )
+    .default(30),
+  audio_negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt for audio generation.',
+      }),
+    )
+    .default('robotic, muffled, echo, distorted'),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt for video generation.',
+      }),
+    )
+    .default('jitter, bad hands, blur, distortion'),
+  seed: z.optional(z.union([z.int(), z.unknown()])),
+})
+
+/**
+ * ImageFile
+ */
+export const zSchemaImageFile = z.object({
+  file_size: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The size of the file in bytes.',
+    }),
+  ),
+  height: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The height of the image',
+    }),
+  ),
+  url: z.string().register(z.globalRegistry, {
+    description: 'The URL where the file can be downloaded from.',
+  }),
+  width: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The width of the image',
+    }),
+  ),
+  file_name: z.optional(
+    z.string().register(z.globalRegistry, {
+      description:
+        'The name of the file. It will be auto-generated if not provided.',
+    }),
+  ),
+  content_type: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The mime type of the file.',
+    }),
+  ),
+  file_data: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
+  ),
+})
+
+/**
+ * TextToVideoOutput
+ */
+export const zSchemaSora2TextToVideoOutput = z.object({
+  spritesheet: z.optional(zSchemaImageFile),
+  thumbnail: z.optional(zSchemaImageFile),
+  video_id: z.string().register(z.globalRegistry, {
+    description: 'The ID of the generated video',
+  }),
+  video: zSchemaVideoFile,
 })
 
 /**
  * TextToVideoInput
  */
-export const zKreaWan14bTextToVideoInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'Prompt for the video-to-video generation.',
+export const zSchemaSora2TextToVideoInput = z.object({
+  prompt: z.string().min(1).max(5000).register(z.globalRegistry, {
+    description: 'The text prompt describing the video you want to generate',
   }),
-  enable_prompt_expansion: z
+  duration: z.optional(
+    z
+      .union([z.literal(4), z.literal(8), z.literal(12)])
+      .register(z.globalRegistry, {
+        description: 'Duration of the generated video in seconds',
+      }),
+  ),
+  resolution: z.optional(
+    z.enum(['720p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video',
+    }),
+  ),
+  model: z.optional(
+    z
+      .enum(['sora-2', 'sora-2-2025-12-08', 'sora-2-2025-10-06'])
+      .register(z.globalRegistry, {
+        description:
+          'The model to use for the generation. When the default model is selected, the latest snapshot of the model will be used - otherwise, select a specific snapshot of the model.',
+      }),
+  ),
+  delete_video: z
     .optional(
       z.boolean().register(z.globalRegistry, {
         description:
-          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
+          'Whether to delete the video after generation for privacy reasons. If True, the video cannot be used for remixing and will be permanently deleted.',
       }),
     )
-    .default(false),
-  num_frames: z
-    .optional(
-      z.int().gte(18).lte(162).register(z.globalRegistry, {
-        description:
-          'Number of frames to generate. Must be a multiple of 12 plus 6, for example 6, 18, 30, 42, etc.',
-      }),
-    )
-    .default(78),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
+    .default(true),
+  aspect_ratio: z.optional(
+    z.enum(['9:16', '16:9']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video',
+    }),
+  ),
 })
 
 /**
- * File
+ * ProTextToVideoOutput
  */
-export const zFalAiKreaWan14bTextToVideoFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+export const zSchemaSora2TextToVideoProOutput = z.object({
+  spritesheet: z.optional(zSchemaImageFile),
+  thumbnail: z.optional(zSchemaImageFile),
+  video_id: z.string().register(z.globalRegistry, {
+    description: 'The ID of the generated video',
   }),
+  video: zSchemaVideoFile,
 })
 
 /**
- * VideoToVideoOutput
+ * ProTextToVideoInput
  */
-export const zKreaWan14bTextToVideoOutput = z.object({
-  video: zFalAiKreaWan14bTextToVideoFile,
+export const zSchemaSora2TextToVideoProInput = z.object({
+  prompt: z.string().min(1).max(5000).register(z.globalRegistry, {
+    description: 'The text prompt describing the video you want to generate',
+  }),
+  duration: z.optional(
+    z
+      .union([z.literal(4), z.literal(8), z.literal(12)])
+      .register(z.globalRegistry, {
+        description: 'Duration of the generated video in seconds',
+      }),
+  ),
+  resolution: z.optional(
+    z.enum(['720p', '1080p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['9:16', '16:9']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video',
+    }),
+  ),
+  delete_video: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to delete the video after generation for privacy reasons. If True, the video cannot be used for remixing and will be permanently deleted.',
+      }),
+    )
+    .default(true),
+})
+
+/**
+ * Veo31TextToVideoOutput
+ */
+export const zSchemaVeo31Output = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * Veo31TextToVideoInput
+ */
+export const zSchemaVeo31Input = z.object({
+  prompt: z.string().max(20000).register(z.globalRegistry, {
+    description: 'The text prompt describing the video you want to generate',
+  }),
+  duration: z.optional(
+    z.enum(['4s', '6s', '8s']).register(z.globalRegistry, {
+      description: 'The duration of the generated video.',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
+      description: 'Aspect ratio of the generated video',
+    }),
+  ),
+  generate_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to generate audio for the video.',
+      }),
+    )
+    .default(true),
+  auto_fix: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to automatically attempt to fix prompts that fail content policy or other validation checks by rewriting them.',
+      }),
+    )
+    .default(true),
+  resolution: z.optional(
+    z.enum(['720p', '1080p', '4k']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video.',
+    }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The seed for the random number generator.',
+    }),
+  ),
+  negative_prompt: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'A negative prompt to guide the video generation.',
+    }),
+  ),
+})
+
+/**
+ * Veo31TextToVideoOutput
+ */
+export const zSchemaVeo31FastOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * Veo31TextToVideoInput
+ */
+export const zSchemaVeo31FastInput = z.object({
+  prompt: z.string().max(20000).register(z.globalRegistry, {
+    description: 'The text prompt describing the video you want to generate',
+  }),
+  duration: z.optional(
+    z.enum(['4s', '6s', '8s']).register(z.globalRegistry, {
+      description: 'The duration of the generated video.',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
+      description: 'Aspect ratio of the generated video',
+    }),
+  ),
+  generate_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to generate audio for the video.',
+      }),
+    )
+    .default(true),
+  auto_fix: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to automatically attempt to fix prompts that fail content policy or other validation checks by rewriting them.',
+      }),
+    )
+    .default(true),
+  resolution: z.optional(
+    z.enum(['720p', '1080p', '4k']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video.',
+    }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The seed for the random number generator.',
+    }),
+  ),
+  negative_prompt: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'A negative prompt to guide the video generation.',
+    }),
+  ),
+})
+
+/**
+ * KandinskyT2VResponse
+ */
+export const zSchemaKandinsky5TextToVideoOutput = z.object({
+  video: z.optional(zSchemaFile),
+})
+
+/**
+ * KandinskyT2VRequest
+ */
+export const zSchemaKandinsky5TextToVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt to guide video generation.',
+  }),
+  resolution: z.optional(
+    z.enum(['768x512']).register(z.globalRegistry, {
+      description:
+        'Resolution of the generated video in W:H format. Will be calculated based on the aspect ratio(768x512, 512x512, 512x768).',
+    }),
+  ),
+  duration: z.optional(
+    z.enum(['5s', '10s']).register(z.globalRegistry, {
+      description: 'The length of the video to generate (5s or 10s)',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['3:2', '1:1', '2:3']).register(z.globalRegistry, {
+      description:
+        'Aspect ratio of the generated video. One of (3:2, 1:1, 2:3).',
+    }),
+  ),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(1).lte(50).register(z.globalRegistry, {
+        description: 'The number of inference steps.',
+      }),
+    )
+    .default(30),
+})
+
+/**
+ * KandinskyT2VResponse
+ */
+export const zSchemaKandinsky5TextToVideoDistillOutput = z.object({
+  video: z.optional(zSchemaFile),
+})
+
+/**
+ * KandinskyT2VDistillRequest
+ */
+export const zSchemaKandinsky5TextToVideoDistillInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt to guide video generation.',
+  }),
+  duration: z.optional(
+    z.enum(['5s', '10s']).register(z.globalRegistry, {
+      description: 'The length of the video to generate (5s or 10s)',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['3:2', '1:1', '2:3']).register(z.globalRegistry, {
+      description:
+        'Aspect ratio of the generated video. One of (3:2, 1:1, 2:3).',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['768x512']).register(z.globalRegistry, {
+      description:
+        'Resolution of the generated video in W:H format. Will be calculated based on the aspect ratio(768x512, 512x512, 512x768).',
+    }),
+  ),
+})
+
+/**
+ * WanAlphaResponse
+ */
+export const zSchemaWanAlphaOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for generation.',
+  }),
+  image: z.optional(zSchemaVideoFile),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  mask: z.optional(zSchemaVideoFile),
+  video: z.optional(zSchemaVideoFile),
 })
 
 /**
  * WanAlphaRequest
  */
-export const zWanAlphaInput = z.object({
+export const zSchemaWanAlphaInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The prompt to guide the video generation.',
   }),
@@ -2906,2316 +5420,112 @@ export const zWanAlphaInput = z.object({
 })
 
 /**
- * VideoFile
+ * VideoToVideoOutput
  */
-export const zFalAiWanAlphaVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  duration: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The duration of the video',
-    }),
-  ),
-  height: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The height of the video',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  width: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The width of the video',
-    }),
-  ),
-  fps: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The FPS of the video',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  num_frames: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The number of frames in the video',
-    }),
-  ),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * WanAlphaResponse
- */
-export const zWanAlphaOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for generation.',
-  }),
-  image: z.optional(zFalAiWanAlphaVideoFile),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  mask: z.optional(zFalAiWanAlphaVideoFile),
-  video: z.optional(zFalAiWanAlphaVideoFile),
-})
-
-/**
- * KandinskyT2VDistillRequest
- */
-export const zKandinsky5TextToVideoDistillInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
-  }),
-  duration: z.optional(
-    z.enum(['5s', '10s']).register(z.globalRegistry, {
-      description: 'The length of the video to generate (5s or 10s)',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['3:2', '1:1', '2:3']).register(z.globalRegistry, {
-      description:
-        'Aspect ratio of the generated video. One of (3:2, 1:1, 2:3).',
-    }),
-  ),
-  resolution: z.optional(
-    z.enum(['768x512']).register(z.globalRegistry, {
-      description:
-        'Resolution of the generated video in W:H format. Will be calculated based on the aspect ratio(768x512, 512x512, 512x768).',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiKandinsky5TextToVideoDistillFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * KandinskyT2VResponse
- */
-export const zKandinsky5TextToVideoDistillOutput = z.object({
-  video: z.optional(zFalAiKandinsky5TextToVideoDistillFile),
-})
-
-/**
- * KandinskyT2VRequest
- */
-export const zKandinsky5TextToVideoInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
-  }),
-  resolution: z.optional(
-    z.enum(['768x512']).register(z.globalRegistry, {
-      description:
-        'Resolution of the generated video in W:H format. Will be calculated based on the aspect ratio(768x512, 512x512, 512x768).',
-    }),
-  ),
-  duration: z.optional(
-    z.enum(['5s', '10s']).register(z.globalRegistry, {
-      description: 'The length of the video to generate (5s or 10s)',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['3:2', '1:1', '2:3']).register(z.globalRegistry, {
-      description:
-        'Aspect ratio of the generated video. One of (3:2, 1:1, 2:3).',
-    }),
-  ),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(1).lte(50).register(z.globalRegistry, {
-        description: 'The number of inference steps.',
-      }),
-    )
-    .default(30),
-})
-
-/**
- * File
- */
-export const zFalAiKandinsky5TextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * KandinskyT2VResponse
- */
-export const zKandinsky5TextToVideoOutput = z.object({
-  video: z.optional(zFalAiKandinsky5TextToVideoFile),
-})
-
-/**
- * Veo31TextToVideoInput
- */
-export const zVeo31FastInput = z.object({
-  prompt: z.string().max(20000).register(z.globalRegistry, {
-    description: 'The text prompt describing the video you want to generate',
-  }),
-  duration: z.optional(
-    z.enum(['4s', '6s', '8s']).register(z.globalRegistry, {
-      description: 'The duration of the generated video.',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
-      description: 'Aspect ratio of the generated video',
-    }),
-  ),
-  generate_audio: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to generate audio for the video.',
-      }),
-    )
-    .default(true),
-  auto_fix: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to automatically attempt to fix prompts that fail content policy or other validation checks by rewriting them.',
-      }),
-    )
-    .default(true),
-  resolution: z.optional(
-    z.enum(['720p', '1080p', '4k']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video.',
-    }),
-  ),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The seed for the random number generator.',
-    }),
-  ),
-  negative_prompt: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'A negative prompt to guide the video generation.',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiVeo31FastFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * Veo31TextToVideoOutput
- */
-export const zVeo31FastOutput = z.object({
-  video: zFalAiVeo31FastFile,
-})
-
-/**
- * Veo31TextToVideoInput
- */
-export const zVeo31Input = z.object({
-  prompt: z.string().max(20000).register(z.globalRegistry, {
-    description: 'The text prompt describing the video you want to generate',
-  }),
-  duration: z.optional(
-    z.enum(['4s', '6s', '8s']).register(z.globalRegistry, {
-      description: 'The duration of the generated video.',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
-      description: 'Aspect ratio of the generated video',
-    }),
-  ),
-  generate_audio: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to generate audio for the video.',
-      }),
-    )
-    .default(true),
-  auto_fix: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to automatically attempt to fix prompts that fail content policy or other validation checks by rewriting them.',
-      }),
-    )
-    .default(true),
-  resolution: z.optional(
-    z.enum(['720p', '1080p', '4k']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video.',
-    }),
-  ),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The seed for the random number generator.',
-    }),
-  ),
-  negative_prompt: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'A negative prompt to guide the video generation.',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiVeo31File = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * Veo31TextToVideoOutput
- */
-export const zVeo31Output = z.object({
-  video: zFalAiVeo31File,
-})
-
-/**
- * ProTextToVideoInput
- */
-export const zSora2TextToVideoProInput = z.object({
-  prompt: z.string().min(1).max(5000).register(z.globalRegistry, {
-    description: 'The text prompt describing the video you want to generate',
-  }),
-  duration: z.optional(
-    z
-      .union([z.literal(4), z.literal(8), z.literal(12)])
-      .register(z.globalRegistry, {
-        description: 'Duration of the generated video in seconds',
-      }),
-  ),
-  resolution: z.optional(
-    z.enum(['720p', '1080p']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['9:16', '16:9']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video',
-    }),
-  ),
-  delete_video: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to delete the video after generation for privacy reasons. If True, the video cannot be used for remixing and will be permanently deleted.',
-      }),
-    )
-    .default(true),
-})
-
-/**
- * ImageFile
- */
-export const zImageFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  height: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The height of the image',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  width: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The width of the image',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * VideoFile
- */
-export const zFalAiSora2TextToVideoProVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  duration: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The duration of the video',
-    }),
-  ),
-  height: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The height of the video',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  fps: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The FPS of the video',
-    }),
-  ),
-  width: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The width of the video',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  num_frames: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The number of frames in the video',
-    }),
-  ),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * ProTextToVideoOutput
- */
-export const zSora2TextToVideoProOutput = z.object({
-  spritesheet: z.optional(zImageFile),
-  thumbnail: z.optional(zImageFile),
-  video_id: z.string().register(z.globalRegistry, {
-    description: 'The ID of the generated video',
-  }),
-  video: zFalAiSora2TextToVideoProVideoFile,
+export const zSchemaKreaWan14bTextToVideoOutput = z.object({
+  video: zSchemaFile,
 })
 
 /**
  * TextToVideoInput
  */
-export const zSora2TextToVideoInput = z.object({
-  prompt: z.string().min(1).max(5000).register(z.globalRegistry, {
-    description: 'The text prompt describing the video you want to generate',
+export const zSchemaKreaWan14bTextToVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'Prompt for the video-to-video generation.',
   }),
-  duration: z.optional(
-    z
-      .union([z.literal(4), z.literal(8), z.literal(12)])
-      .register(z.globalRegistry, {
-        description: 'Duration of the generated video in seconds',
-      }),
-  ),
-  resolution: z.optional(
-    z.enum(['720p']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video',
-    }),
-  ),
-  model: z.optional(
-    z
-      .enum(['sora-2', 'sora-2-2025-12-08', 'sora-2-2025-10-06'])
-      .register(z.globalRegistry, {
-        description:
-          'The model to use for the generation. When the default model is selected, the latest snapshot of the model will be used - otherwise, select a specific snapshot of the model.',
-      }),
-  ),
-  delete_video: z
+  enable_prompt_expansion: z
     .optional(
       z.boolean().register(z.globalRegistry, {
         description:
-          'Whether to delete the video after generation for privacy reasons. If True, the video cannot be used for remixing and will be permanently deleted.',
+          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
       }),
     )
-    .default(true),
-  aspect_ratio: z.optional(
-    z.enum(['9:16', '16:9']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video',
-    }),
-  ),
+    .default(false),
+  num_frames: z
+    .optional(
+      z.int().gte(18).lte(162).register(z.globalRegistry, {
+        description:
+          'Number of frames to generate. Must be a multiple of 12 plus 6, for example 6, 18, 30, 42, etc.',
+      }),
+    )
+    .default(78),
+  seed: z.optional(z.union([z.int(), z.unknown()])),
 })
 
 /**
- * ImageFile
+ * Q2TextToVideoOutput
  */
-export const zFalAiSora2TextToVideoImageFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  height: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The height of the image',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+export const zSchemaViduQ2TextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * Q2TextToVideoRequest
+ */
+export const zSchemaViduQ2TextToVideoInput = z.object({
+  prompt: z.string().max(3000).register(z.globalRegistry, {
+    description: 'Text prompt for video generation, max 3000 characters',
   }),
-  width: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The width of the image',
+  resolution: z.optional(
+    z.enum(['360p', '520p', '720p', '1080p']).register(z.globalRegistry, {
+      description: 'Output video resolution',
     }),
   ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * VideoFile
- */
-export const zFalAiSora2TextToVideoVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the output video',
     }),
   ),
   duration: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The duration of the video',
-    }),
-  ),
-  height: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The height of the video',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  fps: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The FPS of the video',
-    }),
-  ),
-  width: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The width of the video',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  num_frames: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The number of frames in the video',
-    }),
-  ),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * TextToVideoOutput
- */
-export const zSora2TextToVideoOutput = z.object({
-  spritesheet: z.optional(zFalAiSora2TextToVideoImageFile),
-  thumbnail: z.optional(zFalAiSora2TextToVideoImageFile),
-  video_id: z.string().register(z.globalRegistry, {
-    description: 'The ID of the generated video',
-  }),
-  video: zFalAiSora2TextToVideoVideoFile,
-})
-
-/**
- * OviT2VRequest
- */
-export const zOviInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
-  }),
-  resolution: z.optional(
     z
-      .enum([
-        '512x992',
-        '992x512',
-        '960x512',
-        '512x960',
-        '720x720',
-        '448x1120',
-        '1120x448',
+      .union([
+        z.literal(2),
+        z.literal(3),
+        z.literal(4),
+        z.literal(5),
+        z.literal(6),
+        z.literal(7),
+        z.literal(8),
       ])
       .register(z.globalRegistry, {
-        description:
-          'Resolution of the generated video in W:H format. One of (512x992, 992x512, 960x512, 512x960, 720x720, or 448x1120).',
+        description: 'Duration of the video in seconds',
       }),
   ),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(1).lte(50).register(z.globalRegistry, {
-        description: 'The number of inference steps.',
-      }),
-    )
-    .default(30),
-  audio_negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt for audio generation.',
-      }),
-    )
-    .default('robotic, muffled, echo, distorted'),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt for video generation.',
-      }),
-    )
-    .default('jitter, bad hands, blur, distortion'),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
-})
-
-/**
- * File
- */
-export const zFalAiOviFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * OviT2VResponse
- */
-export const zOviOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: z.optional(z.union([zFalAiOviFile, z.unknown()])),
-})
-
-/**
- * TextToVideoInput
- *
- * Input for text-to-video generation
- */
-export const zWan25PreviewTextToVideoInput = z
-  .object({
-    prompt: z.string().min(1).register(z.globalRegistry, {
-      description:
-        'The text prompt for video generation. Supports Chinese and English, max 800 characters.',
-    }),
-    resolution: z.optional(
-      z.enum(['480p', '720p', '1080p']).register(z.globalRegistry, {
-        description: 'Video resolution tier',
-      }),
-    ),
-    aspect_ratio: z.optional(
-      z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-        description: 'The aspect ratio of the generated video',
-      }),
-    ),
-    duration: z.optional(
-      z.enum(['5', '10']).register(z.globalRegistry, {
-        description:
-          'Duration of the generated video in seconds. Choose between 5 or 10 seconds.',
-      }),
-    ),
-    enable_safety_checker: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description: 'If set to true, the safety checker will be enabled.',
-        }),
-      )
-      .default(true),
-    seed: z.optional(
-      z.int().register(z.globalRegistry, {
-        description:
-          'Random seed for reproducibility. If None, a random seed is chosen.',
-      }),
-    ),
-    audio_url: z.optional(
-      z.string().register(z.globalRegistry, {
-        description:
-          '\nURL of the audio to use as the background music. Must be publicly accessible.\nLimit handling: If the audio duration exceeds the duration value (5 or 10 seconds),\nthe audio is truncated to the first 5 or 10 seconds, and the rest is discarded. If\nthe audio is shorter than the video, the remaining part of the video will be silent.\nFor example, if the audio is 3 seconds long and the video duration is 5 seconds, the\nfirst 3 seconds of the output video will have sound, and the last 2 seconds will be silent.\n- Format: WAV, MP3.\n- Duration: 3 to 30 s.\n- File size: Up to 15 MB.\n',
-      }),
-    ),
-    negative_prompt: z.optional(
-      z.string().register(z.globalRegistry, {
-        description:
-          'Negative prompt to describe content to avoid. Max 500 characters.',
-      }),
-    ),
-    enable_prompt_expansion: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description:
-            'Whether to enable prompt rewriting using LLM. Improves results for short prompts but increases processing time.',
-        }),
-      )
-      .default(true),
-  })
-  .register(z.globalRegistry, {
-    description: 'Input for text-to-video generation',
-  })
-
-/**
- * VideoFile
- */
-export const zFalAiWan25PreviewTextToVideoVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  duration: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The duration of the video',
-    }),
-  ),
-  height: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The height of the video',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  fps: z.optional(
-    z.number().register(z.globalRegistry, {
-      description: 'The FPS of the video',
-    }),
-  ),
-  width: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The width of the video',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  num_frames: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The number of frames in the video',
-    }),
-  ),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * VideoOutput
- *
- * Base output for video generation
- */
-export const zWan25PreviewTextToVideoOutput = z
-  .object({
-    actual_prompt: z.optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The actual prompt used if prompt rewriting was enabled',
-      }),
-    ),
-    seed: z.int().register(z.globalRegistry, {
-      description: 'The seed used for generation',
-    }),
-    video: zFalAiWan25PreviewTextToVideoVideoFile,
-  })
-  .register(z.globalRegistry, {
-    description: 'Base output for video generation',
-  })
-
-/**
- * TextToVideoRequest
- */
-export const zAvatarsTextToVideoInput = z.object({
-  text: z.string(),
-  voice: z.enum([
-    'Rachel',
-    'Clyde',
-    'Roger',
-    'Sarah',
-    'Laura',
-    'Thomas',
-    'Charlie',
-    'George',
-    'Callum',
-    'River',
-    'Harry',
-    'Liam',
-    'Alice',
-    'Matilda',
-    'Will',
-    'Jessica',
-    'Lilly',
-    'Bill',
-    'Oxley',
-    'Luna',
-  ]),
-  remove_background: z
+  bgm: z
     .optional(
       z.boolean().register(z.globalRegistry, {
         description:
-          'Enabling the remove background feature will result in a 50% increase in the price.',
+          'Whether to add background music to the video (only for 4-second videos)',
       }),
     )
     .default(false),
-  avatar: z.enum([
-    'Mia outdoor (UGC)',
-    'Lara (Masterclass)',
-    'Ines (UGC)',
-    'Maria (Masterclass)',
-    'Emma (UGC)',
-    'Sienna (Masterclass)',
-    'Elena (UGC)',
-    'Jasmine (Masterclass)',
-    'Amara (Masterclass)',
-    'Ryan podcast (UGC)',
-    'Tyler (Masterclass)',
-    'Jayse (Masterclass)',
-    'Paul (Masterclass)',
-    'Matteo (UGC)',
-    'Daniel car (UGC)',
-    'Dario (Masterclass)',
-    'Viva (Masterclass)',
-    'Chen (Masterclass)',
-    'Alex (Masterclass)',
-    'Vanessa (UGC)',
-    'Laurent (UGC)',
-    'Noemie car (UGC)',
-    'Brandon (UGC)',
-    'Byron (Masterclass)',
-    'Calista (Masterclass)',
-    'Milo (Masterclass)',
-    'Fabien (Masterclass)',
-    'Rose (UGC)',
-  ]),
-})
-
-/**
- * Video
- */
-export const zVideo = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * InferenceResult
- */
-export const zAvatarsTextToVideoOutput = z.object({
-  moderation_transcription: z.optional(z.union([z.string(), z.unknown()])),
-  moderation_error: z.optional(z.union([z.string(), z.unknown()])),
-  moderation_flagged: z.optional(z.boolean()).default(false),
-  video: z.optional(z.union([zVideo, z.unknown()])),
-})
-
-/**
- * TextToVideoRequest
- */
-export const zPixverseV5TextToVideoInput = z.object({
-  prompt: z.string(),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video',
-    }),
-  ),
-  duration: z.optional(
-    z.enum(['5', '8']).register(z.globalRegistry, {
-      description:
-        'The duration of the generated video in seconds. 8s videos cost double. 1080p videos are limited to 5 seconds',
-    }),
-  ),
-  style: z.optional(
-    z
-      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
-      .register(z.globalRegistry, {
-        description: 'The style of the generated video',
-      }),
-  ),
-  resolution: z.optional(
-    z.enum(['360p', '540p', '720p', '1080p']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video',
-    }),
-  ),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
+        'Random seed for reproducibility. If None, a random seed is chosen.',
     }),
   ),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt to be used for the generation',
-      }),
-    )
-    .default(''),
-})
-
-/**
- * File
- */
-export const zFalAiPixverseV5TextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
+  movement_amplitude: z.optional(
+    z.enum(['auto', 'small', 'medium', 'large']).register(z.globalRegistry, {
+      description: 'The movement amplitude of objects in the frame',
     }),
   ),
 })
 
 /**
- * VideoOutputV5
+ * SeedanceFastT2VVideoOutput
  */
-export const zPixverseV5TextToVideoOutput = z.object({
-  video: zFalAiPixverseV5TextToVideoFile,
-})
-
-/**
- * InfiniTalkSingleTextRequest
- */
-export const zInfinitalkSingleTextInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
-  }),
-  resolution: z.optional(
-    z.enum(['480p', '720p']).register(z.globalRegistry, {
-      description:
-        'Resolution of the video to generate. Must be either 480p or 720p.',
-    }),
-  ),
-  acceleration: z.optional(
-    z.enum(['none', 'regular', 'high']).register(z.globalRegistry, {
-      description: 'The acceleration level to use for generation.',
-    }),
-  ),
-  text_input: z.string().register(z.globalRegistry, {
-    description: 'The text input to guide video generation.',
-  }),
-  image_url: z.string().register(z.globalRegistry, {
-    description:
-      'URL of the input image. If the input image does not match the chosen aspect ratio, it is resized and center cropped.',
-  }),
-  voice: z
-    .enum([
-      'Aria',
-      'Roger',
-      'Sarah',
-      'Laura',
-      'Charlie',
-      'George',
-      'Callum',
-      'River',
-      'Liam',
-      'Charlotte',
-      'Alice',
-      'Matilda',
-      'Will',
-      'Jessica',
-      'Eric',
-      'Chris',
-      'Brian',
-      'Daniel',
-      'Lily',
-      'Bill',
-    ])
-    .register(z.globalRegistry, {
-      description: 'The voice to use for speech generation',
-    }),
-  num_frames: z
-    .optional(
-      z.int().gte(41).lte(721).register(z.globalRegistry, {
-        description: 'Number of frames to generate. Must be between 41 to 721.',
-      }),
-    )
-    .default(145),
-  seed: z
-    .optional(
-      z.int().register(z.globalRegistry, {
-        description:
-          'Random seed for reproducibility. If None, a random seed is chosen.',
-      }),
-    )
-    .default(42),
-})
-
-/**
- * File
- */
-export const zFalAiInfinitalkSingleTextFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * AvatarSingleTextResponse
- */
-export const zInfinitalkSingleTextOutput = z.object({
+export const zSchemaBytedanceSeedanceV1ProFastTextToVideoOutput = z.object({
   seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
+    description: 'Seed used for generation',
   }),
-  video: zFalAiInfinitalkSingleTextFile,
+  video: zSchemaFile,
 })
 
 /**
- * MareyInputT2V
+ * SeedanceProFastTextToVideoInput
  */
-export const zMareyT2vInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to generate a video from',
-  }),
-  duration: z.optional(
-    z.enum(['5s', '10s']).register(z.globalRegistry, {
-      description: 'The duration of the generated video.',
-    }),
-  ),
-  dimensions: z.optional(
-    z
-      .enum(['1920x1080', '1152x1152', '1536x1152', '1152x1536'])
-      .register(z.globalRegistry, {
-        description:
-          'The dimensions of the generated video in width x height format.',
-      }),
-  ),
-  guidance_scale: z.optional(z.union([z.number(), z.unknown()])),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
-  negative_prompt: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * File
- */
-export const zMoonvalleyMareyT2vFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * MareyOutput
- */
-export const zMareyT2vOutput = z.object({
-  video: zMoonvalleyMareyT2vFile,
-})
-
-/**
- * LoRAWeight
- */
-export const zLoRaWeight = z.object({
-  path: z.string().register(z.globalRegistry, {
-    description: 'URL or the path to the LoRA weights.',
-  }),
-  scale: z
-    .optional(
-      z.number().gte(0).lte(4).register(z.globalRegistry, {
-        description:
-          '\n            The scale of the LoRA weight. This is used to scale the LoRA weight\n            before merging it with the base model.\n        ',
-      }),
-    )
-    .default(1),
-  transformer: z.optional(
-    z.enum(['high', 'low', 'both']).register(z.globalRegistry, {
-      description:
-        "Specifies the transformer to load the lora weight into. 'high' loads into the high-noise transformer, 'low' loads it into the low-noise transformer, while 'both' loads the LoRA into both transformers.",
-    }),
-  ),
-  weight_name: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * WanLoRAT2VRequest
- */
-export const zWanV22A14bTextToVideoLoraInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
-  }),
-  shift: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description: 'Shift value for the video. Must be between 1.0 and 10.0.',
-      }),
-    )
-    .default(5),
-  acceleration: z.optional(
-    z.enum(['none', 'regular']).register(z.globalRegistry, {
-      description:
-        "Acceleration level to use. The more acceleration, the faster the generation, but with lower quality. The recommended value is 'regular'.",
-    }),
-  ),
-  num_interpolated_frames: z
-    .optional(
-      z.int().gte(0).lte(4).register(z.globalRegistry, {
-        description:
-          'Number of frames to interpolate between each pair of generated frames. Must be between 0 and 4.',
-      }),
-    )
-    .default(1),
-  reverse_video: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'If true, the video will be reversed.',
-      }),
-    )
-    .default(false),
-  loras: z
-    .optional(
-      z.array(zLoRaWeight).register(z.globalRegistry, {
-        description: 'LoRA weights to be used in the inference.',
-      }),
-    )
-    .default([]),
-  frames_per_second: z.optional(z.union([z.int().gte(4).lte(60), z.unknown()])),
-  guidance_scale: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description:
-          'Classifier-free guidance scale. Higher values give better adherence to the prompt but may decrease quality.',
-      }),
-    )
-    .default(3.5),
-  num_frames: z
-    .optional(
-      z.int().gte(17).lte(161).register(z.globalRegistry, {
-        description:
-          'Number of frames to generate. Must be between 17 to 161 (inclusive).',
-      }),
-    )
-    .default(81),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, input data will be checked for safety before processing.',
-      }),
-    )
-    .default(false),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt for video generation.',
-      }),
-    )
-    .default(''),
-  video_write_mode: z.optional(
-    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
-      description:
-        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
-    }),
-  ),
-  resolution: z.optional(
-    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
-      description: 'Resolution of the generated video (480p, 580p, or 720p).',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
-    }),
-  ),
-  enable_output_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, output video will be checked for safety after generation.',
-      }),
-    )
-    .default(false),
-  guidance_scale_2: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description:
-          'Guidance scale for the second stage of the model. This is used to control the adherence to the prompt in the second stage of the model.',
-      }),
-    )
-    .default(4),
-  video_quality: z.optional(
-    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
-      description:
-        'The quality of the output video. Higher quality means better visual quality but larger file size.',
-    }),
-  ),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
-      }),
-    )
-    .default(false),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
-  interpolator_model: z.optional(
-    z.enum(['none', 'film', 'rife']).register(z.globalRegistry, {
-      description:
-        'The model to use for frame interpolation. If None, no interpolation is applied.',
-    }),
-  ),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(40).register(z.globalRegistry, {
-        description:
-          'Number of inference steps for sampling. Higher values give better quality but take longer.',
-      }),
-    )
-    .default(27),
-  adjust_fps_for_interpolation: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If true, the number of frames per second will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If false, the passed frames per second will be used as-is.',
-      }),
-    )
-    .default(true),
-})
-
-/**
- * File
- */
-export const zFalAiWanV22A14bTextToVideoLoraFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * WanT2VResponse
- */
-export const zWanV22A14bTextToVideoLoraOutput = z.object({
-  prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The text prompt used for video generation.',
-      }),
-    )
-    .default(''),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiWanV22A14bTextToVideoLoraFile,
-})
-
-/**
- * WanDistillT2VRequest
- */
-export const zWanV225bTextToVideoDistillInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
-  }),
-  shift: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description: 'Shift value for the video. Must be between 1.0 and 10.0.',
-      }),
-    )
-    .default(5),
-  num_interpolated_frames: z
-    .optional(
-      z.int().gte(0).lte(4).register(z.globalRegistry, {
-        description:
-          'Number of frames to interpolate between each pair of generated frames. Must be between 0 and 4.',
-      }),
-    )
-    .default(0),
-  frames_per_second: z.optional(z.union([z.int().gte(4).lte(60), z.unknown()])),
-  guidance_scale: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description:
-          'Classifier-free guidance scale. Higher values give better adherence to the prompt but may decrease quality.',
-      }),
-    )
-    .default(1),
-  num_frames: z
-    .optional(
-      z.int().gte(17).lte(161).register(z.globalRegistry, {
-        description:
-          'Number of frames to generate. Must be between 17 to 161 (inclusive).',
-      }),
-    )
-    .default(81),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, input data will be checked for safety before processing.',
-      }),
-    )
-    .default(false),
-  video_write_mode: z.optional(
-    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
-      description:
-        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
-    }),
-  ),
-  resolution: z.optional(
-    z.enum(['580p', '720p']).register(z.globalRegistry, {
-      description: 'Resolution of the generated video (580p or 720p).',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
-    }),
-  ),
-  enable_output_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, output video will be checked for safety after generation.',
-      }),
-    )
-    .default(false),
-  video_quality: z.optional(
-    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
-      description:
-        'The quality of the output video. Higher quality means better visual quality but larger file size.',
-    }),
-  ),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
-      }),
-    )
-    .default(false),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
-  interpolator_model: z.optional(
-    z.enum(['none', 'film', 'rife']).register(z.globalRegistry, {
-      description:
-        'The model to use for frame interpolation. If None, no interpolation is applied.',
-    }),
-  ),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(50).register(z.globalRegistry, {
-        description:
-          'Number of inference steps for sampling. Higher values give better quality but take longer.',
-      }),
-    )
-    .default(40),
-  adjust_fps_for_interpolation: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If true, the number of frames per second will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If false, the passed frames per second will be used as-is.',
-      }),
-    )
-    .default(true),
-})
-
-/**
- * File
- */
-export const zFalAiWanV225bTextToVideoDistillFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * WanSmallT2VResponse
- */
-export const zWanV225bTextToVideoDistillOutput = z.object({
-  prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The text prompt used for video generation.',
-      }),
-    )
-    .default(''),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiWanV225bTextToVideoDistillFile,
-})
-
-/**
- * WanSmallFastVideoT2VRequest
- */
-export const zWanV225bTextToVideoFastWanInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
-  }),
-  num_interpolated_frames: z
-    .optional(
-      z.int().gte(0).lte(4).register(z.globalRegistry, {
-        description:
-          'Number of frames to interpolate between each pair of generated frames. Must be between 0 and 4.',
-      }),
-    )
-    .default(0),
-  frames_per_second: z.optional(z.union([z.int().gte(4).lte(60), z.unknown()])),
-  guidance_scale: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description:
-          'Classifier-free guidance scale. Higher values give better adherence to the prompt but may decrease quality.',
-      }),
-    )
-    .default(3.5),
-  num_frames: z
-    .optional(
-      z.int().gte(17).lte(161).register(z.globalRegistry, {
-        description:
-          'Number of frames to generate. Must be between 17 to 161 (inclusive).',
-      }),
-    )
-    .default(81),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, input data will be checked for safety before processing.',
-      }),
-    )
-    .default(false),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt for video generation.',
-      }),
-    )
-    .default(''),
-  video_write_mode: z.optional(
-    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
-      description:
-        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
-    }),
-  ),
-  resolution: z.optional(
-    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
-      description: 'Resolution of the generated video (580p or 720p).',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
-    }),
-  ),
-  enable_output_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, output video will be checked for safety after generation.',
-      }),
-    )
-    .default(false),
-  video_quality: z.optional(
-    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
-      description:
-        'The quality of the output video. Higher quality means better visual quality but larger file size.',
-    }),
-  ),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
-      }),
-    )
-    .default(false),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
-  interpolator_model: z.optional(
-    z.enum(['none', 'film', 'rife']).register(z.globalRegistry, {
-      description:
-        'The model to use for frame interpolation. If None, no interpolation is applied.',
-    }),
-  ),
-  adjust_fps_for_interpolation: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If true, the number of frames per second will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If false, the passed frames per second will be used as-is.',
-      }),
-    )
-    .default(true),
-})
-
-/**
- * File
- */
-export const zFalAiWanV225bTextToVideoFastWanFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * WanSmallFastVideoT2VResponse
- */
-export const zWanV225bTextToVideoFastWanOutput = z.object({
-  prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The text prompt used for video generation.',
-      }),
-    )
-    .default(''),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiWanV225bTextToVideoFastWanFile,
-})
-
-/**
- * WanTurboT2VRequest
- */
-export const zWanV22A14bTextToVideoTurboInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
-  }),
-  resolution: z.optional(
-    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
-      description: 'Resolution of the generated video (480p, 580p, or 720p).',
-    }),
-  ),
-  acceleration: z.optional(
-    z.enum(['none', 'regular']).register(z.globalRegistry, {
-      description:
-        "Acceleration level to use. The more acceleration, the faster the generation, but with lower quality. The recommended value is 'regular'.",
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
-    }),
-  ),
-  video_write_mode: z.optional(
-    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
-      description:
-        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
-    }),
-  ),
-  enable_output_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, output video will be checked for safety after generation.',
-      }),
-    )
-    .default(false),
-  video_quality: z.optional(
-    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
-      description:
-        'The quality of the output video. Higher quality means better visual quality but larger file size.',
-    }),
-  ),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, input data will be checked for safety before processing.',
-      }),
-    )
-    .default(false),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
-      }),
-    )
-    .default(false),
-})
-
-/**
- * File
- */
-export const zFalAiWanV22A14bTextToVideoTurboFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * WanTurboT2VResponse
- */
-export const zWanV22A14bTextToVideoTurboOutput = z.object({
-  prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The text prompt used for video generation.',
-      }),
-    )
-    .default(''),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiWanV22A14bTextToVideoTurboFile,
-})
-
-/**
- * WanSmallT2VRequest
- */
-export const zWanV225bTextToVideoInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
-  }),
-  shift: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description: 'Shift value for the video. Must be between 1.0 and 10.0.',
-      }),
-    )
-    .default(5),
-  num_interpolated_frames: z
-    .optional(
-      z.int().gte(0).lte(4).register(z.globalRegistry, {
-        description:
-          'Number of frames to interpolate between each pair of generated frames. Must be between 0 and 4.',
-      }),
-    )
-    .default(0),
-  frames_per_second: z.optional(z.union([z.int().gte(4).lte(60), z.unknown()])),
-  guidance_scale: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description:
-          'Classifier-free guidance scale. Higher values give better adherence to the prompt but may decrease quality.',
-      }),
-    )
-    .default(3.5),
-  num_frames: z
-    .optional(
-      z.int().gte(17).lte(161).register(z.globalRegistry, {
-        description:
-          'Number of frames to generate. Must be between 17 to 161 (inclusive).',
-      }),
-    )
-    .default(81),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, input data will be checked for safety before processing.',
-      }),
-    )
-    .default(false),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt for video generation.',
-      }),
-    )
-    .default(''),
-  video_write_mode: z.optional(
-    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
-      description:
-        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
-    }),
-  ),
-  resolution: z.optional(
-    z.enum(['580p', '720p']).register(z.globalRegistry, {
-      description: 'Resolution of the generated video (580p or 720p).',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
-    }),
-  ),
-  enable_output_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, output video will be checked for safety after generation.',
-      }),
-    )
-    .default(false),
-  video_quality: z.optional(
-    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
-      description:
-        'The quality of the output video. Higher quality means better visual quality but larger file size.',
-    }),
-  ),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
-      }),
-    )
-    .default(false),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
-  interpolator_model: z.optional(
-    z.enum(['none', 'film', 'rife']).register(z.globalRegistry, {
-      description:
-        'The model to use for frame interpolation. If None, no interpolation is applied.',
-    }),
-  ),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(50).register(z.globalRegistry, {
-        description:
-          'Number of inference steps for sampling. Higher values give better quality but take longer.',
-      }),
-    )
-    .default(40),
-  adjust_fps_for_interpolation: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If true, the number of frames per second will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If false, the passed frames per second will be used as-is.',
-      }),
-    )
-    .default(true),
-})
-
-/**
- * File
- */
-export const zFalAiWanV225bTextToVideoFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * WanSmallT2VResponse
- */
-export const zWanV225bTextToVideoOutput = z.object({
-  prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The text prompt used for video generation.',
-      }),
-    )
-    .default(''),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiWanV225bTextToVideoFile,
-})
-
-/**
- * WanT2VRequest
- */
-export const zWanV22A14bTextToVideoInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
-  }),
-  shift: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description: 'Shift value for the video. Must be between 1.0 and 10.0.',
-      }),
-    )
-    .default(5),
-  acceleration: z.optional(
-    z.enum(['none', 'regular']).register(z.globalRegistry, {
-      description:
-        "Acceleration level to use. The more acceleration, the faster the generation, but with lower quality. The recommended value is 'regular'.",
-    }),
-  ),
-  num_interpolated_frames: z
-    .optional(
-      z.int().gte(0).lte(4).register(z.globalRegistry, {
-        description:
-          'Number of frames to interpolate between each pair of generated frames. Must be between 0 and 4.',
-      }),
-    )
-    .default(1),
-  frames_per_second: z.optional(z.union([z.int().gte(4).lte(60), z.unknown()])),
-  guidance_scale: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description:
-          'Classifier-free guidance scale. Higher values give better adherence to the prompt but may decrease quality.',
-      }),
-    )
-    .default(3.5),
-  num_frames: z
-    .optional(
-      z.int().gte(17).lte(161).register(z.globalRegistry, {
-        description:
-          'Number of frames to generate. Must be between 17 to 161 (inclusive).',
-      }),
-    )
-    .default(81),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, input data will be checked for safety before processing.',
-      }),
-    )
-    .default(false),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt for video generation.',
-      }),
-    )
-    .default(''),
-  video_write_mode: z.optional(
-    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
-      description:
-        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
-    }),
-  ),
-  resolution: z.optional(
-    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
-      description: 'Resolution of the generated video (480p, 580p, or 720p).',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
-    }),
-  ),
-  enable_output_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, output video will be checked for safety after generation.',
-      }),
-    )
-    .default(false),
-  guidance_scale_2: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description:
-          'Guidance scale for the second stage of the model. This is used to control the adherence to the prompt in the second stage of the model.',
-      }),
-    )
-    .default(4),
-  video_quality: z.optional(
-    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
-      description:
-        'The quality of the output video. Higher quality means better visual quality but larger file size.',
-    }),
-  ),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether to enable prompt expansion. This will use a large language model to expand the prompt with additional details while maintaining the original meaning.',
-      }),
-    )
-    .default(false),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
-  interpolator_model: z.optional(
-    z.enum(['none', 'film', 'rife']).register(z.globalRegistry, {
-      description:
-        'The model to use for frame interpolation. If None, no interpolation is applied.',
-    }),
-  ),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(40).register(z.globalRegistry, {
-        description:
-          'Number of inference steps for sampling. Higher values give better quality but take longer.',
-      }),
-    )
-    .default(27),
-  adjust_fps_for_interpolation: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If true, the number of frames per second will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If false, the passed frames per second will be used as-is.',
-      }),
-    )
-    .default(true),
-})
-
-/**
- * File
- */
-export const zFalAiWanV22A14bTextToVideoFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * WanT2VResponse
- */
-export const zWanV22A14bTextToVideoOutput = z.object({
-  prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The text prompt used for video generation.',
-      }),
-    )
-    .default(''),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiWanV22A14bTextToVideoFile,
-})
-
-/**
- * LoRAWeight
- */
-export const zFalAiLtxv13B098DistilledLoRaWeight = z.object({
-  path: z.string().register(z.globalRegistry, {
-    description: 'URL or path to the LoRA weights.',
-  }),
-  scale: z
-    .optional(
-      z.number().gte(0).lte(4).register(z.globalRegistry, {
-        description:
-          'Scale of the LoRA weight. This is a multiplier applied to the LoRA weight when loading it.',
-      }),
-    )
-    .default(1),
-  weight_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'Name of the LoRA weight. Only used if `path` is a HuggingFace repository, and is only required when the repository contains multiple LoRA weights.',
-    }),
-  ),
-})
-
-/**
- * DistilledTextToVideoInput
- *
- * Distilled model input
- */
-export const zLtxv13B098DistilledInput = z
-  .object({
-    second_pass_skip_initial_steps: z
-      .optional(
-        z.int().gte(1).lte(11).register(z.globalRegistry, {
-          description:
-            'The number of inference steps to skip in the initial steps of the second pass. By skipping some steps at the beginning, the second pass can focus on smaller details instead of larger changes.',
-        }),
-      )
-      .default(5),
-    first_pass_num_inference_steps: z
-      .optional(
-        z.int().gte(2).lte(12).register(z.globalRegistry, {
-          description: 'Number of inference steps during the first pass.',
-        }),
-      )
-      .default(8),
-    frame_rate: z
-      .optional(
-        z.int().gte(1).lte(60).register(z.globalRegistry, {
-          description: 'The frame rate of the video.',
-        }),
-      )
-      .default(24),
-    reverse_video: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description: 'Whether to reverse the video.',
-        }),
-      )
-      .default(false),
-    prompt: z.string().register(z.globalRegistry, {
-      description: 'Text prompt to guide generation',
-    }),
-    expand_prompt: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description: 'Whether to expand the prompt using a language model.',
-        }),
-      )
-      .default(false),
-    temporal_adain_factor: z
-      .optional(
-        z.number().gte(0).lte(1).register(z.globalRegistry, {
-          description:
-            'The factor for adaptive instance normalization (AdaIN) applied to generated video chunks after the first. This can help deal with a gradual increase in saturation/contrast in the generated video by normalizing the color distribution across the video. A high value will ensure the color distribution is more consistent across the video, while a low value will allow for more variation in color distribution.',
-        }),
-      )
-      .default(0.5),
-    loras: z
-      .optional(
-        z
-          .array(zFalAiLtxv13B098DistilledLoRaWeight)
-          .register(z.globalRegistry, {
-            description: 'LoRA weights to use for generation',
-          }),
-      )
-      .default([]),
-    enable_safety_checker: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description: 'Whether to enable the safety checker.',
-        }),
-      )
-      .default(true),
-    num_frames: z
-      .optional(
-        z.int().gte(9).lte(1441).register(z.globalRegistry, {
-          description: 'The number of frames in the video.',
-        }),
-      )
-      .default(121),
-    second_pass_num_inference_steps: z
-      .optional(
-        z.int().gte(2).lte(12).register(z.globalRegistry, {
-          description: 'Number of inference steps during the second pass.',
-        }),
-      )
-      .default(8),
-    negative_prompt: z
-      .optional(
-        z.string().register(z.globalRegistry, {
-          description: 'Negative prompt for generation',
-        }),
-      )
-      .default(
-        'worst quality, inconsistent motion, blurry, jittery, distorted',
-      ),
-    enable_detail_pass: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description:
-            'Whether to use a detail pass. If True, the model will perform a second pass to refine the video and enhance details. This incurs a 2.0x cost multiplier on the base price.',
-        }),
-      )
-      .default(false),
-    resolution: z.optional(
-      z.enum(['480p', '720p']).register(z.globalRegistry, {
-        description: 'Resolution of the generated video.',
-      }),
-    ),
-    aspect_ratio: z.optional(
-      z.enum(['9:16', '1:1', '16:9']).register(z.globalRegistry, {
-        description: 'Aspect ratio of the generated video.',
-      }),
-    ),
-    tone_map_compression_ratio: z
-      .optional(
-        z.number().gte(0).lte(1).register(z.globalRegistry, {
-          description:
-            'The compression ratio for tone mapping. This is used to compress the dynamic range of the video to improve visual quality. A value of 0.0 means no compression, while a value of 1.0 means maximum compression.',
-        }),
-      )
-      .default(0),
-    seed: z.optional(
-      z.int().register(z.globalRegistry, {
-        description: 'Random seed for generation',
-      }),
-    ),
-  })
-  .register(z.globalRegistry, {
-    description: 'Distilled model input',
-  })
-
-/**
- * File
- */
-export const zFalAiLtxv13B098DistilledFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * TextToVideoOutput
- */
-export const zLtxv13B098DistilledOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for generation.',
-  }),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiLtxv13B098DistilledFile,
-})
-
-/**
- * ProTextToVideoHailuo02Input
- */
-export const zMinimaxHailuo02ProTextToVideoInput = z.object({
-  prompt_optimizer: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: "Whether to use the model's prompt optimizer",
-      }),
-    )
-    .default(true),
-  prompt: z.string().min(1).max(2000),
-})
-
-/**
- * File
- */
-export const zFalAiMinimaxHailuo02ProTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * TextToVideoHailuo02Output
- */
-export const zMinimaxHailuo02ProTextToVideoOutput = z.object({
-  video: zFalAiMinimaxHailuo02ProTextToVideoFile,
-})
-
-/**
- * SeedanceProTextToVideoInput
- */
-export const zBytedanceSeedanceV1ProTextToVideoInput = z.object({
+export const zSchemaBytedanceSeedanceV1ProFastTextToVideoInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt used to generate the video',
   }),
@@ -5262,70 +5572,1071 @@ export const zBytedanceSeedanceV1ProTextToVideoInput = z.object({
 })
 
 /**
- * File
+ * ProTextToVideoHailuo23Output
  */
-export const zFalAiBytedanceSeedanceV1ProTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+export const zSchemaMinimaxHailuo23ProTextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * ProTextToVideoHailuo23Input
+ */
+export const zSchemaMinimaxHailuo23ProTextToVideoInput = z.object({
+  prompt_optimizer: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: "Whether to use the model's prompt optimizer",
+      }),
+    )
+    .default(true),
+  prompt: z.string().min(1).max(2000).register(z.globalRegistry, {
+    description: 'Text prompt for video generation',
   }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
+})
+
+/**
+ * StandardTextToVideoHailuo23Output
+ */
+export const zSchemaMinimaxHailuo23StandardTextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * StandardTextToVideoHailuo23Input
+ */
+export const zSchemaMinimaxHailuo23StandardTextToVideoInput = z.object({
+  prompt_optimizer: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: "Whether to use the model's prompt optimizer",
+      }),
+    )
+    .default(true),
+  duration: z.optional(
+    z.enum(['6', '10']).register(z.globalRegistry, {
+      description: 'The duration of the video in seconds.',
+    }),
+  ),
+  prompt: z.string().min(1).max(2000),
+})
+
+/**
+ * LongCatVideoResponse
+ */
+export const zSchemaLongcatVideoDistilledTextToVideo480pOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for generation.',
+  }),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * LongCatVideoRequest
+ */
+export const zSchemaLongcatVideoDistilledTextToVideo480pInput = z.object({
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description: 'The write mode of the generated video.',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video.',
+    }),
+  ),
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to guide the video generation.',
+  }),
+  video_output_type: z.optional(
+    z
+      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+      .register(z.globalRegistry, {
+        description: 'The output type of the generated video.',
+      }),
+  ),
+  fps: z
+    .optional(
+      z.int().gte(1).lte(60).register(z.globalRegistry, {
+        description: 'The frame rate of the generated video.',
+      }),
+    )
+    .default(15),
+  sync_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      }),
+    )
+    .default(false),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description: 'The quality of the generated video.',
+    }),
+  ),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable safety checker.',
+      }),
+    )
+    .default(true),
+  num_frames: z
+    .optional(
+      z.int().gte(17).lte(961).register(z.globalRegistry, {
+        description: 'The number of frames to generate.',
+      }),
+    )
+    .default(162),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(2).lte(16).register(z.globalRegistry, {
+        description: 'The number of inference steps to use.',
+      }),
+    )
+    .default(12),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The seed for the random number generator.',
+    }),
+  ),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable prompt expansion.',
+      }),
+    )
+    .default(false),
+})
+
+/**
+ * LongCatVideoResponse
+ */
+export const zSchemaLongcatVideoDistilledTextToVideo720pOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for generation.',
+  }),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * LongCat720PVideoRequest
+ */
+export const zSchemaLongcatVideoDistilledTextToVideo720pInput = z.object({
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description: 'The write mode of the generated video.',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video.',
+    }),
+  ),
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to guide the video generation.',
+  }),
+  video_output_type: z.optional(
+    z
+      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+      .register(z.globalRegistry, {
+        description: 'The output type of the generated video.',
+      }),
+  ),
+  fps: z
+    .optional(
+      z.int().gte(1).lte(60).register(z.globalRegistry, {
+        description: 'The frame rate of the generated video.',
+      }),
+    )
+    .default(30),
+  sync_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      }),
+    )
+    .default(false),
+  num_refine_inference_steps: z
+    .optional(
+      z.int().gte(2).lte(16).register(z.globalRegistry, {
+        description: 'The number of inference steps to use for refinement.',
+      }),
+    )
+    .default(12),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description: 'The quality of the generated video.',
+    }),
+  ),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable safety checker.',
+      }),
+    )
+    .default(true),
+  num_frames: z
+    .optional(
+      z.int().gte(17).lte(961).register(z.globalRegistry, {
+        description: 'The number of frames to generate.',
+      }),
+    )
+    .default(162),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(2).lte(16).register(z.globalRegistry, {
+        description: 'The number of inference steps to use.',
+      }),
+    )
+    .default(12),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The seed for the random number generator.',
+    }),
+  ),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable prompt expansion.',
+      }),
+    )
+    .default(false),
+})
+
+/**
+ * LongCatVideoResponse
+ */
+export const zSchemaLongcatVideoTextToVideo480pOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for generation.',
+  }),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * LongCatCFGVideoRequest
+ */
+export const zSchemaLongcatVideoTextToVideo480pInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to guide the video generation.',
+  }),
+  acceleration: z.optional(
+    z.enum(['none', 'regular']).register(z.globalRegistry, {
+      description: 'The acceleration level to use for the video generation.',
+    }),
+  ),
+  fps: z
+    .optional(
+      z.int().gte(1).lte(60).register(z.globalRegistry, {
+        description: 'The frame rate of the generated video.',
+      }),
+    )
+    .default(15),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description: 'The guidance scale to use for the video generation.',
+      }),
+    )
+    .default(4),
+  num_frames: z
+    .optional(
+      z.int().gte(17).lte(961).register(z.globalRegistry, {
+        description: 'The number of frames to generate.',
+      }),
+    )
+    .default(162),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable safety checker.',
+      }),
+    )
+    .default(true),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The negative prompt to use for the video generation.',
+      }),
+    )
+    .default(
+      'Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
+    ),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description: 'The write mode of the generated video.',
+    }),
+  ),
+  video_output_type: z.optional(
+    z
+      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+      .register(z.globalRegistry, {
+        description: 'The output type of the generated video.',
+      }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video.',
+    }),
+  ),
+  sync_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      }),
+    )
+    .default(false),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description: 'The quality of the generated video.',
+    }),
+  ),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable prompt expansion.',
+      }),
+    )
+    .default(false),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The seed for the random number generator.',
+    }),
+  ),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(8).lte(50).register(z.globalRegistry, {
+        description:
+          'The number of inference steps to use for the video generation.',
+      }),
+    )
+    .default(40),
+})
+
+/**
+ * LongCatVideoResponse
+ */
+export const zSchemaLongcatVideoTextToVideo720pOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for generation.',
+  }),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * LongCat720PCFGVideoRequest
+ */
+export const zSchemaLongcatVideoTextToVideo720pInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to guide the video generation.',
+  }),
+  acceleration: z.optional(
+    z.enum(['none', 'regular']).register(z.globalRegistry, {
+      description: 'The acceleration level to use for the video generation.',
+    }),
+  ),
+  fps: z
+    .optional(
+      z.int().gte(1).lte(60).register(z.globalRegistry, {
+        description: 'The frame rate of the generated video.',
+      }),
+    )
+    .default(30),
+  num_refine_inference_steps: z
+    .optional(
+      z.int().gte(8).lte(50).register(z.globalRegistry, {
+        description: 'The number of inference steps to use for refinement.',
+      }),
+    )
+    .default(40),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description: 'The guidance scale to use for the video generation.',
+      }),
+    )
+    .default(4),
+  num_frames: z
+    .optional(
+      z.int().gte(17).lte(961).register(z.globalRegistry, {
+        description: 'The number of frames to generate.',
+      }),
+    )
+    .default(162),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable safety checker.',
+      }),
+    )
+    .default(true),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The negative prompt to use for the video generation.',
+      }),
+    )
+    .default(
+      'Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
+    ),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description: 'The write mode of the generated video.',
+    }),
+  ),
+  video_output_type: z.optional(
+    z
+      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+      .register(z.globalRegistry, {
+        description: 'The output type of the generated video.',
+      }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video.',
+    }),
+  ),
+  sync_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      }),
+    )
+    .default(false),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description: 'The quality of the generated video.',
+    }),
+  ),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable prompt expansion.',
+      }),
+    )
+    .default(false),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(8).lte(50).register(z.globalRegistry, {
+        description:
+          'The number of inference steps to use for the video generation.',
+      }),
+    )
+    .default(40),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The seed for the random number generator.',
     }),
   ),
 })
 
 /**
- * SeedanceProT2VVideoOutput
+ * SanaVideoOutput
  */
-export const zBytedanceSeedanceV1ProTextToVideoOutput = z.object({
+export const zSchemaSanaVideoOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The random seed used for the generation process',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * SanaVideoInput
+ */
+export const zSchemaSanaVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt describing the video to generate',
+  }),
+  resolution: z.optional(
+    z.enum(['480p']).register(z.globalRegistry, {
+      description: 'The resolution of the output video',
+    }),
+  ),
+  fps: z
+    .optional(
+      z.int().gte(8).lte(30).register(z.globalRegistry, {
+        description: 'Frames per second for the output video',
+      }),
+    )
+    .default(16),
+  motion_score: z
+    .optional(
+      z.int().gte(0).lte(100).register(z.globalRegistry, {
+        description: 'Motion intensity score (higher = more motion)',
+      }),
+    )
+    .default(30),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(20).register(z.globalRegistry, {
+        description:
+          'Guidance scale for generation (higher = more prompt adherence)',
+      }),
+    )
+    .default(6),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(1).lte(50).register(z.globalRegistry, {
+        description: 'Number of denoising steps',
+      }),
+    )
+    .default(28),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        'Random seed for reproducible generation. If not provided, a random seed will be used.',
+    }),
+  ),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description:
+          'The negative prompt describing what to avoid in the generation',
+      }),
+    )
+    .default(
+      'A chaotic sequence with misshapen, deformed limbs in heavy motion blur, sudden disappearance, jump cuts, jerky movements, rapid shot changes, frames out of sync, inconsistent character shapes, temporal artifacts, jitter, and ghosting effects, creating a disorienting visual experience.',
+    ),
+  num_frames: z
+    .optional(
+      z.int().gte(16).lte(200).register(z.globalRegistry, {
+        description: 'Number of frames to generate',
+      }),
+    )
+    .default(81),
+})
+
+/**
+ * GenerationOutput
+ *
+ * Output model for text-to-video generation
+ */
+export const zSchemaInfinityStarTextToVideoOutput = z
+  .object({
+    video: zSchemaFile,
+  })
+  .register(z.globalRegistry, {
+    description: 'Output model for text-to-video generation',
+  })
+
+/**
+ * GenerationInput
+ *
+ * Input model for text-to-video generation
+ */
+export const zSchemaInfinityStarTextToVideoInput = z
+  .object({
+    prompt: z.string().register(z.globalRegistry, {
+      description: 'Text prompt for generating the video',
+    }),
+    aspect_ratio: z.optional(
+      z.enum(['16:9', '1:1', '9:16']).register(z.globalRegistry, {
+        description: 'Aspect ratio of the generated output',
+      }),
+    ),
+    enhance_prompt: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether to use an LLM to enhance the prompt.',
+        }),
+      )
+      .default(true),
+    use_apg: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether to use APG',
+        }),
+      )
+      .default(true),
+    guidance_scale: z
+      .optional(
+        z.number().gte(1).lte(40).register(z.globalRegistry, {
+          description: 'Guidance scale for generation',
+        }),
+      )
+      .default(7.5),
+    num_inference_steps: z
+      .optional(
+        z.int().gte(1).lte(100).register(z.globalRegistry, {
+          description: 'Number of inference steps',
+        }),
+      )
+      .default(50),
+    seed: z.optional(
+      z.int().register(z.globalRegistry, {
+        description:
+          'Random seed for reproducibility. Leave empty for random generation.',
+      }),
+    ),
+    negative_prompt: z
+      .optional(
+        z.string().register(z.globalRegistry, {
+          description: 'Negative prompt to guide what to avoid in generation',
+        }),
+      )
+      .default(''),
+    tau_video: z
+      .optional(
+        z.number().gte(0.1).lte(1).register(z.globalRegistry, {
+          description: 'Tau value for video scale',
+        }),
+      )
+      .default(0.4),
+  })
+  .register(z.globalRegistry, {
+    description: 'Input model for text-to-video generation',
+  })
+
+/**
+ * HunyuanVideo15Response
+ */
+export const zSchemaHunyuanVideoV15TextToVideoOutput = z.object({
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for generation.',
+  }),
+  video: zSchemaFile,
+})
+
+/**
+ * HunyuanVideo15T2VRequest
+ */
+export const zSchemaHunyuanVideoV15TextToVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video.',
+  }),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the video.',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['480p']).register(z.globalRegistry, {
+      description: 'The resolution of the video.',
+    }),
+  ),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Enable prompt expansion to enhance the input prompt.',
+      }),
+    )
+    .default(true),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'Random seed for reproducibility.',
+    }),
+  ),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(1).lte(50).register(z.globalRegistry, {
+        description: 'The number of inference steps.',
+      }),
+    )
+    .default(28),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The negative prompt to guide what not to generate.',
+      }),
+    )
+    .default(''),
+  num_frames: z
+    .optional(
+      z.int().gte(1).lte(121).register(z.globalRegistry, {
+        description: 'The number of frames to generate.',
+      }),
+    )
+    .default(121),
+})
+
+/**
+ * LTXVTextToVideoResponse
+ */
+export const zSchemaLtx2TextToVideoOutput = z.object({
+  video: zSchemaVideoFile,
+})
+
+/**
+ * LTXVTextToVideoRequest
+ */
+export const zSchemaLtx2TextToVideoInput = z.object({
+  prompt: z.string().min(1).max(5000).register(z.globalRegistry, {
+    description: 'The prompt to generate the video from',
+  }),
+  aspect_ratio: z.optional(
+    z.enum(['16:9']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video',
+    }),
+  ),
+  duration: z.optional(
+    z
+      .union([z.literal(6), z.literal(8), z.literal(10)])
+      .register(z.globalRegistry, {
+        description: 'The duration of the generated video in seconds',
+      }),
+  ),
+  generate_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to generate audio for the generated video',
+      }),
+    )
+    .default(true),
+  resolution: z.optional(
+    z.enum(['1080p', '1440p', '2160p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video',
+    }),
+  ),
+  fps: z.optional(
+    z.union([z.literal(25), z.literal(50)]).register(z.globalRegistry, {
+      description: 'The frames per second of the generated video',
+    }),
+  ),
+})
+
+/**
+ * LTXVTextToVideoResponse
+ */
+export const zSchemaLtx2TextToVideoFastOutput = z.object({
+  video: zSchemaVideoFile,
+})
+
+/**
+ * LTXVTextToVideoFastRequest
+ */
+export const zSchemaLtx2TextToVideoFastInput = z.object({
+  prompt: z.string().min(1).max(5000).register(z.globalRegistry, {
+    description: 'The prompt to generate the video from',
+  }),
+  aspect_ratio: z.optional(
+    z.enum(['16:9']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video',
+    }),
+  ),
+  duration: z.optional(
+    z
+      .union([
+        z.literal(6),
+        z.literal(8),
+        z.literal(10),
+        z.literal(12),
+        z.literal(14),
+        z.literal(16),
+        z.literal(18),
+        z.literal(20),
+      ])
+      .register(z.globalRegistry, {
+        description:
+          'The duration of the generated video in seconds. The fast model supports 6-20 seconds. Note: Durations longer than 10 seconds (12, 14, 16, 18, 20) are only supported with 25 FPS and 1080p resolution.',
+      }),
+  ),
+  generate_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to generate audio for the generated video',
+      }),
+    )
+    .default(true),
+  resolution: z.optional(
+    z.enum(['1080p', '1440p', '2160p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video',
+    }),
+  ),
+  fps: z.optional(
+    z.union([z.literal(25), z.literal(50)]).register(z.globalRegistry, {
+      description: 'The frames per second of the generated video',
+    }),
+  ),
+})
+
+/**
+ * VideoOutputV5_5
+ */
+export const zSchemaPixverseV55TextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoRequestV5_5
+ */
+export const zSchemaPixverseV55TextToVideoInput = z.object({
+  prompt: z.string(),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['360p', '540p', '720p', '1080p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video',
+    }),
+  ),
+  style: z.optional(
+    z
+      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
+      .register(z.globalRegistry, {
+        description: 'The style of the generated video',
+      }),
+  ),
+  thinking_type: z.optional(
+    z.enum(['enabled', 'disabled', 'auto']).register(z.globalRegistry, {
+      description:
+        "Prompt optimization mode: 'enabled' to optimize, 'disabled' to turn off, 'auto' for model decision",
+    }),
+  ),
+  generate_multi_clip_switch: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Enable multi-clip generation with dynamic camera changes',
+      }),
+    )
+    .default(false),
+  duration: z.optional(
+    z.enum(['5', '8', '10']).register(z.globalRegistry, {
+      description:
+        'The duration of the generated video in seconds. Longer durations cost more. 1080p videos are limited to 5 or 8 seconds',
+    }),
+  ),
+  generate_audio_switch: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Enable audio generation (BGM, SFX, dialogue)',
+      }),
+    )
+    .default(false),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
+    }),
+  ),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt to be used for the generation',
+      }),
+    )
+    .default(''),
+})
+
+/**
+ * TextToVideoV26ProOutput
+ */
+export const zSchemaKlingVideoV26ProTextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoV26ProRequest
+ */
+export const zSchemaKlingVideoV26ProTextToVideoInput = z.object({
+  prompt: z.string().max(2500),
+  duration: z.optional(
+    z.enum(['5', '10']).register(z.globalRegistry, {
+      description: 'The duration of the generated video in seconds',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video frame',
+    }),
+  ),
+  generate_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to generate native audio for the video. Supports Chinese and English voice output. Other languages are automatically translated to English. For English speech, use lowercase letters; for acronyms or proper nouns, use uppercase.',
+      }),
+    )
+    .default(true),
+  negative_prompt: z
+    .optional(z.string().max(2500))
+    .default('blur, distort, and low quality'),
+  cfg_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
+      }),
+    )
+    .default(0.5),
+})
+
+/**
+ * FabricOneTextOutput
+ */
+export const zSchemaFabric10TextOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * FabricOneTextInput
+ */
+export const zSchemaFabric10TextInput = z.object({
+  text: z.string().min(1).max(2000),
+  resolution: z.enum(['720p', '480p']).register(z.globalRegistry, {
+    description: 'Resolution',
+  }),
+  voice_description: z.optional(z.union([z.string(), z.unknown()])),
+  image_url: z.url().min(1).max(2083),
+})
+
+/**
+ * TextToVideoOutput
+ *
+ * Output for text-to-video generation
+ */
+export const zSchemaV26TextToVideoOutput = z
+  .object({
+    actual_prompt: z.optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The actual prompt used if prompt rewriting was enabled',
+      }),
+    ),
+    seed: z.int().register(z.globalRegistry, {
+      description: 'The seed used for generation',
+    }),
+    video: zSchemaVideoFile,
+  })
+  .register(z.globalRegistry, {
+    description: 'Output for text-to-video generation',
+  })
+
+/**
+ * TextToVideoInput
+ *
+ * Input for Wan 2.6 text-to-video generation
+ */
+export const zSchemaV26TextToVideoInput = z
+  .object({
+    prompt: z.string().min(1).register(z.globalRegistry, {
+      description:
+        "The text prompt for video generation. Supports Chinese and English, max 800 characters. For multi-shot videos, use format: 'Overall description. First shot [0-3s] content. Second shot [3-5s] content.'",
+    }),
+    aspect_ratio: z.optional(
+      z.enum(['16:9', '9:16', '1:1', '4:3', '3:4']).register(z.globalRegistry, {
+        description:
+          'The aspect ratio of the generated video. Wan 2.6 supports additional ratios.',
+      }),
+    ),
+    resolution: z.optional(
+      z.enum(['720p', '1080p']).register(z.globalRegistry, {
+        description:
+          'Video resolution tier. Wan 2.6 T2V only supports 720p and 1080p (no 480p).',
+      }),
+    ),
+    duration: z.optional(
+      z.enum(['5', '10', '15']).register(z.globalRegistry, {
+        description:
+          'Duration of the generated video in seconds. Choose between 5, 10, or 15 seconds.',
+      }),
+    ),
+    enable_safety_checker: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'If set to true, the safety checker will be enabled.',
+        }),
+      )
+      .default(true),
+    audio_url: z.optional(
+      z.string().register(z.globalRegistry, {
+        description:
+          '\nURL of the audio to use as the background music. Must be publicly accessible.\nLimit handling: If the audio duration exceeds the duration value (5, 10, or 15 seconds),\nthe audio is truncated to the first N seconds, and the rest is discarded. If\nthe audio is shorter than the video, the remaining part of the video will be silent.\nFor example, if the audio is 3 seconds long and the video duration is 5 seconds, the\nfirst 3 seconds of the output video will have sound, and the last 2 seconds will be silent.\n- Format: WAV, MP3.\n- Duration: 3 to 30 s.\n- File size: Up to 15 MB.\n',
+      }),
+    ),
+    seed: z.optional(
+      z.int().register(z.globalRegistry, {
+        description:
+          'Random seed for reproducibility. If None, a random seed is chosen.',
+      }),
+    ),
+    multi_shots: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description:
+            'When true, enables intelligent multi-shot segmentation for coherent narrative videos. Only active when enable_prompt_expansion is True. Set to false for single-shot generation.',
+        }),
+      )
+      .default(true),
+    negative_prompt: z
+      .optional(
+        z.string().register(z.globalRegistry, {
+          description:
+            'Negative prompt to describe content to avoid. Max 500 characters.',
+        }),
+      )
+      .default(''),
+    enable_prompt_expansion: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description:
+            'Whether to enable prompt rewriting using LLM. Improves results for short prompts but increases processing time.',
+        }),
+      )
+      .default(true),
+  })
+  .register(z.globalRegistry, {
+    description: 'Input for Wan 2.6 text-to-video generation',
+  })
+
+/**
+ * SeedanceProv15T2VVideoOutput
+ */
+export const zSchemaBytedanceSeedanceV15ProTextToVideoOutput = z.object({
   seed: z.int().register(z.globalRegistry, {
     description: 'Seed used for generation',
   }),
-  video: zFalAiBytedanceSeedanceV1ProTextToVideoFile,
+  video: zSchemaFile,
 })
 
 /**
- * SeedanceTextToVideoInput
+ * SeedanceProv15TextToVideoInput
  */
-export const zBytedanceSeedanceV1LiteTextToVideoInput = z.object({
+export const zSchemaBytedanceSeedanceV15ProTextToVideoInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt used to generate the video',
   }),
   resolution: z.optional(
     z.enum(['480p', '720p', '1080p']).register(z.globalRegistry, {
       description:
-        'Video resolution - 480p for faster generation, 720p for higher quality',
+        'Video resolution - 480p for faster generation, 720p for balance, 1080p for higher quality',
     }),
-  ),
-  duration: z.optional(
-    z
-      .enum(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'])
-      .register(z.globalRegistry, {
-        description: 'Duration of the video in seconds',
-      }),
   ),
   aspect_ratio: z.optional(
     z
-      .enum(['21:9', '16:9', '4:3', '1:1', '3:4', '9:16', '9:21'])
+      .enum(['21:9', '16:9', '4:3', '1:1', '3:4', '9:16'])
       .register(z.globalRegistry, {
         description: 'The aspect ratio of the generated video',
+      }),
+  ),
+  generate_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to generate audio for the video',
+      }),
+    )
+    .default(true),
+  duration: z.optional(
+    z
+      .enum(['4', '5', '6', '7', '8', '9', '10', '11', '12'])
+      .register(z.globalRegistry, {
+        description: 'Duration of the video in seconds',
       }),
   ),
   enable_safety_checker: z
@@ -5335,12 +6646,6 @@ export const zBytedanceSeedanceV1LiteTextToVideoInput = z.object({
       }),
     )
     .default(true),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        'Random seed to control video generation. Use -1 for random.',
-    }),
-  ),
   camera_fixed: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -5348,3166 +6653,125 @@ export const zBytedanceSeedanceV1LiteTextToVideoInput = z.object({
       }),
     )
     .default(false),
-})
-
-/**
- * File
- */
-export const zFalAiBytedanceSeedanceV1LiteTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * SeedanceVideoOutput
- */
-export const zBytedanceSeedanceV1LiteTextToVideoOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'Seed used for generation',
-  }),
-  video: zFalAiBytedanceSeedanceV1LiteTextToVideoFile,
-})
-
-/**
- * TextToVideoV21MasterRequest
- */
-export const zKlingVideoV21MasterTextToVideoInput = z.object({
-  prompt: z.string().max(2500),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video frame',
-    }),
-  ),
-  duration: z.optional(
-    z.enum(['5', '10']).register(z.globalRegistry, {
-      description: 'The duration of the generated video in seconds',
-    }),
-  ),
-  negative_prompt: z
-    .optional(z.string().max(2500))
-    .default('blur, distort, and low quality'),
-  cfg_scale: z
-    .optional(
-      z.number().gte(0).lte(1).register(z.globalRegistry, {
-        description:
-          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
-      }),
-    )
-    .default(0.5),
-})
-
-/**
- * File
- */
-export const zFalAiKlingVideoV21MasterTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * TextToVideoV21MasterOutput
- */
-export const zKlingVideoV21MasterTextToVideoOutput = z.object({
-  video: zFalAiKlingVideoV21MasterTextToVideoFile,
-})
-
-/**
- * Text2VideoInput
- */
-export const zVeedAvatarsTextToVideoAvatarsTextToVideoInput = z.object({
-  text: z.string(),
-  avatar_id: z
-    .enum([
-      'emily_vertical_primary',
-      'emily_vertical_secondary',
-      'marcus_vertical_primary',
-      'marcus_vertical_secondary',
-      'mira_vertical_primary',
-      'mira_vertical_secondary',
-      'jasmine_vertical_primary',
-      'jasmine_vertical_secondary',
-      'jasmine_vertical_walking',
-      'aisha_vertical_walking',
-      'elena_vertical_primary',
-      'elena_vertical_secondary',
-      'any_male_vertical_primary',
-      'any_female_vertical_primary',
-      'any_male_vertical_secondary',
-      'any_female_vertical_secondary',
-      'any_female_vertical_walking',
-      'emily_primary',
-      'emily_side',
-      'marcus_primary',
-      'marcus_side',
-      'aisha_walking',
-      'elena_primary',
-      'elena_side',
-      'any_male_primary',
-      'any_female_primary',
-      'any_male_side',
-      'any_female_side',
-    ])
-    .register(z.globalRegistry, {
-      description: 'The avatar to use for the video',
-    }),
-})
-
-/**
- * File
- */
-export const zVeedAvatarsTextToVideoFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * AvatarsAppOutput
- */
-export const zVeedAvatarsTextToVideoAvatarsTextToVideoOutput = z.object({
-  video: zVeedAvatarsTextToVideoFile,
-})
-
-/**
- * LoRAWeight
- */
-export const zFalAiLtxVideo13bDevLoRaWeight = z.object({
-  path: z.string().register(z.globalRegistry, {
-    description: 'URL or path to the LoRA weights.',
-  }),
-  scale: z
-    .optional(
-      z.number().gte(0).lte(4).register(z.globalRegistry, {
-        description:
-          'Scale of the LoRA weight. This is a multiplier applied to the LoRA weight when loading it.',
-      }),
-    )
-    .default(1),
-  weight_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'Name of the LoRA weight. Only used if `path` is a HuggingFace repository, and is only required when the repository contains multiple LoRA weights.',
-    }),
-  ),
-})
-
-/**
- * TextToVideoInput
- */
-export const zLtxVideo13bDevInput = z.object({
-  second_pass_skip_initial_steps: z
-    .optional(
-      z.int().gte(1).lte(50).register(z.globalRegistry, {
-        description:
-          'The number of inference steps to skip in the initial steps of the second pass. By skipping some steps at the beginning, the second pass can focus on smaller details instead of larger changes.',
-      }),
-    )
-    .default(17),
-  first_pass_num_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(50).register(z.globalRegistry, {
-        description: 'Number of inference steps during the first pass.',
-      }),
-    )
-    .default(30),
-  frame_rate: z
-    .optional(
-      z.int().gte(1).lte(60).register(z.globalRegistry, {
-        description: 'The frame rate of the video.',
-      }),
-    )
-    .default(30),
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'Text prompt to guide generation',
-  }),
-  reverse_video: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to reverse the video.',
-      }),
-    )
-    .default(false),
-  expand_prompt: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to expand the prompt using a language model.',
-      }),
-    )
-    .default(false),
-  loras: z
-    .optional(
-      z.array(zFalAiLtxVideo13bDevLoRaWeight).register(z.globalRegistry, {
-        description: 'LoRA weights to use for generation',
-      }),
-    )
-    .default([]),
-  second_pass_num_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(50).register(z.globalRegistry, {
-        description: 'Number of inference steps during the second pass.',
-      }),
-    )
-    .default(30),
-  num_frames: z
-    .optional(
-      z.int().gte(9).lte(161).register(z.globalRegistry, {
-        description: 'The number of frames in the video.',
-      }),
-    )
-    .default(121),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable the safety checker.',
-      }),
-    )
-    .default(true),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt for generation',
-      }),
-    )
-    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
-  resolution: z.optional(
-    z.enum(['480p', '720p']).register(z.globalRegistry, {
-      description: 'Resolution of the generated video (480p or 720p).',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['9:16', '1:1', '16:9']).register(z.globalRegistry, {
-      description: 'Aspect ratio of the generated video (16:9, 1:1 or 9:16).',
-    }),
-  ),
-  first_pass_skip_final_steps: z
-    .optional(
-      z.int().gte(0).lte(50).register(z.globalRegistry, {
-        description:
-          'Number of inference steps to skip in the final steps of the first pass. By skipping some steps at the end, the first pass can focus on larger changes instead of smaller details.',
-      }),
-    )
-    .default(3),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'Random seed for generation',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiLtxVideo13bDevFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * TextToVideoOutput
- */
-export const zLtxVideo13bDevOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for generation.',
-  }),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiLtxVideo13bDevFile,
-})
-
-/**
- * LoRAWeight
- */
-export const zFalAiLtxVideo13bDistilledLoRaWeight = z.object({
-  path: z.string().register(z.globalRegistry, {
-    description: 'URL or path to the LoRA weights.',
-  }),
-  scale: z
-    .optional(
-      z.number().gte(0).lte(4).register(z.globalRegistry, {
-        description:
-          'Scale of the LoRA weight. This is a multiplier applied to the LoRA weight when loading it.',
-      }),
-    )
-    .default(1),
-  weight_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'Name of the LoRA weight. Only used if `path` is a HuggingFace repository, and is only required when the repository contains multiple LoRA weights.',
-    }),
-  ),
-})
-
-/**
- * DistilledTextToVideoInput
- *
- * Distilled model input
- */
-export const zLtxVideo13bDistilledInput = z
-  .object({
-    second_pass_skip_initial_steps: z
-      .optional(
-        z.int().gte(1).lte(20).register(z.globalRegistry, {
-          description:
-            'The number of inference steps to skip in the initial steps of the second pass. By skipping some steps at the beginning, the second pass can focus on smaller details instead of larger changes.',
-        }),
-      )
-      .default(5),
-    first_pass_num_inference_steps: z
-      .optional(
-        z.int().gte(2).lte(20).register(z.globalRegistry, {
-          description: 'Number of inference steps during the first pass.',
-        }),
-      )
-      .default(8),
-    frame_rate: z
-      .optional(
-        z.int().gte(1).lte(60).register(z.globalRegistry, {
-          description: 'The frame rate of the video.',
-        }),
-      )
-      .default(30),
-    reverse_video: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description: 'Whether to reverse the video.',
-        }),
-      )
-      .default(false),
-    prompt: z.string().register(z.globalRegistry, {
-      description: 'Text prompt to guide generation',
-    }),
-    expand_prompt: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description: 'Whether to expand the prompt using a language model.',
-        }),
-      )
-      .default(false),
-    loras: z
-      .optional(
-        z
-          .array(zFalAiLtxVideo13bDistilledLoRaWeight)
-          .register(z.globalRegistry, {
-            description: 'LoRA weights to use for generation',
-          }),
-      )
-      .default([]),
-    enable_safety_checker: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description: 'Whether to enable the safety checker.',
-        }),
-      )
-      .default(true),
-    num_frames: z
-      .optional(
-        z.int().gte(9).lte(161).register(z.globalRegistry, {
-          description: 'The number of frames in the video.',
-        }),
-      )
-      .default(121),
-    second_pass_num_inference_steps: z
-      .optional(
-        z.int().gte(2).lte(20).register(z.globalRegistry, {
-          description: 'Number of inference steps during the second pass.',
-        }),
-      )
-      .default(8),
-    negative_prompt: z
-      .optional(
-        z.string().register(z.globalRegistry, {
-          description: 'Negative prompt for generation',
-        }),
-      )
-      .default(
-        'worst quality, inconsistent motion, blurry, jittery, distorted',
-      ),
-    resolution: z.optional(
-      z.enum(['480p', '720p']).register(z.globalRegistry, {
-        description: 'Resolution of the generated video (480p or 720p).',
-      }),
-    ),
-    aspect_ratio: z.optional(
-      z.enum(['9:16', '1:1', '16:9']).register(z.globalRegistry, {
-        description: 'Aspect ratio of the generated video (16:9, 1:1 or 9:16).',
-      }),
-    ),
-    first_pass_skip_final_steps: z
-      .optional(
-        z.int().gte(0).lte(20).register(z.globalRegistry, {
-          description:
-            'Number of inference steps to skip in the final steps of the first pass. By skipping some steps at the end, the first pass can focus on larger changes instead of smaller details.',
-        }),
-      )
-      .default(1),
-    seed: z.optional(
-      z.int().register(z.globalRegistry, {
-        description: 'Random seed for generation',
-      }),
-    ),
-  })
-  .register(z.globalRegistry, {
-    description: 'Distilled model input',
-  })
-
-/**
- * File
- */
-export const zFalAiLtxVideo13bDistilledFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * TextToVideoOutput
- */
-export const zLtxVideo13bDistilledOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for generation.',
-  }),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiLtxVideo13bDistilledFile,
-})
-
-/**
- * FastTextToVideoRequest
- */
-export const zPixverseV45TextToVideoFastInput = z.object({
-  prompt: z.string(),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video',
-    }),
-  ),
-  resolution: z.optional(
-    z.enum(['360p', '540p', '720p']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video',
-    }),
-  ),
-  style: z.optional(
-    z
-      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
-      .register(z.globalRegistry, {
-        description: 'The style of the generated video',
-      }),
-  ),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
-    }),
-  ),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt to be used for the generation',
-      }),
-    )
-    .default(''),
-})
-
-/**
- * File
- */
-export const zFalAiPixverseV45TextToVideoFastFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
+        'Random seed to control video generation. Use -1 for random.',
     }),
   ),
 })
 
 /**
- * VideoOutputV4
+ * KandinskyT2VResponse
  */
-export const zPixverseV45TextToVideoFastOutput = z.object({
-  video: zFalAiPixverseV45TextToVideoFastFile,
+export const zSchemaKandinsky5ProTextToVideoOutput = z.object({
+  video: z.optional(zSchemaFile),
 })
 
 /**
- * TextToVideoRequest
+ * KandinskyT2VRequest
  */
-export const zPixverseV45TextToVideoInput = z.object({
-  prompt: z.string(),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video',
-    }),
-  ),
-  duration: z.optional(
-    z.enum(['5', '8']).register(z.globalRegistry, {
-      description:
-        'The duration of the generated video in seconds. 8s videos cost double. 1080p videos are limited to 5 seconds',
-    }),
-  ),
-  style: z.optional(
-    z
-      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
-      .register(z.globalRegistry, {
-        description: 'The style of the generated video',
-      }),
-  ),
-  resolution: z.optional(
-    z.enum(['360p', '540p', '720p', '1080p']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video',
-    }),
-  ),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
-    }),
-  ),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt to be used for the generation',
-      }),
-    )
-    .default(''),
-})
-
-/**
- * File
- */
-export const zFalAiPixverseV45TextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * VideoOutputV4
- */
-export const zPixverseV45TextToVideoOutput = z.object({
-  video: zFalAiPixverseV45TextToVideoFile,
-})
-
-/**
- * Q1TextToVideoRequest
- */
-export const zViduQ1TextToVideoInput = z.object({
-  prompt: z.string().max(1500).register(z.globalRegistry, {
-    description: 'Text prompt for video generation, max 1500 characters',
-  }),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the output video',
-    }),
-  ),
-  style: z.optional(
-    z.enum(['general', 'anime']).register(z.globalRegistry, {
-      description: 'The style of output video',
-    }),
-  ),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'Seed for the random number generator',
-    }),
-  ),
-  movement_amplitude: z.optional(
-    z.enum(['auto', 'small', 'medium', 'large']).register(z.globalRegistry, {
-      description: 'The movement amplitude of objects in the frame',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiViduQ1TextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * Q1TextToVideoOutput
- */
-export const zViduQ1TextToVideoOutput = z.object({
-  video: zFalAiViduQ1TextToVideoFile,
-})
-
-/**
- * MagiTextToVideoRequest
- */
-export const zMagiInput = z.object({
+export const zSchemaKandinsky5ProTextToVideoInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt to guide video generation.',
   }),
   resolution: z.optional(
-    z.enum(['480p', '720p']).register(z.globalRegistry, {
-      description:
-        'Resolution of the generated video (480p or 720p). 480p is 0.5 billing units, and 720p is 1 billing unit.',
+    z.enum(['512P', '1024P']).register(z.globalRegistry, {
+      description: 'Video resolution: 512p or 1024p.',
+    }),
+  ),
+  acceleration: z.optional(
+    z.enum(['none', 'regular']).register(z.globalRegistry, {
+      description: 'Acceleration level for faster generation.',
     }),
   ),
   aspect_ratio: z.optional(
-    z.enum(['auto', '16:9', '9:16', '1:1']).register(z.globalRegistry, {
+    z.enum(['3:2', '1:1', '2:3']).register(z.globalRegistry, {
       description:
-        "Aspect ratio of the generated video. If 'auto', the aspect ratio will be determined automatically based on the input image.",
+        'Aspect ratio of the generated video. One of (3:2, 1:1, 2:3).',
     }),
   ),
-  enable_safety_checker: z
+  num_inference_steps: z
+    .optional(
+      z.int().gte(1).lte(50).register(z.globalRegistry, {
+        description: 'The number of inference steps.',
+      }),
+    )
+    .default(28),
+  duration: z.optional(
+    z.enum(['5s']).register(z.globalRegistry, {
+      description: 'The length of the video to generate (5s or 10s)',
+    }),
+  ),
+})
+
+/**
+ * LTX2TextToVideoOutput
+ */
+export const zSchemaLtx219bTextToVideoOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for the generation.',
+  }),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for the random number generator.',
+  }),
+  video: zSchemaVideoFile,
+})
+
+/**
+ * LTX2TextToVideoInput
+ */
+export const zSchemaLtx219bTextToVideoInput = z.object({
+  use_multiscale: z
     .optional(
       z.boolean().register(z.globalRegistry, {
-        description: 'If set to true, the safety checker will be enabled.',
+        description:
+          'Whether to use multi-scale generation. If True, the model will generate the video at a smaller scale first, then use the smaller video to guide the generation of a video at or above your requested size. This results in better coherence and details.',
       }),
     )
     .default(true),
-  num_inference_steps: z.optional(
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video from.',
+  }),
+  acceleration: z.optional(
+    z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
+      description: 'The acceleration level to use.',
+    }),
+  ),
+  generate_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to generate audio for the video.',
+      }),
+    )
+    .default(true),
+  fps: z
+    .optional(
+      z.number().gte(1).lte(60).register(z.globalRegistry, {
+        description: 'The frames per second of the generated video.',
+      }),
+    )
+    .default(25),
+  camera_lora: z.optional(
     z
-      .union([
-        z.literal(4),
-        z.literal(8),
-        z.literal(16),
-        z.literal(32),
-        z.literal(64),
+      .enum([
+        'dolly_in',
+        'dolly_out',
+        'dolly_left',
+        'dolly_right',
+        'jib_up',
+        'jib_down',
+        'static',
+        'none',
       ])
       .register(z.globalRegistry, {
         description:
-          'Number of inference steps for sampling. Higher values give better quality but take longer.',
+          'The camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
       }),
   ),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        'Random seed for reproducibility. If None, a random seed is chosen.',
-    }),
-  ),
-  num_frames: z
-    .optional(
-      z.int().gte(96).lte(192).register(z.globalRegistry, {
-        description:
-          'Number of frames to generate. Must be between 96 and 192 (inclusive). Each additional 24 frames beyond 96 incurs an additional billing unit.',
-      }),
-    )
-    .default(96),
-})
-
-/**
- * File
- */
-export const zFalAiMagiFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * MagiResponse
- */
-export const zMagiOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiMagiFile,
-})
-
-/**
- * MagiTextToVideoRequest
- */
-export const zMagiDistilledInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
-  }),
-  resolution: z.optional(
-    z.enum(['480p', '720p']).register(z.globalRegistry, {
-      description:
-        'Resolution of the generated video (480p or 720p). 480p is 0.5 billing units, and 720p is 1 billing unit.',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['auto', '16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description:
-        "Aspect ratio of the generated video. If 'auto', the aspect ratio will be determined automatically based on the input image.",
-    }),
-  ),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'If set to true, the safety checker will be enabled.',
-      }),
-    )
-    .default(true),
-  num_inference_steps: z.optional(
-    z
-      .union([z.literal(4), z.literal(8), z.literal(16), z.literal(32)])
-      .register(z.globalRegistry, {
-        description:
-          'Number of inference steps for sampling. Higher values give better quality but take longer.',
-      }),
-  ),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        'Random seed for reproducibility. If None, a random seed is chosen.',
-    }),
-  ),
-  num_frames: z
-    .optional(
-      z.int().gte(96).lte(192).register(z.globalRegistry, {
-        description:
-          'Number of frames to generate. Must be between 96 and 192 (inclusive). Each additional 24 frames beyond 96 incurs an additional billing unit.',
-      }),
-    )
-    .default(96),
-})
-
-/**
- * File
- */
-export const zFalAiMagiDistilledFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * MagiResponse
- */
-export const zMagiDistilledOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiMagiDistilledFile,
-})
-
-/**
- * TextToVideoRequest
- */
-export const zPixverseV4TextToVideoInput = z.object({
-  prompt: z.string(),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video',
-    }),
-  ),
-  duration: z.optional(
-    z.enum(['5', '8']).register(z.globalRegistry, {
-      description:
-        'The duration of the generated video in seconds. 8s videos cost double. 1080p videos are limited to 5 seconds',
-    }),
-  ),
-  style: z.optional(
-    z
-      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
-      .register(z.globalRegistry, {
-        description: 'The style of the generated video',
-      }),
-  ),
-  resolution: z.optional(
-    z.enum(['360p', '540p', '720p', '1080p']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video',
-    }),
-  ),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
-    }),
-  ),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt to be used for the generation',
-      }),
-    )
-    .default(''),
-})
-
-/**
- * File
- */
-export const zFalAiPixverseV4TextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * VideoOutputV4
- */
-export const zPixverseV4TextToVideoOutput = z.object({
-  video: zFalAiPixverseV4TextToVideoFile,
-})
-
-/**
- * FastTextToVideoRequest
- */
-export const zPixverseV4TextToVideoFastInput = z.object({
-  prompt: z.string(),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video',
-    }),
-  ),
-  resolution: z.optional(
-    z.enum(['360p', '540p', '720p']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video',
-    }),
-  ),
-  style: z.optional(
-    z
-      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
-      .register(z.globalRegistry, {
-        description: 'The style of the generated video',
-      }),
-  ),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
-    }),
-  ),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt to be used for the generation',
-      }),
-    )
-    .default(''),
-})
-
-/**
- * File
- */
-export const zFalAiPixverseV4TextToVideoFastFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * VideoOutputV4
- */
-export const zPixverseV4TextToVideoFastOutput = z.object({
-  video: zFalAiPixverseV4TextToVideoFastFile,
-})
-
-/**
- * LipsyncA2VRequest
- */
-export const zKlingVideoLipsyncAudioToVideoInput = z.object({
-  video_url: z.string().register(z.globalRegistry, {
-    description:
-      'The URL of the video to generate the lip sync for. Supports .mp4/.mov, ≤100MB, 2–10s, 720p/1080p only, width/height 720–1920px.',
-  }),
-  audio_url: z.string().register(z.globalRegistry, {
-    description:
-      'The URL of the audio to generate the lip sync for. Minimum duration is 2s and maximum duration is 60s. Maximum file size is 5MB.',
-  }),
-})
-
-/**
- * File
- */
-export const zFalAiKlingVideoLipsyncAudioToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * LipsyncA2VOutput
- */
-export const zKlingVideoLipsyncAudioToVideoOutput = z.object({
-  video: zFalAiKlingVideoLipsyncAudioToVideoFile,
-})
-
-/**
- * LipsyncT2VRequest
- */
-export const zKlingVideoLipsyncTextToVideoInput = z.object({
-  text: z.string().max(120).register(z.globalRegistry, {
-    description:
-      'Text content for lip-sync video generation. Max 120 characters.',
-  }),
-  video_url: z.string().register(z.globalRegistry, {
-    description:
-      'The URL of the video to generate the lip sync for. Supports .mp4/.mov, ≤100MB, 2-60s, 720p/1080p only, width/height 720–1920px. If validation fails, an error is returned.',
-  }),
-  voice_id: z
-    .enum([
-      'genshin_vindi2',
-      'zhinen_xuesheng',
-      'AOT',
-      'ai_shatang',
-      'genshin_klee2',
-      'genshin_kirara',
-      'ai_kaiya',
-      'oversea_male1',
-      'ai_chenjiahao_712',
-      'girlfriend_4_speech02',
-      'chat1_female_new-3',
-      'chat_0407_5-1',
-      'cartoon-boy-07',
-      'uk_boy1',
-      'cartoon-girl-01',
-      'PeppaPig_platform',
-      'ai_huangzhong_712',
-      'ai_huangyaoshi_712',
-      'ai_laoguowang_712',
-      'chengshu_jiejie',
-      'you_pingjing',
-      'calm_story1',
-      'uk_man2',
-      'laopopo_speech02',
-      'heainainai_speech02',
-      'reader_en_m-v1',
-      'commercial_lady_en_f-v1',
-      'tiyuxi_xuedi',
-      'tiexin_nanyou',
-      'girlfriend_1_speech02',
-      'girlfriend_2_speech02',
-      'zhuxi_speech02',
-      'uk_oldman3',
-      'dongbeilaotie_speech02',
-      'chongqingxiaohuo_speech02',
-      'chuanmeizi_speech02',
-      'chaoshandashu_speech02',
-      'ai_taiwan_man2_speech02',
-      'xianzhanggui_speech02',
-      'tianjinjiejie_speech02',
-      'diyinnansang_DB_CN_M_04-v2',
-      'yizhipiannan-v1',
-      'guanxiaofang-v2',
-      'tianmeixuemei-v1',
-      'daopianyansang-v1',
-      'mengwa-v1',
-    ])
-    .register(z.globalRegistry, {
-      description: 'Voice ID to use for speech synthesis',
-    }),
-  voice_speed: z
-    .optional(
-      z.number().gte(0.8).lte(2).register(z.globalRegistry, {
-        description: 'Speech rate for Text to Video generation',
-      }),
-    )
-    .default(1),
-  voice_language: z.optional(
-    z.enum(['zh', 'en']).register(z.globalRegistry, {
-      description: 'The voice language corresponding to the Voice ID',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiKlingVideoLipsyncTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * LipsyncOutput
- */
-export const zKlingVideoLipsyncTextToVideoOutput = z.object({
-  video: zFalAiKlingVideoLipsyncTextToVideoFile,
-})
-
-/**
- * LoraWeight
- */
-export const zLoraWeight = z.object({
-  path: z.string().register(z.globalRegistry, {
-    description: 'URL or the path to the LoRA weights.',
-  }),
-  scale: z
-    .optional(
-      z.number().gte(0).lte(4).register(z.globalRegistry, {
-        description:
-          '\n            The scale of the LoRA weight. This is used to scale the LoRA weight\n            before merging it with the base model.\n        ',
-      }),
-    )
-    .default(1),
-  weight_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'Name of the LoRA weight. Used only if `path` is a Hugging Face repository, and required only if you have more than 1 safetensors file in the repo.',
-    }),
-  ),
-})
-
-/**
- * WanLoRARequest
- */
-export const zWanT2vLoraInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
-  }),
-  resolution: z.optional(
-    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
-      description: 'Resolution of the generated video (480p,580p, or 720p).',
-    }),
-  ),
-  reverse_video: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'If true, the video will be reversed.',
-      }),
-    )
-    .default(false),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        'Random seed for reproducibility. If None, a random seed is chosen.',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['9:16', '16:9']).register(z.globalRegistry, {
-      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
-    }),
-  ),
-  loras: z
-    .optional(
-      z.array(zLoraWeight).register(z.globalRegistry, {
-        description: 'LoRA weights to be used in the inference.',
-      }),
-    )
-    .default([]),
-  frames_per_second: z
-    .optional(
-      z.int().gte(5).lte(24).register(z.globalRegistry, {
-        description:
-          'Frames per second of the generated video. Must be between 5 to 24.',
-      }),
-    )
-    .default(16),
-  turbo_mode: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If true, the video will be generated faster with no noticeable degradation in the visual quality.',
-      }),
-    )
-    .default(true),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'If set to true, the safety checker will be enabled.',
-      }),
-    )
-    .default(false),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(40).register(z.globalRegistry, {
-        description:
-          'Number of inference steps for sampling. Higher values give better quality but take longer.',
-      }),
-    )
-    .default(30),
-  num_frames: z
-    .optional(
-      z.int().gte(81).lte(100).register(z.globalRegistry, {
-        description:
-          'Number of frames to generate. Must be between 81 to 100 (inclusive).',
-      }),
-    )
-    .default(81),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt for video generation.',
-      }),
-    )
-    .default(
-      'bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
-    ),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable prompt expansion.',
-      }),
-    )
-    .default(false),
-})
-
-/**
- * File
- */
-export const zFalAiWanT2vLoraFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * WanT2VResponse
- */
-export const zWanT2vLoraOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiWanT2vLoraFile,
-})
-
-/**
- * Ray2TextToVideoRequest
- */
-export const zLumaDreamMachineRay2FlashInput = z.object({
-  prompt: z.string().min(3).max(5000),
-  aspect_ratio: z.optional(
-    z
-      .enum(['16:9', '9:16', '4:3', '3:4', '21:9', '9:21'])
-      .register(z.globalRegistry, {
-        description: 'The aspect ratio of the generated video',
-      }),
-  ),
-  resolution: z.optional(
-    z.enum(['540p', '720p', '1080p']).register(z.globalRegistry, {
-      description:
-        'The resolution of the generated video (720p costs 2x more, 1080p costs 4x more)',
-    }),
-  ),
-  loop: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether the video should loop (end of video is blended with the beginning)',
-      }),
-    )
-    .default(false),
-  duration: z.optional(
-    z.enum(['5s', '9s']).register(z.globalRegistry, {
-      description: 'The duration of the generated video (9s costs 2x more)',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiLumaDreamMachineRay2FlashFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * Ray2T2VOutput
- */
-export const zLumaDreamMachineRay2FlashOutput = z.object({
-  video: zFalAiLumaDreamMachineRay2FlashFile,
-})
-
-/**
- * TextToVideoTurboInput
- *
- * Base request for text-to-video generation
- */
-export const zPikaV2TurboTextToVideoInput = z
-  .object({
-    prompt: z.string(),
-    resolution: z.optional(
-      z.enum(['720p', '1080p']).register(z.globalRegistry, {
-        description: 'The resolution of the generated video',
-      }),
-    ),
-    aspect_ratio: z.optional(
-      z
-        .enum(['16:9', '9:16', '1:1', '4:5', '5:4', '3:2', '2:3'])
-        .register(z.globalRegistry, {
-          description: 'The aspect ratio of the generated video',
-        }),
-    ),
-    duration: z
-      .optional(
-        z.int().register(z.globalRegistry, {
-          description: 'The duration of the generated video in seconds',
-        }),
-      )
-      .default(5),
-    seed: z.optional(
-      z.int().register(z.globalRegistry, {
-        description: 'The seed for the random number generator',
-      }),
-    ),
-    negative_prompt: z
-      .optional(
-        z.string().register(z.globalRegistry, {
-          description: 'A negative prompt to guide the model',
-        }),
-      )
-      .default(''),
-  })
-  .register(z.globalRegistry, {
-    description: 'Base request for text-to-video generation',
-  })
-
-/**
- * File
- */
-export const zFalAiPikaV2TurboTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * TurboTextToVideoOutput
- *
- * Output from text-to-video generation
- */
-export const zPikaV2TurboTextToVideoOutput = z
-  .object({
-    video: zFalAiPikaV2TurboTextToVideoFile,
-  })
-  .register(z.globalRegistry, {
-    description: 'Output from text-to-video generation',
-  })
-
-/**
- * Pika22TextToVideoRequest
- *
- * Request model for Pika 2.2 text-to-video generation
- */
-export const zPikaV22TextToVideoInput = z
-  .object({
-    prompt: z.string(),
-    resolution: z.optional(
-      z.enum(['1080p', '720p']).register(z.globalRegistry, {
-        description: 'The resolution of the generated video',
-      }),
-    ),
-    aspect_ratio: z.optional(
-      z
-        .enum(['16:9', '9:16', '1:1', '4:5', '5:4', '3:2', '2:3'])
-        .register(z.globalRegistry, {
-          description: 'The aspect ratio of the generated video',
-        }),
-    ),
-    duration: z.optional(
-      z.union([z.literal(5), z.literal(10)]).register(z.globalRegistry, {
-        description: 'The duration of the generated video in seconds',
-      }),
-    ),
-    seed: z.optional(
-      z.int().register(z.globalRegistry, {
-        description: 'The seed for the random number generator',
-      }),
-    ),
-    negative_prompt: z
-      .optional(
-        z.string().register(z.globalRegistry, {
-          description: 'A negative prompt to guide the model',
-        }),
-      )
-      .default('ugly, bad, terrible'),
-  })
-  .register(z.globalRegistry, {
-    description: 'Request model for Pika 2.2 text-to-video generation',
-  })
-
-/**
- * File
- */
-export const zFalAiPikaV22TextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * Pika22TextToVideoOutput
- *
- * Output model for Pika 2.2 text-to-video generation
- */
-export const zPikaV22TextToVideoOutput = z
-  .object({
-    video: zFalAiPikaV22TextToVideoFile,
-  })
-  .register(z.globalRegistry, {
-    description: 'Output model for Pika 2.2 text-to-video generation',
-  })
-
-/**
- * TextToVideov21Input
- *
- * Base request for text-to-video generation
- */
-export const zPikaV21TextToVideoInput = z
-  .object({
-    prompt: z.string(),
-    resolution: z.optional(
-      z.enum(['720p', '1080p']).register(z.globalRegistry, {
-        description: 'The resolution of the generated video',
-      }),
-    ),
-    aspect_ratio: z.optional(
-      z
-        .enum(['16:9', '9:16', '1:1', '4:5', '5:4', '3:2', '2:3'])
-        .register(z.globalRegistry, {
-          description: 'The aspect ratio of the generated video',
-        }),
-    ),
-    duration: z
-      .optional(
-        z.int().register(z.globalRegistry, {
-          description: 'The duration of the generated video in seconds',
-        }),
-      )
-      .default(5),
-    seed: z.optional(
-      z.int().register(z.globalRegistry, {
-        description: 'The seed for the random number generator',
-      }),
-    ),
-    negative_prompt: z
-      .optional(
-        z.string().register(z.globalRegistry, {
-          description: 'A negative prompt to guide the model',
-        }),
-      )
-      .default(''),
-  })
-  .register(z.globalRegistry, {
-    description: 'Base request for text-to-video generation',
-  })
-
-/**
- * File
- */
-export const zFalAiPikaV21TextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * TextToVideoV21Output
- *
- * Output from text-to-video generation
- */
-export const zPikaV21TextToVideoOutput = z
-  .object({
-    video: zFalAiPikaV21TextToVideoFile,
-  })
-  .register(z.globalRegistry, {
-    description: 'Output from text-to-video generation',
-  })
-
-/**
- * WanProT2VRequest
- */
-export const zWanProTextToVideoInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to generate the video',
-  }),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable the safety checker',
-      }),
-    )
-    .default(true),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
-})
-
-/**
- * File
- */
-export const zFalAiWanProTextToVideoFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * WanProT2VResponse
- */
-export const zWanProTextToVideoOutput = z.object({
-  video: zFalAiWanProTextToVideoFile,
-})
-
-/**
- * VideoEffectsRequest
- */
-export const zKlingVideoV15ProEffectsInput = z.object({
-  duration: z.optional(
-    z.enum(['5', '10']).register(z.globalRegistry, {
-      description: 'The duration of the generated video in seconds',
-    }),
-  ),
-  input_image_urls: z.optional(
-    z.array(z.string()).register(z.globalRegistry, {
-      description:
-        'URL of images to be used for hug, kiss or heart_gesture video.',
-    }),
-  ),
-  effect_scene: z
-    .enum([
-      'hug',
-      'kiss',
-      'heart_gesture',
-      'squish',
-      'expansion',
-      'fuzzyfuzzy',
-      'bloombloom',
-      'dizzydizzy',
-      'jelly_press',
-      'jelly_slice',
-      'jelly_squish',
-      'jelly_jiggle',
-      'pixelpixel',
-      'yearbook',
-      'instant_film',
-      'anime_figure',
-      'rocketrocket',
-      'fly_fly',
-      'disappear',
-      'lightning_power',
-      'bullet_time',
-      'bullet_time_360',
-      'media_interview',
-      'day_to_night',
-      "let's_ride",
-      'jumpdrop',
-      'swish_swish',
-      'running_man',
-      'jazz_jazz',
-      'swing_swing',
-      'skateskate',
-      'building_sweater',
-      'pure_white_wings',
-      'black_wings',
-      'golden_wing',
-      'pink_pink_wings',
-      'rampage_ape',
-      'a_list_look',
-      'countdown_teleport',
-      'firework_2026',
-      'instant_christmas',
-      'birthday_star',
-      'firework',
-      'celebration',
-      'tiger_hug_pro',
-      'pet_lion_pro',
-      'guardian_spirit',
-      'squeeze_scream',
-      'inner_voice',
-      'memory_alive',
-      'guess_what',
-      'eagle_snatch',
-      'hug_from_past',
-      'instant_kid',
-      'dollar_rain',
-      'cry_cry',
-      'building_collapse',
-      'mushroom',
-      'jesus_hug',
-      'shark_alert',
-      'lie_flat',
-      'polar_bear_hug',
-      'brown_bear_hug',
-      'office_escape_plow',
-      'watermelon_bomb',
-      'boss_coming',
-      'wig_out',
-      'car_explosion',
-      'tiger_hug',
-      'siblings',
-      'construction_worker',
-      'snatched',
-      'felt_felt',
-      'plushcut',
-    ])
-    .register(z.globalRegistry, {
-      description: 'The effect scene to use for the video generation',
-    }),
-})
-
-/**
- * File
- */
-export const zFalAiKlingVideoV15ProEffectsFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * VideoEffectsOutput
- */
-export const zKlingVideoV15ProEffectsOutput = z.object({
-  video: zFalAiKlingVideoV15ProEffectsFile,
-})
-
-/**
- * VideoEffectsRequest
- */
-export const zKlingVideoV16ProEffectsInput = z.object({
-  duration: z.optional(
-    z.enum(['5', '10']).register(z.globalRegistry, {
-      description: 'The duration of the generated video in seconds',
-    }),
-  ),
-  input_image_urls: z.optional(
-    z.array(z.string()).register(z.globalRegistry, {
-      description:
-        'URL of images to be used for hug, kiss or heart_gesture video.',
-    }),
-  ),
-  effect_scene: z
-    .enum([
-      'hug',
-      'kiss',
-      'heart_gesture',
-      'squish',
-      'expansion',
-      'fuzzyfuzzy',
-      'bloombloom',
-      'dizzydizzy',
-      'jelly_press',
-      'jelly_slice',
-      'jelly_squish',
-      'jelly_jiggle',
-      'pixelpixel',
-      'yearbook',
-      'instant_film',
-      'anime_figure',
-      'rocketrocket',
-      'fly_fly',
-      'disappear',
-      'lightning_power',
-      'bullet_time',
-      'bullet_time_360',
-      'media_interview',
-      'day_to_night',
-      "let's_ride",
-      'jumpdrop',
-      'swish_swish',
-      'running_man',
-      'jazz_jazz',
-      'swing_swing',
-      'skateskate',
-      'building_sweater',
-      'pure_white_wings',
-      'black_wings',
-      'golden_wing',
-      'pink_pink_wings',
-      'rampage_ape',
-      'a_list_look',
-      'countdown_teleport',
-      'firework_2026',
-      'instant_christmas',
-      'birthday_star',
-      'firework',
-      'celebration',
-      'tiger_hug_pro',
-      'pet_lion_pro',
-      'guardian_spirit',
-      'squeeze_scream',
-      'inner_voice',
-      'memory_alive',
-      'guess_what',
-      'eagle_snatch',
-      'hug_from_past',
-      'instant_kid',
-      'dollar_rain',
-      'cry_cry',
-      'building_collapse',
-      'mushroom',
-      'jesus_hug',
-      'shark_alert',
-      'lie_flat',
-      'polar_bear_hug',
-      'brown_bear_hug',
-      'office_escape_plow',
-      'watermelon_bomb',
-      'boss_coming',
-      'wig_out',
-      'car_explosion',
-      'tiger_hug',
-      'siblings',
-      'construction_worker',
-      'snatched',
-      'felt_felt',
-      'plushcut',
-    ])
-    .register(z.globalRegistry, {
-      description: 'The effect scene to use for the video generation',
-    }),
-})
-
-/**
- * File
- */
-export const zFalAiKlingVideoV16ProEffectsFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * VideoEffectsOutput
- */
-export const zKlingVideoV16ProEffectsOutput = z.object({
-  video: zFalAiKlingVideoV16ProEffectsFile,
-})
-
-/**
- * VideoEffectsRequest
- */
-export const zKlingVideoV1StandardEffectsInput = z.object({
-  duration: z.optional(
-    z.enum(['5', '10']).register(z.globalRegistry, {
-      description: 'The duration of the generated video in seconds',
-    }),
-  ),
-  input_image_urls: z.optional(
-    z.array(z.string()).register(z.globalRegistry, {
-      description:
-        'URL of images to be used for hug, kiss or heart_gesture video.',
-    }),
-  ),
-  effect_scene: z
-    .enum([
-      'hug',
-      'kiss',
-      'heart_gesture',
-      'squish',
-      'expansion',
-      'fuzzyfuzzy',
-      'bloombloom',
-      'dizzydizzy',
-      'jelly_press',
-      'jelly_slice',
-      'jelly_squish',
-      'jelly_jiggle',
-      'pixelpixel',
-      'yearbook',
-      'instant_film',
-      'anime_figure',
-      'rocketrocket',
-      'fly_fly',
-      'disappear',
-      'lightning_power',
-      'bullet_time',
-      'bullet_time_360',
-      'media_interview',
-      'day_to_night',
-      "let's_ride",
-      'jumpdrop',
-      'swish_swish',
-      'running_man',
-      'jazz_jazz',
-      'swing_swing',
-      'skateskate',
-      'building_sweater',
-      'pure_white_wings',
-      'black_wings',
-      'golden_wing',
-      'pink_pink_wings',
-      'rampage_ape',
-      'a_list_look',
-      'countdown_teleport',
-      'firework_2026',
-      'instant_christmas',
-      'birthday_star',
-      'firework',
-      'celebration',
-      'tiger_hug_pro',
-      'pet_lion_pro',
-      'guardian_spirit',
-      'squeeze_scream',
-      'inner_voice',
-      'memory_alive',
-      'guess_what',
-      'eagle_snatch',
-      'hug_from_past',
-      'instant_kid',
-      'dollar_rain',
-      'cry_cry',
-      'building_collapse',
-      'mushroom',
-      'jesus_hug',
-      'shark_alert',
-      'lie_flat',
-      'polar_bear_hug',
-      'brown_bear_hug',
-      'office_escape_plow',
-      'watermelon_bomb',
-      'boss_coming',
-      'wig_out',
-      'car_explosion',
-      'tiger_hug',
-      'siblings',
-      'construction_worker',
-      'snatched',
-      'felt_felt',
-      'plushcut',
-    ])
-    .register(z.globalRegistry, {
-      description: 'The effect scene to use for the video generation',
-    }),
-})
-
-/**
- * File
- */
-export const zFalAiKlingVideoV1StandardEffectsFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * VideoEffectsOutput
- */
-export const zKlingVideoV1StandardEffectsOutput = z.object({
-  video: zFalAiKlingVideoV1StandardEffectsFile,
-})
-
-/**
- * VideoEffectsRequest
- */
-export const zKlingVideoV16StandardEffectsInput = z.object({
-  duration: z.optional(
-    z.enum(['5', '10']).register(z.globalRegistry, {
-      description: 'The duration of the generated video in seconds',
-    }),
-  ),
-  input_image_urls: z.optional(
-    z.array(z.string()).register(z.globalRegistry, {
-      description:
-        'URL of images to be used for hug, kiss or heart_gesture video.',
-    }),
-  ),
-  effect_scene: z
-    .enum([
-      'hug',
-      'kiss',
-      'heart_gesture',
-      'squish',
-      'expansion',
-      'fuzzyfuzzy',
-      'bloombloom',
-      'dizzydizzy',
-      'jelly_press',
-      'jelly_slice',
-      'jelly_squish',
-      'jelly_jiggle',
-      'pixelpixel',
-      'yearbook',
-      'instant_film',
-      'anime_figure',
-      'rocketrocket',
-      'fly_fly',
-      'disappear',
-      'lightning_power',
-      'bullet_time',
-      'bullet_time_360',
-      'media_interview',
-      'day_to_night',
-      "let's_ride",
-      'jumpdrop',
-      'swish_swish',
-      'running_man',
-      'jazz_jazz',
-      'swing_swing',
-      'skateskate',
-      'building_sweater',
-      'pure_white_wings',
-      'black_wings',
-      'golden_wing',
-      'pink_pink_wings',
-      'rampage_ape',
-      'a_list_look',
-      'countdown_teleport',
-      'firework_2026',
-      'instant_christmas',
-      'birthday_star',
-      'firework',
-      'celebration',
-      'tiger_hug_pro',
-      'pet_lion_pro',
-      'guardian_spirit',
-      'squeeze_scream',
-      'inner_voice',
-      'memory_alive',
-      'guess_what',
-      'eagle_snatch',
-      'hug_from_past',
-      'instant_kid',
-      'dollar_rain',
-      'cry_cry',
-      'building_collapse',
-      'mushroom',
-      'jesus_hug',
-      'shark_alert',
-      'lie_flat',
-      'polar_bear_hug',
-      'brown_bear_hug',
-      'office_escape_plow',
-      'watermelon_bomb',
-      'boss_coming',
-      'wig_out',
-      'car_explosion',
-      'tiger_hug',
-      'siblings',
-      'construction_worker',
-      'snatched',
-      'felt_felt',
-      'plushcut',
-    ])
-    .register(z.globalRegistry, {
-      description: 'The effect scene to use for the video generation',
-    }),
-})
-
-/**
- * File
- */
-export const zFalAiKlingVideoV16StandardEffectsFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * VideoEffectsOutput
- */
-export const zKlingVideoV16StandardEffectsOutput = z.object({
-  video: zFalAiKlingVideoV16StandardEffectsFile,
-})
-
-/**
- * TextToVideoInput
- */
-export const zLtxVideoV095Input = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'Text prompt to guide generation',
-  }),
-  resolution: z.optional(
-    z.enum(['480p', '720p']).register(z.globalRegistry, {
-      description: 'Resolution of the generated video (480p or 720p).',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['9:16', '16:9']).register(z.globalRegistry, {
-      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
-    }),
-  ),
-  expand_prompt: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          "Whether to expand the prompt using the model's own capabilities.",
-      }),
-    )
-    .default(true),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'Random seed for generation',
-    }),
-  ),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(50).register(z.globalRegistry, {
-        description: 'Number of inference steps',
-      }),
-    )
-    .default(40),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt for generation',
-      }),
-    )
-    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
-})
-
-/**
- * File
- */
-export const zFalAiLtxVideoV095File = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * TextToVideoOutput
- */
-export const zLtxVideoV095Output = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiLtxVideoV095File,
-})
-
-/**
- * TextToVideoRequest
- */
-export const zKlingVideoV16ProTextToVideoInput = z.object({
-  prompt: z.string().max(2500),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video frame',
-    }),
-  ),
-  duration: z.optional(
-    z.enum(['5', '10']).register(z.globalRegistry, {
-      description: 'The duration of the generated video in seconds',
-    }),
-  ),
-  negative_prompt: z
-    .optional(z.string().max(2500))
-    .default('blur, distort, and low quality'),
-  cfg_scale: z
-    .optional(
-      z.number().gte(0).lte(1).register(z.globalRegistry, {
-        description:
-          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
-      }),
-    )
-    .default(0.5),
-})
-
-/**
- * File
- */
-export const zFalAiKlingVideoV16ProTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * T2VOutput
- */
-export const zKlingVideoV16ProTextToVideoOutput = z.object({
-  video: zFalAiKlingVideoV16ProTextToVideoFile,
-})
-
-/**
- * WanT2VRequest
- */
-export const zWanT2vInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt to guide video generation.',
-  }),
-  aspect_ratio: z.optional(
-    z.enum(['9:16', '16:9']).register(z.globalRegistry, {
-      description: 'Aspect ratio of the generated video (16:9 or 9:16).',
-    }),
-  ),
-  resolution: z.optional(
-    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
-      description: 'Resolution of the generated video (480p, 580p, or 720p).',
-    }),
-  ),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        'Random seed for reproducibility. If None, a random seed is chosen.',
-    }),
-  ),
-  turbo_mode: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If true, the video will be generated faster with no noticeable degradation in the visual quality.',
-      }),
-    )
-    .default(false),
-  frames_per_second: z
-    .optional(
-      z.int().gte(5).lte(24).register(z.globalRegistry, {
-        description:
-          'Frames per second of the generated video. Must be between 5 to 24.',
-      }),
-    )
-    .default(16),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'If set to true, the safety checker will be enabled.',
-      }),
-    )
-    .default(false),
-  num_frames: z
-    .optional(
-      z.int().gte(81).lte(100).register(z.globalRegistry, {
-        description:
-          'Number of frames to generate. Must be between 81 to 100 (inclusive).',
-      }),
-    )
-    .default(81),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(40).register(z.globalRegistry, {
-        description:
-          'Number of inference steps for sampling. Higher values give better quality but take longer.',
-      }),
-    )
-    .default(30),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt for video generation.',
-      }),
-    )
-    .default(
-      'bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
-    ),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable prompt expansion.',
-      }),
-    )
-    .default(false),
-})
-
-/**
- * File
- */
-export const zFalAiWanT2vFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * WanT2VResponse
- */
-export const zWanT2vOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generation.',
-  }),
-  video: zFalAiWanT2vFile,
-})
-
-/**
- * TextToVideoInput
- */
-export const zVeo2Input = z.object({
-  prompt: z.string().min(1).register(z.globalRegistry, {
-    description: 'The text prompt describing the video you want to generate',
-  }),
-  duration: z.optional(
-    z.enum(['5s', '6s', '7s', '8s']).register(z.globalRegistry, {
-      description: 'The duration of the generated video in seconds',
-    }),
-  ),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video',
-    }),
-  ),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'A seed to use for the video generation',
-    }),
-  ),
-  negative_prompt: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'A negative prompt to guide the video generation',
-    }),
-  ),
-  enhance_prompt: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enhance the video generation',
-      }),
-    )
-    .default(true),
-})
-
-/**
- * File
- */
-export const zFalAiVeo2File = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * TextToVideoOutput
- */
-export const zVeo2Output = z.object({
-  video: zFalAiVeo2File,
-})
-
-/**
- * TextToVideoDirectorRequest
- */
-export const zMinimaxVideo01DirectorInput = z.object({
-  prompt_optimizer: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: "Whether to use the model's prompt optimizer",
-      }),
-    )
-    .default(true),
-  prompt: z.string().max(2000).register(z.globalRegistry, {
-    description:
-      'Text prompt for video generation. Camera movement instructions can be added using square brackets (e.g. [Pan left] or [Zoom in]). You can use up to 3 combined movements per prompt. Supported movements: Truck left/right, Pan left/right, Push in/Pull out, Pedestal up/down, Tilt up/down, Zoom in/out, Shake, Tracking shot, Static shot. For example: [Truck left, Pan right, Zoom in]. For a more detailed guide, refer https://sixth-switch-2ac.notion.site/T2V-01-Director-Model-Tutorial-with-camera-movement-1886c20a98eb80f395b8e05291ad8645',
-  }),
-})
-
-/**
- * File
- */
-export const zFalAiMinimaxVideo01DirectorFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * T2VDirectorOutput
- */
-export const zMinimaxVideo01DirectorOutput = z.object({
-  video: zFalAiMinimaxVideo01DirectorFile,
-})
-
-/**
- * TextToVideoRequest
- */
-export const zPixverseV35TextToVideoInput = z.object({
-  prompt: z.string(),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video',
-    }),
-  ),
-  duration: z.optional(
-    z.enum(['5', '8']).register(z.globalRegistry, {
-      description:
-        'The duration of the generated video in seconds. 8s videos cost double. 1080p videos are limited to 5 seconds',
-    }),
-  ),
-  style: z.optional(
-    z
-      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
-      .register(z.globalRegistry, {
-        description: 'The style of the generated video',
-      }),
-  ),
-  resolution: z.optional(
-    z.enum(['360p', '540p', '720p', '1080p']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video',
-    }),
-  ),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
-    }),
-  ),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt to be used for the generation',
-      }),
-    )
-    .default(''),
-})
-
-/**
- * File
- */
-export const zFalAiPixverseV35TextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * VideoOutput
- */
-export const zPixverseV35TextToVideoOutput = z.object({
-  video: zFalAiPixverseV35TextToVideoFile,
-})
-
-/**
- * FastTextToVideoRequest
- */
-export const zPixverseV35TextToVideoFastInput = z.object({
-  prompt: z.string(),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video',
-    }),
-  ),
-  resolution: z.optional(
-    z.enum(['360p', '540p', '720p']).register(z.globalRegistry, {
-      description: 'The resolution of the generated video',
-    }),
-  ),
-  style: z.optional(
-    z
-      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
-      .register(z.globalRegistry, {
-        description: 'The style of the generated video',
-      }),
-  ),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
-    }),
-  ),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt to be used for the generation',
-      }),
-    )
-    .default(''),
-})
-
-/**
- * File
- */
-export const zFalAiPixverseV35TextToVideoFastFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * VideoOutput
- */
-export const zPixverseV35TextToVideoFastOutput = z.object({
-  video: zFalAiPixverseV35TextToVideoFastFile,
-})
-
-/**
- * Ray2TextToVideoRequest
- */
-export const zLumaDreamMachineRay2Input = z.object({
-  prompt: z.string().min(3).max(5000),
-  aspect_ratio: z.optional(
-    z
-      .enum(['16:9', '9:16', '4:3', '3:4', '21:9', '9:21'])
-      .register(z.globalRegistry, {
-        description: 'The aspect ratio of the generated video',
-      }),
-  ),
-  resolution: z.optional(
-    z.enum(['540p', '720p', '1080p']).register(z.globalRegistry, {
-      description:
-        'The resolution of the generated video (720p costs 2x more, 1080p costs 4x more)',
-    }),
-  ),
-  loop: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'Whether the video should loop (end of video is blended with the beginning)',
-      }),
-    )
-    .default(false),
-  duration: z.optional(
-    z.enum(['5s', '9s']).register(z.globalRegistry, {
-      description: 'The duration of the generated video (9s costs 2x more)',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiLumaDreamMachineRay2File = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * Ray2T2VOutput
- */
-export const zLumaDreamMachineRay2Output = z.object({
-  video: zFalAiLumaDreamMachineRay2File,
-})
-
-/**
- * LoraWeight
- */
-export const zFalAiHunyuanVideoLoraLoraWeight = z.object({
-  path: z.string().register(z.globalRegistry, {
-    description: 'URL or the path to the LoRA weights.',
-  }),
-  scale: z
-    .optional(
-      z.number().gte(0).lte(4).register(z.globalRegistry, {
-        description:
-          '\n            The scale of the LoRA weight. This is used to scale the LoRA weight\n            before merging it with the base model.\n        ',
-      }),
-    )
-    .default(1),
-})
-
-/**
- * HunyuanT2VRequest
- */
-export const zHunyuanVideoLoraInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to generate the video from.',
-  }),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the video to generate.',
-    }),
-  ),
-  resolution: z.optional(
-    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
-      description: 'The resolution of the video to generate.',
-    }),
-  ),
-  loras: z
-    .optional(
-      z.array(zFalAiHunyuanVideoLoraLoraWeight).register(z.globalRegistry, {
-        description:
-          '\n            The LoRAs to use for the image generation. You can use any number of LoRAs\n            and they will be merged together to generate the final image.\n        ',
-      }),
-    )
-    .default([]),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'If set to true, the safety checker will be enabled.',
-      }),
-    )
-    .default(false),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The seed to use for generating the video.',
-    }),
-  ),
-  num_frames: z.optional(
-    z.enum(['129', '85']).register(z.globalRegistry, {
-      description: 'The number of frames to generate.',
-    }),
-  ),
-  pro_mode: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'By default, generations are done with 35 steps. Pro mode does 55 steps which results in higher quality videos but will take more time and cost 2x more billing units.',
-      }),
-    )
-    .default(false),
-})
-
-/**
- * File
- */
-export const zFalAiHunyuanVideoLoraFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * HunyuanT2VResponse
- */
-export const zHunyuanVideoLoraOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generating the video.',
-  }),
-  video: zFalAiHunyuanVideoLoraFile,
-})
-
-/**
- * BaseInput
- */
-export const zTranspixarInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to generate the video from.',
-  }),
-  guidance_scale: z
-    .optional(
-      z.number().gte(0).lte(20).register(z.globalRegistry, {
-        description:
-          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt when looking for a related video to show you.\n        ',
-      }),
-    )
-    .default(7),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(1).lte(50).register(z.globalRegistry, {
-        description: 'The number of inference steps to perform.',
-      }),
-    )
-    .default(24),
-  export_fps: z
-    .optional(
-      z.int().gte(4).lte(32).register(z.globalRegistry, {
-        description: 'The target FPS of the video',
-      }),
-    )
-    .default(8),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The negative prompt to generate video from',
-      }),
-    )
-    .default(''),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
-})
-
-/**
- * File
- */
-export const zFalAiTranspixarFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * Output
- */
-export const zTranspixarOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for generating the video.',
-  }),
-  videos: z.array(zFalAiTranspixarFile).register(z.globalRegistry, {
-    description: 'The URL to the generated video',
-  }),
-  timings: z.record(z.string(), z.number()),
-  seed: z.int().register(z.globalRegistry, {
-    description:
-      '\n            Seed of the generated video. It will be the same value of the one passed in the\n            input or the randomly generated that was used in case none was passed.\n        ',
-  }),
-})
-
-/**
- * LoraWeight
- */
-export const zFalAiCogvideox5bLoraWeight = z.object({
-  path: z.string().register(z.globalRegistry, {
-    description: 'URL or the path to the LoRA weights.',
-  }),
-  scale: z
-    .optional(
-      z.number().gte(0).lte(4).register(z.globalRegistry, {
-        description:
-          '\n            The scale of the LoRA weight. This is used to scale the LoRA weight\n            before merging it with the base model.\n        ',
-      }),
-    )
-    .default(1),
-})
-
-/**
- * ImageSize
- */
-export const zFalAiCogvideox5bImageSize = z.object({
-  height: z
-    .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The height of the generated image.',
-      }),
-    )
-    .default(512),
-  width: z
-    .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The width of the generated image.',
-      }),
-    )
-    .default(512),
-})
-
-/**
- * BaseInput
- */
-export const zCogvideox5bInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to generate the video from.',
-  }),
-  use_rife: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Use RIFE for video interpolation',
-      }),
-    )
-    .default(true),
-  loras: z
-    .optional(
-      z.array(zFalAiCogvideox5bLoraWeight).register(z.globalRegistry, {
-        description:
-          '\n            The LoRAs to use for the image generation. We currently support one lora.\n        ',
-      }),
-    )
-    .default([]),
   video_size: z.optional(
     z.union([
-      zFalAiCogvideox5bImageSize,
+      zSchemaImageSize,
       z.enum([
         'square_hd',
         'square',
@@ -8520,542 +6784,26 @@ export const zCogvideox5bInput = z.object({
   ),
   guidance_scale: z
     .optional(
-      z.number().gte(0).lte(20).register(z.globalRegistry, {
-        description:
-          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt when looking for a related video to show you.\n        ',
-      }),
-    )
-    .default(7),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(1).lte(50).register(z.globalRegistry, {
-        description: 'The number of inference steps to perform.',
-      }),
-    )
-    .default(50),
-  export_fps: z
-    .optional(
-      z.int().gte(4).lte(32).register(z.globalRegistry, {
-        description: 'The target FPS of the video',
-      }),
-    )
-    .default(16),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The negative prompt to generate video from',
-      }),
-    )
-    .default(''),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiCogvideox5bFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * Output
- */
-export const zCogvideox5bOutput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt used for generating the video.',
-  }),
-  timings: z.record(z.string(), z.number()),
-  seed: z.int().register(z.globalRegistry, {
-    description:
-      '\n            Seed of the generated video. It will be the same value of the one passed in the\n            input or the randomly generated that was used in case none was passed.\n        ',
-  }),
-  video: zFalAiCogvideox5bFile,
-})
-
-/**
- * TextToVideoRequest
- */
-export const zKlingVideoV16StandardTextToVideoInput = z.object({
-  prompt: z.string().max(2500),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video frame',
-    }),
-  ),
-  duration: z.optional(
-    z.enum(['5', '10']).register(z.globalRegistry, {
-      description: 'The duration of the generated video in seconds',
-    }),
-  ),
-  negative_prompt: z
-    .optional(z.string().max(2500))
-    .default('blur, distort, and low quality'),
-  cfg_scale: z
-    .optional(
-      z.number().gte(0).lte(1).register(z.globalRegistry, {
-        description:
-          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
-      }),
-    )
-    .default(0.5),
-})
-
-/**
- * File
- */
-export const zFalAiKlingVideoV16StandardTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * T2VOutput
- */
-export const zKlingVideoV16StandardTextToVideoOutput = z.object({
-  video: zFalAiKlingVideoV16StandardTextToVideoFile,
-})
-
-/**
- * TextToVideoLiveRequest
- */
-export const zMinimaxVideo01LiveInput = z.object({
-  prompt_optimizer: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: "Whether to use the model's prompt optimizer",
-      }),
-    )
-    .default(true),
-  prompt: z.string().max(2000),
-})
-
-/**
- * File
- */
-export const zFalAiMinimaxVideo01LiveFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * T2VLiveOutput
- */
-export const zMinimaxVideo01LiveOutput = z.object({
-  video: zFalAiMinimaxVideo01LiveFile,
-})
-
-/**
- * CameraControl
- */
-export const zCameraControl = z.object({
-  movement_type: z
-    .enum(['horizontal', 'vertical', 'pan', 'tilt', 'roll', 'zoom'])
-    .register(z.globalRegistry, {
-      description: 'The type of camera movement',
-    }),
-  movement_value: z.int().gte(-10).lte(10).register(z.globalRegistry, {
-    description: 'The value of the camera movement',
-  }),
-})
-
-/**
- * V1TextToVideoRequest
- */
-export const zKlingVideoV1StandardTextToVideoInput = z.object({
-  prompt: z.string().max(2500),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video frame',
-    }),
-  ),
-  advanced_camera_control: z.optional(zCameraControl),
-  duration: z.optional(
-    z.enum(['5', '10']).register(z.globalRegistry, {
-      description: 'The duration of the generated video in seconds',
-    }),
-  ),
-  camera_control: z.optional(
-    z
-      .enum([
-        'down_back',
-        'forward_up',
-        'right_turn_forward',
-        'left_turn_forward',
-      ])
-      .register(z.globalRegistry, {
-        description: 'Camera control parameters',
-      }),
-  ),
-  negative_prompt: z
-    .optional(z.string().max(2500))
-    .default('blur, distort, and low quality'),
-  cfg_scale: z
-    .optional(
-      z.number().gte(0).lte(1).register(z.globalRegistry, {
-        description:
-          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
-      }),
-    )
-    .default(0.5),
-})
-
-/**
- * File
- */
-export const zFalAiKlingVideoV1StandardTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * T2VOutput
- */
-export const zKlingVideoV1StandardTextToVideoOutput = z.object({
-  video: zFalAiKlingVideoV1StandardTextToVideoFile,
-})
-
-/**
- * TextToVideoRequest
- */
-export const zKlingVideoV15ProTextToVideoInput = z.object({
-  prompt: z.string().max(2500),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the generated video frame',
-    }),
-  ),
-  duration: z.optional(
-    z.enum(['5', '10']).register(z.globalRegistry, {
-      description: 'The duration of the generated video in seconds',
-    }),
-  ),
-  negative_prompt: z
-    .optional(z.string().max(2500))
-    .default('blur, distort, and low quality'),
-  cfg_scale: z
-    .optional(
-      z.number().gte(0).lte(1).register(z.globalRegistry, {
-        description:
-          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
-      }),
-    )
-    .default(0.5),
-})
-
-/**
- * File
- */
-export const zFalAiKlingVideoV15ProTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * T2VOutput
- */
-export const zKlingVideoV15ProTextToVideoOutput = z.object({
-  video: zFalAiKlingVideoV15ProTextToVideoFile,
-})
-
-/**
- * MochiT2VInput
- */
-export const zMochiV1Input = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to generate a video from.',
-  }),
-  enable_prompt_expansion: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable prompt expansion.',
-      }),
-    )
-    .default(true),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The seed to use for generating the video.',
-    }),
-  ),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The negative prompt for the video.',
-      }),
-    )
-    .default(''),
-})
-
-/**
- * File
- */
-export const zFalAiMochiV1File = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * MochiT2VOutput
- */
-export const zMochiV1Output = z.object({
-  video: zFalAiMochiV1File,
-})
-
-/**
- * HunyuanVideoRequest
- */
-export const zHunyuanVideoInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to generate the video from.',
-  }),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
-      description: 'The aspect ratio of the video to generate.',
-    }),
-  ),
-  resolution: z.optional(
-    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
-      description: 'The resolution of the video to generate.',
-    }),
-  ),
-  enable_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'If set to true, the safety checker will be enabled.',
-      }),
-    )
-    .default(false),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(30).register(z.globalRegistry, {
-        description:
-          'The number of inference steps to run. Lower gets faster results, higher gets better results.',
-      }),
-    )
-    .default(30),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The seed to use for generating the video.',
-    }),
-  ),
-  num_frames: z.optional(
-    z.enum(['129', '85']).register(z.globalRegistry, {
-      description: 'The number of frames to generate.',
-    }),
-  ),
-  pro_mode: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'By default, generations are done with 35 steps. Pro mode does 55 steps which results in higher quality videos but will take more time and cost 2x more billing units.',
-      }),
-    )
-    .default(false),
-})
-
-/**
- * File
- */
-export const zFalAiHunyuanVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * HunyuanT2VResponse
- */
-export const zHunyuanVideoOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for generating the video.',
-  }),
-  video: zFalAiHunyuanVideoFile,
-})
-
-/**
- * TextToVideoInput
- */
-export const zLtxVideoInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to generate the video from.',
-  }),
-  guidance_scale: z
-    .optional(
-      z.number().lte(10).register(z.globalRegistry, {
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
         description: 'The guidance scale to use.',
       }),
     )
     .default(3),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The seed to use for random number generation.',
-    }),
-  ),
-  num_inference_steps: z
+  num_frames: z
     .optional(
-      z.int().gte(1).lte(50).register(z.globalRegistry, {
-        description: 'The number of inference steps to take.',
+      z.int().gte(9).lte(481).register(z.globalRegistry, {
+        description: 'The number of frames to generate.',
       }),
     )
-    .default(30),
+    .default(121),
+  camera_lora_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'The scale of the camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
+      }),
+    )
+    .default(1),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -9063,546 +6811,150 @@ export const zLtxVideoInput = z.object({
       }),
     )
     .default(
-      'low quality, worst quality, deformed, distorted, disfigured, motion smear, motion artifacts, fused fingers, bad anatomy, weird hand, ugly',
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
     ),
-})
-
-/**
- * File
- */
-export const zFalAiLtxVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * Output
- */
-export const zLtxVideoOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used for random number generation.',
-  }),
-  video: zFalAiLtxVideoFile,
-})
-
-/**
- * ImageSize
- */
-export const zFalAiFastSvdTextToVideoImageSize = z.object({
-  height: z
+  enable_safety_checker: z
     .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The height of the generated image.',
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable the safety checker.',
       }),
     )
-    .default(512),
-  width: z
-    .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The width of the generated image.',
+    .default(true),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description: 'The write mode of the generated video.',
+    }),
+  ),
+  video_output_type: z.optional(
+    z
+      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+      .register(z.globalRegistry, {
+        description: 'The output type of the generated video.',
       }),
-    )
-    .default(512),
-})
-
-/**
- * FastSVDTextInput
- */
-export const zFastSvdTextToVideoInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to use as a starting point for the generation.',
-  }),
-  cond_aug: z
+  ),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description: 'The quality of the generated video.',
+    }),
+  ),
+  sync_mode: z
     .optional(
-      z.number().gte(0).lte(10).register(z.globalRegistry, {
+      z.boolean().register(z.globalRegistry, {
         description:
-          '\n            The conditoning augmentation determines the amount of noise that will be\n            added to the conditioning frame. The higher the number, the more noise\n            there will be, and the less the video will look like the initial image.\n            Increase it for more motion.\n        ',
+          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
       }),
     )
-    .default(0.02),
-  deep_cache: z.optional(
-    z.enum(['none', 'minimum', 'medium', 'high']).register(z.globalRegistry, {
-      description:
-        '\n            Enabling [DeepCache](https://github.com/horseee/DeepCache) will make the execution\n            faster, but might sometimes degrade overall quality. The higher the setting, the\n            faster the execution will be, but the more quality might be lost.\n        ',
-    }),
-  ),
-  fps: z
+    .default(false),
+  enable_prompt_expansion: z
     .optional(
-      z.int().gte(1).lte(25).register(z.globalRegistry, {
-        description:
-          '\n            The FPS of the generated video. The higher the number, the faster the video will\n            play. Total video length is 25 frames.\n        ',
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable prompt expansion.',
       }),
     )
-    .default(10),
-  motion_bucket_id: z
-    .optional(
-      z.int().gte(1).lte(255).register(z.globalRegistry, {
-        description:
-          '\n            The motion bucket id determines the motion of the generated video. The\n            higher the number, the more motion there will be.\n        ',
-      }),
-    )
-    .default(127),
-  video_size: z.optional(
-    z.union([
-      zFalAiFastSvdTextToVideoImageSize,
-      z.enum([
-        'square_hd',
-        'square',
-        'portrait_4_3',
-        'portrait_16_9',
-        'landscape_4_3',
-        'landscape_16_9',
-      ]),
-    ]),
-  ),
-  steps: z
-    .optional(
-      z.int().gte(1).lte(100).register(z.globalRegistry, {
-        description:
-          '\n            The number of steps to run the model for. The higher the number the better\n            the quality and longer it will take to generate.\n        ',
-      }),
-    )
-    .default(20),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
-    }),
-  ),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description:
-          'The negative prompt to use as a starting point for the generation.',
-      }),
-    )
-    .default(
-      'unrealistic, saturated, high contrast, big nose, painting, drawing, sketch, cartoon, anime, manga, render, CG, 3d, watermark, signature, label',
-    ),
-})
-
-/**
- * File
- */
-export const zFalAiFastSvdTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * FastSVDOutput
- */
-export const zFastSvdTextToVideoOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description:
-      '\n            Seed of the generated Image. It will be the same value of the one passed in the\n            input or the randomly generated that was used in case none was passed.\n\n        ',
-  }),
-  video: zFalAiFastSvdTextToVideoFile,
-})
-
-/**
- * ImageSize
- */
-export const zFalAiFastSvdLcmTextToVideoImageSize = z.object({
-  height: z
-    .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The height of the generated image.',
-      }),
-    )
-    .default(512),
-  width: z
-    .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The width of the generated image.',
-      }),
-    )
-    .default(512),
-})
-
-/**
- * FastSVDTextInput
- */
-export const zFastSvdLcmTextToVideoInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to use as a starting point for the generation.',
-  }),
-  cond_aug: z
-    .optional(
-      z.number().gte(0).lte(10).register(z.globalRegistry, {
-        description:
-          '\n            The conditoning augmentation determines the amount of noise that will be\n            added to the conditioning frame. The higher the number, the more noise\n            there will be, and the less the video will look like the initial image.\n            Increase it for more motion.\n        ',
-      }),
-    )
-    .default(0.02),
-  fps: z
-    .optional(
-      z.int().gte(1).lte(25).register(z.globalRegistry, {
-        description:
-          '\n            The FPS of the generated video. The higher the number, the faster the video will\n            play. Total video length is 25 frames.\n        ',
-      }),
-    )
-    .default(10),
-  motion_bucket_id: z
-    .optional(
-      z.int().gte(1).lte(255).register(z.globalRegistry, {
-        description:
-          '\n            The motion bucket id determines the motion of the generated video. The\n            higher the number, the more motion there will be.\n        ',
-      }),
-    )
-    .default(127),
-  video_size: z.optional(
-    z.union([
-      zFalAiFastSvdLcmTextToVideoImageSize,
-      z.enum([
-        'square_hd',
-        'square',
-        'portrait_4_3',
-        'portrait_16_9',
-        'landscape_4_3',
-        'landscape_16_9',
-      ]),
-    ]),
-  ),
-  steps: z
-    .optional(
-      z.int().gte(1).lte(20).register(z.globalRegistry, {
-        description:
-          '\n            The number of steps to run the model for. The higher the number the better\n            the quality and longer it will take to generate.\n        ',
-      }),
-    )
-    .default(4),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiFastSvdLcmTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * FastSVDOutput
- */
-export const zFastSvdLcmTextToVideoOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description:
-      '\n            Seed of the generated Image. It will be the same value of the one passed in the\n            input or the randomly generated that was used in case none was passed.\n\n        ',
-  }),
-  video: zFalAiFastSvdLcmTextToVideoFile,
-})
-
-/**
- * Input
- */
-export const zT2vTurboInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to generate images from',
-  }),
-  guidance_scale: z
-    .optional(
-      z.number().gte(0.1).lte(30).register(z.globalRegistry, {
-        description: 'The guidance scale',
-      }),
-    )
-    .default(7.5),
-  seed: z.optional(z.union([z.int().gte(0).lte(203279), z.unknown()])),
-  export_fps: z
-    .optional(
-      z.int().gte(1).lte(24).register(z.globalRegistry, {
-        description: 'The FPS of the exported video',
-      }),
-    )
-    .default(8),
-  num_frames: z
-    .optional(
-      z.int().gte(16).lte(32).register(z.globalRegistry, {
-        description: 'The number of frames to generate',
-      }),
-    )
-    .default(16),
+    .default(false),
   num_inference_steps: z
     .optional(
-      z.int().gte(1).lte(12).register(z.globalRegistry, {
-        description: 'The number of steps to sample',
+      z.int().gte(8).lte(50).register(z.globalRegistry, {
+        description: 'The number of inference steps to use.',
       }),
     )
-    .default(4),
+    .default(40),
+  seed: z.optional(z.union([z.int(), z.unknown()])),
 })
 
 /**
- * File
+ * LTX2TextToVideoOutput
  */
-export const zFalAiT2vTurboFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * Output
- */
-export const zT2vTurboOutput = z.object({
-  video: zFalAiT2vTurboFile,
-})
-
-/**
- * ImageSize
- */
-export const zFalAiFastAnimatediffTextToVideoImageSize = z.object({
-  height: z
-    .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The height of the generated image.',
-      }),
-    )
-    .default(512),
-  width: z
-    .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The width of the generated image.',
-      }),
-    )
-    .default(512),
-})
-
-/**
- * AnimateDiffT2VInput
- */
-export const zFastAnimatediffTextToVideoInput = z.object({
+export const zSchemaLtx219bTextToVideoLoraOutput = z.object({
   prompt: z.string().register(z.globalRegistry, {
-    description:
-      'The prompt to use for generating the video. Be as descriptive as possible for best results.',
+    description: 'The prompt used for the generation.',
   }),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for the random number generator.',
+  }),
+  video: zSchemaVideoFile,
+})
+
+/**
+ * LoRAInput
+ *
+ * LoRA weight configuration.
+ */
+export const zSchemaLoRaInput = z
+  .object({
+    path: z.string().register(z.globalRegistry, {
+      description: 'URL, HuggingFace repo ID (owner/repo) to lora weights.',
+    }),
+    scale: z
+      .optional(
+        z.number().gte(0).lte(4).register(z.globalRegistry, {
+          description: 'Scale factor for LoRA application (0.0 to 4.0).',
+        }),
+      )
+      .default(1),
+    weight_name: z.optional(z.union([z.string(), z.unknown()])),
+  })
+  .register(z.globalRegistry, {
+    description: 'LoRA weight configuration.',
+  })
+
+/**
+ * LTX2LoRATextToVideoInput
+ */
+export const zSchemaLtx219bTextToVideoLoraInput = z.object({
+  use_multiscale: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to use multi-scale generation. If True, the model will generate the video at a smaller scale first, then use the smaller video to guide the generation of a video at or above your requested size. This results in better coherence and details.',
+      }),
+    )
+    .default(true),
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video from.',
+  }),
+  acceleration: z.optional(
+    z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
+      description: 'The acceleration level to use.',
     }),
   ),
+  generate_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to generate audio for the video.',
+      }),
+    )
+    .default(true),
   fps: z
     .optional(
-      z.int().gte(1).lte(16).register(z.globalRegistry, {
-        description: 'Number of frames per second to extract from the video.',
-      }),
-    )
-    .default(8),
-  video_size: z.optional(
-    z.union([
-      zFalAiFastAnimatediffTextToVideoImageSize,
-      z.enum([
-        'square_hd',
-        'square',
-        'portrait_4_3',
-        'portrait_16_9',
-        'landscape_4_3',
-        'landscape_16_9',
-      ]),
-    ]),
-  ),
-  guidance_scale: z
-    .optional(
-      z.number().gte(0).lte(20).register(z.globalRegistry, {
-        description:
-          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt when looking for a related image to show you.\n        ',
-      }),
-    )
-    .default(7.5),
-  num_frames: z
-    .optional(
-      z.int().gte(1).lte(32).register(z.globalRegistry, {
-        description: 'The number of frames to generate for the video.',
-      }),
-    )
-    .default(16),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(1).lte(50).register(z.globalRegistry, {
-        description: 'The number of inference steps to perform.',
+      z.number().gte(1).lte(60).register(z.globalRegistry, {
+        description: 'The frames per second of the generated video.',
       }),
     )
     .default(25),
-  negative_prompt: z
-    .optional(
-      z.string().register(z.globalRegistry, {
-        description:
-          "\n            The negative prompt to use. Use it to address details that you don't want\n            in the image. This could be colors, objects, scenery and even the small details\n            (e.g. moustache, blurry, low resolution).\n        ",
-      }),
-    )
-    .default('(bad quality, worst quality:1.2), ugly faces, bad anime'),
-  motions: z.optional(
+  loras: z.array(zSchemaLoRaInput).register(z.globalRegistry, {
+    description: 'The LoRAs to use for the generation.',
+  }),
+  camera_lora: z.optional(
     z
-      .array(
-        z.enum([
-          'zoom-out',
-          'zoom-in',
-          'pan-left',
-          'pan-right',
-          'tilt-up',
-          'tilt-down',
-        ]),
-      )
+      .enum([
+        'dolly_in',
+        'dolly_out',
+        'dolly_left',
+        'dolly_right',
+        'jib_up',
+        'jib_down',
+        'static',
+        'none',
+      ])
       .register(z.globalRegistry, {
-        description: 'The motions to apply to the video.',
+        description:
+          'The camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
       }),
   ),
-})
-
-/**
- * File
- */
-export const zFalAiFastAnimatediffTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * AnimateDiffT2VOutput
- */
-export const zFastAnimatediffTextToVideoOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'Seed used for generating the video.',
-  }),
-  video: zFalAiFastAnimatediffTextToVideoFile,
-})
-
-/**
- * ImageSize
- */
-export const zFalAiFastAnimatediffTurboTextToVideoImageSize = z.object({
-  height: z
-    .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The height of the generated image.',
-      }),
-    )
-    .default(512),
-  width: z
-    .optional(
-      z.int().lte(14142).register(z.globalRegistry, {
-        description: 'The width of the generated image.',
-      }),
-    )
-    .default(512),
-})
-
-/**
- * AnimateDiffT2VTurboInput
- */
-export const zFastAnimatediffTurboTextToVideoInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description:
-      'The prompt to use for generating the video. Be as descriptive as possible for best results.',
-  }),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description:
-        '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
-    }),
-  ),
-  fps: z
-    .optional(
-      z.int().gte(1).lte(16).register(z.globalRegistry, {
-        description: 'Number of frames per second to extract from the video.',
-      }),
-    )
-    .default(8),
   video_size: z.optional(
     z.union([
-      zFalAiFastAnimatediffTurboTextToVideoImageSize,
+      zSchemaImageSize,
       z.enum([
         'square_hd',
         'square',
@@ -9615,92 +6967,538 @@ export const zFastAnimatediffTurboTextToVideoInput = z.object({
   ),
   guidance_scale: z
     .optional(
-      z.number().gte(0).lte(20).register(z.globalRegistry, {
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description: 'The guidance scale to use.',
+      }),
+    )
+    .default(3),
+  num_frames: z
+    .optional(
+      z.int().gte(9).lte(481).register(z.globalRegistry, {
+        description: 'The number of frames to generate.',
+      }),
+    )
+    .default(121),
+  camera_lora_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
         description:
-          'The CFG (Classifier Free Guidance) scale is a measure of how close you want the model to stick to your prompt when looking for a related image to show you.',
+          'The scale of the camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
       }),
     )
     .default(1),
-  num_frames: z
-    .optional(
-      z.int().gte(1).lte(64).register(z.globalRegistry, {
-        description: 'The number of frames to generate for the video.',
-      }),
-    )
-    .default(16),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(1).lte(8).register(z.globalRegistry, {
-        description:
-          'The number of inference steps to perform. 4-12 is recommended for turbo mode.',
-      }),
-    )
-    .default(4),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
-        description:
-          "\n            The negative prompt to use. Use it to address details that you don't want\n            in the image. This could be colors, objects, scenery and even the small details\n            (e.g. moustache, blurry, low resolution).\n        ",
+        description: 'The negative prompt to generate the video from.',
       }),
     )
-    .default('(bad quality, worst quality:1.2), ugly faces, bad anime'),
-  motions: z.optional(
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable the safety checker.',
+      }),
+    )
+    .default(true),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description: 'The write mode of the generated video.',
+    }),
+  ),
+  video_output_type: z.optional(
     z
-      .array(
-        z.enum([
-          'zoom-out',
-          'zoom-in',
-          'pan-left',
-          'pan-right',
-          'tilt-up',
-          'tilt-down',
-        ]),
-      )
+      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
       .register(z.globalRegistry, {
-        description: 'The motions to apply to the video.',
+        description: 'The output type of the generated video.',
       }),
   ),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description: 'The quality of the generated video.',
+    }),
+  ),
+  sync_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      }),
+    )
+    .default(false),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable prompt expansion.',
+      }),
+    )
+    .default(false),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(8).lte(50).register(z.globalRegistry, {
+        description: 'The number of inference steps to use.',
+      }),
+    )
+    .default(40),
+  seed: z.optional(z.union([z.int(), z.unknown()])),
 })
 
 /**
- * File
+ * LTX2TextToVideoOutput
  */
-export const zFalAiFastAnimatediffTurboTextToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+export const zSchemaLtx219bDistilledTextToVideoOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for the generation.',
   }),
-})
-
-/**
- * AnimateDiffT2VOutput
- */
-export const zFastAnimatediffTurboTextToVideoOutput = z.object({
   seed: z.int().register(z.globalRegistry, {
-    description: 'Seed used for generating the video.',
+    description: 'The seed used for the random number generator.',
   }),
-  video: zFalAiFastAnimatediffTurboTextToVideoFile,
+  video: zSchemaVideoFile,
 })
 
 /**
- * TextToVideoRequest
+ * LTX2DistilledTextToVideoInput
  */
-export const zMinimaxVideo01Input = z.object({
+export const zSchemaLtx219bDistilledTextToVideoInput = z.object({
+  use_multiscale: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to use multi-scale generation. If True, the model will generate the video at a smaller scale first, then use the smaller video to guide the generation of a video at or above your requested size. This results in better coherence and details.',
+      }),
+    )
+    .default(true),
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video from.',
+  }),
+  acceleration: z.optional(
+    z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
+      description: 'The acceleration level to use.',
+    }),
+  ),
+  generate_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to generate audio for the video.',
+      }),
+    )
+    .default(true),
+  fps: z
+    .optional(
+      z.number().gte(1).lte(60).register(z.globalRegistry, {
+        description: 'The frames per second of the generated video.',
+      }),
+    )
+    .default(25),
+  camera_lora: z.optional(
+    z
+      .enum([
+        'dolly_in',
+        'dolly_out',
+        'dolly_left',
+        'dolly_right',
+        'jib_up',
+        'jib_down',
+        'static',
+        'none',
+      ])
+      .register(z.globalRegistry, {
+        description:
+          'The camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
+      }),
+  ),
+  video_size: z.optional(
+    z.union([
+      zSchemaImageSize,
+      z.enum([
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ]),
+  ),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable the safety checker.',
+      }),
+    )
+    .default(true),
+  num_frames: z
+    .optional(
+      z.int().gte(9).lte(481).register(z.globalRegistry, {
+        description: 'The number of frames to generate.',
+      }),
+    )
+    .default(121),
+  camera_lora_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'The scale of the camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
+      }),
+    )
+    .default(1),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The negative prompt to generate the video from.',
+      }),
+    )
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description: 'The write mode of the generated video.',
+    }),
+  ),
+  video_output_type: z.optional(
+    z
+      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+      .register(z.globalRegistry, {
+        description: 'The output type of the generated video.',
+      }),
+  ),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description: 'The quality of the generated video.',
+    }),
+  ),
+  sync_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      }),
+    )
+    .default(false),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable prompt expansion.',
+      }),
+    )
+    .default(false),
+  seed: z.optional(z.union([z.int(), z.unknown()])),
+})
+
+/**
+ * LTX2TextToVideoOutput
+ */
+export const zSchemaLtx219bDistilledTextToVideoLoraOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for the generation.',
+  }),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for the random number generator.',
+  }),
+  video: zSchemaVideoFile,
+})
+
+/**
+ * LTX2LoRADistilledTextToVideoInput
+ */
+export const zSchemaLtx219bDistilledTextToVideoLoraInput = z.object({
+  use_multiscale: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to use multi-scale generation. If True, the model will generate the video at a smaller scale first, then use the smaller video to guide the generation of a video at or above your requested size. This results in better coherence and details.',
+      }),
+    )
+    .default(true),
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video from.',
+  }),
+  acceleration: z.optional(
+    z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
+      description: 'The acceleration level to use.',
+    }),
+  ),
+  generate_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to generate audio for the video.',
+      }),
+    )
+    .default(true),
+  fps: z
+    .optional(
+      z.number().gte(1).lte(60).register(z.globalRegistry, {
+        description: 'The frames per second of the generated video.',
+      }),
+    )
+    .default(25),
+  loras: z.array(zSchemaLoRaInput).register(z.globalRegistry, {
+    description: 'The LoRAs to use for the generation.',
+  }),
+  camera_lora: z.optional(
+    z
+      .enum([
+        'dolly_in',
+        'dolly_out',
+        'dolly_left',
+        'dolly_right',
+        'jib_up',
+        'jib_down',
+        'static',
+        'none',
+      ])
+      .register(z.globalRegistry, {
+        description:
+          'The camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
+      }),
+  ),
+  video_size: z.optional(
+    z.union([
+      zSchemaImageSize,
+      z.enum([
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ]),
+  ),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable the safety checker.',
+      }),
+    )
+    .default(true),
+  num_frames: z
+    .optional(
+      z.int().gte(9).lte(481).register(z.globalRegistry, {
+        description: 'The number of frames to generate.',
+      }),
+    )
+    .default(121),
+  camera_lora_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'The scale of the camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
+      }),
+    )
+    .default(1),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The negative prompt to generate the video from.',
+      }),
+    )
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description: 'The write mode of the generated video.',
+    }),
+  ),
+  video_output_type: z.optional(
+    z
+      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+      .register(z.globalRegistry, {
+        description: 'The output type of the generated video.',
+      }),
+  ),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description: 'The quality of the generated video.',
+    }),
+  ),
+  sync_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      }),
+    )
+    .default(false),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable prompt expansion.',
+      }),
+    )
+    .default(false),
+  seed: z.optional(z.union([z.int(), z.unknown()])),
+})
+
+/**
+ * VideoOutputV5_5
+ */
+export const zSchemaPixverseV56TextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoRequestV5_6
+ */
+export const zSchemaPixverseV56TextToVideoInput = z.object({
+  prompt: z.string(),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['360p', '540p', '720p', '1080p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video',
+    }),
+  ),
+  style: z.optional(
+    z
+      .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
+      .register(z.globalRegistry, {
+        description: 'The style of the generated video',
+      }),
+  ),
+  thinking_type: z.optional(
+    z.enum(['enabled', 'disabled', 'auto']).register(z.globalRegistry, {
+      description:
+        "Prompt optimization mode: 'enabled' to optimize, 'disabled' to turn off, 'auto' for model decision",
+    }),
+  ),
+  duration: z.optional(
+    z.enum(['5', '8', '10']).register(z.globalRegistry, {
+      description:
+        'The duration of the generated video in seconds. 1080p videos are limited to 5 or 8 seconds',
+    }),
+  ),
+  generate_audio_switch: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Enable audio generation (BGM, SFX, dialogue)',
+      }),
+    )
+    .default(false),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
+    }),
+  ),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt to be used for the generation',
+      }),
+    )
+    .default(''),
+})
+
+/**
+ * TextToVideoV2MasterOutput
+ */
+export const zSchemaKlingVideoV2MasterTextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoV2MasterRequest
+ */
+export const zSchemaKlingVideoV2MasterTextToVideoInput = z.object({
+  prompt: z.string().max(2500),
+  duration: z.optional(
+    z.enum(['5', '10']).register(z.globalRegistry, {
+      description: 'The duration of the generated video in seconds',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video frame',
+    }),
+  ),
+  negative_prompt: z
+    .optional(z.string().max(2500))
+    .default('blur, distort, and low quality'),
+  cfg_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
+      }),
+    )
+    .default(0.5),
+})
+
+/**
+ * Veo3TextToVideoOutput
+ */
+export const zSchemaVeo3Output = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * Veo3TextToVideoInput
+ */
+export const zSchemaVeo3Input = z.object({
+  prompt: z.string().max(20000).register(z.globalRegistry, {
+    description: 'The text prompt describing the video you want to generate',
+  }),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video.',
+    }),
+  ),
+  duration: z.optional(
+    z.enum(['4s', '6s', '8s']).register(z.globalRegistry, {
+      description: 'The duration of the generated video.',
+    }),
+  ),
+  generate_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to generate audio for the video.',
+      }),
+    )
+    .default(true),
+  auto_fix: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to automatically attempt to fix prompts that fail content policy or other validation checks by rewriting them.',
+      }),
+    )
+    .default(true),
+  resolution: z.optional(
+    z.enum(['720p', '1080p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video.',
+    }),
+  ),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The seed for the random number generator.',
+    }),
+  ),
+  negative_prompt: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'A negative prompt to guide the video generation.',
+    }),
+  ),
+})
+
+/**
+ * TextToVideoHailuo02Output
+ */
+export const zSchemaMinimaxHailuo02StandardTextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * StandardTextToVideoHailuo02Input
+ */
+export const zSchemaMinimaxHailuo02StandardTextToVideoInput = z.object({
   prompt_optimizer: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -9708,144 +7506,8178 @@ export const zMinimaxVideo01Input = z.object({
       }),
     )
     .default(true),
-  prompt: z.string().max(2000),
-})
-
-/**
- * File
- */
-export const zFalAiMinimaxVideo01File = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
+  duration: z.optional(
+    z.enum(['6', '10']).register(z.globalRegistry, {
       description:
-        'The name of the file. It will be auto-generated if not provided.',
+        'The duration of the video in seconds. 10 seconds videos are not supported for 1080p resolution.',
     }),
   ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
+  prompt: z.string().min(1).max(2000),
 })
 
 /**
- * VideoOutput
+ * Veo3TextToVideoOutput
  */
-export const zMinimaxVideo01Output = z.object({
-  video: zFalAiMinimaxVideo01File,
+export const zSchemaVeo3FastOutput = z.object({
+  video: zSchemaFile,
 })
 
 /**
- * AnimatediffLCMInput
+ * Veo3TextToVideoInput
  */
-export const zAnimatediffSparsectrlLcmInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description:
-      'The prompt to use for generating the image. Be as descriptive as possible for best results.',
+export const zSchemaVeo3FastInput = z.object({
+  prompt: z.string().max(20000).register(z.globalRegistry, {
+    description: 'The text prompt describing the video you want to generate',
   }),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video.',
+    }),
+  ),
+  duration: z.optional(
+    z.enum(['4s', '6s', '8s']).register(z.globalRegistry, {
+      description: 'The duration of the generated video.',
+    }),
+  ),
+  generate_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to generate audio for the video.',
+      }),
+    )
+    .default(true),
+  auto_fix: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to automatically attempt to fix prompts that fail content policy or other validation checks by rewriting them.',
+      }),
+    )
+    .default(true),
+  resolution: z.optional(
+    z.enum(['720p', '1080p']).register(z.globalRegistry, {
+      description: 'The resolution of the generated video.',
+    }),
+  ),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
-      description:
-        '\n        The same seed and the same prompt given to the same version of Stable\n        Diffusion will output the same image every time.\n        ',
+      description: 'The seed for the random number generator.',
     }),
   ),
-  controlnet_type: z.optional(
-    z.enum(['scribble', 'rgb']).register(z.globalRegistry, {
-      description:
-        'The type of controlnet to use for generating the video. The controlnet determines how the video will be animated.',
+  negative_prompt: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'A negative prompt to guide the video generation.',
     }),
   ),
-  keyframe_2_index: z
-    .optional(
-      z.int().register(z.globalRegistry, {
-        description:
-          'The frame index of the third keyframe to use for the generation.',
-      }),
-    )
-    .default(0),
-  keyframe_0_index: z
-    .optional(
-      z.int().register(z.globalRegistry, {
-        description:
-          'The frame index of the first keyframe to use for the generation.',
-      }),
-    )
-    .default(0),
-  keyframe_1_image_url: z.optional(z.union([z.string(), z.null()])),
-  keyframe_1_index: z
-    .optional(
-      z.int().register(z.globalRegistry, {
-        description:
-          'The frame index of the second keyframe to use for the generation.',
-      }),
-    )
-    .default(0),
-  guidance_scale: z
-    .optional(
-      z.int().gte(0).lte(2).register(z.globalRegistry, {
-        description:
-          'The CFG (Classifier Free Guidance) scale is a measure of how close you want the model to stick to your prompt when looking for a related image to show you.',
-      }),
-    )
-    .default(1),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(1).lte(12).register(z.globalRegistry, {
-        description:
-          'Increasing the amount of steps tells Stable Diffusion that it should take more steps to generate your final result which can increase the amount of detail in your image.',
-      }),
-    )
-    .default(4),
-  keyframe_2_image_url: z.optional(z.union([z.string(), z.null()])),
+})
+
+/**
+ * TextToVideoV25ProOutput
+ */
+export const zSchemaKlingVideoV25TurboProTextToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * TextToVideoV25ProRequest
+ */
+export const zSchemaKlingVideoV25TurboProTextToVideoInput = z.object({
+  prompt: z.string().max(2500),
+  duration: z.optional(
+    z.enum(['5', '10']).register(z.globalRegistry, {
+      description: 'The duration of the generated video in seconds',
+    }),
+  ),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '9:16', '1:1']).register(z.globalRegistry, {
+      description: 'The aspect ratio of the generated video frame',
+    }),
+  ),
   negative_prompt: z
+    .optional(z.string().max(2500))
+    .default('blur, distort, and low quality'),
+  cfg_scale: z
     .optional(
-      z.string().register(z.globalRegistry, {
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
         description:
-          "\n            The negative prompt to use. Use it to specify what you don't want.\n        ",
+          '\n            The CFG (Classifier Free Guidance) scale is a measure of how close you want\n            the model to stick to your prompt.\n        ',
       }),
     )
-    .default(''),
-  keyframe_0_image_url: z.optional(z.union([z.string(), z.null()])),
+    .default(0.5),
+})
+
+export const zSchemaQueueStatus = z.object({
+  status: z.enum(['IN_QUEUE', 'IN_PROGRESS', 'COMPLETED']),
+  request_id: z.string().register(z.globalRegistry, {
+    description: 'The request id.',
+  }),
+  response_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The response url.',
+    }),
+  ),
+  status_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The status url.',
+    }),
+  ),
+  cancel_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The cancel url.',
+    }),
+  ),
+  logs: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The logs.',
+    }),
+  ),
+  metrics: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The metrics.',
+    }),
+  ),
+  queue_position: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The queue position.',
+    }),
+  ),
+})
+
+export const zGetFalAiKlingVideoV25TurboProTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoV25TurboProTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoV25TurboProTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoV25TurboProTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoV25TurboProTextToVideoData = z.object({
+  body: zSchemaKlingVideoV25TurboProTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
 })
 
 /**
- * File
+ * The request status.
  */
-export const zFalAiAnimatediffSparsectrlLcmFile = z.object({
-  file_size: z.int().register(z.globalRegistry, {
-    description: 'The size of the file in bytes.',
+export const zPostFalAiKlingVideoV25TurboProTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoV25TurboProTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoV25TurboProTextToVideoRequestsByRequestIdResponse =
+  zSchemaKlingVideoV25TurboProTextToVideoOutput
+
+export const zGetFalAiVeo3FastRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
   }),
-  file_name: z.string().register(z.globalRegistry, {
-    description:
-      'The name of the file. It will be auto-generated if not provided.',
-  }),
-  content_type: z.string().register(z.globalRegistry, {
-    description: 'The mime type of the file.',
-  }),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
 })
 
 /**
- * AnimatediffLCMOutput
+ * The request status.
  */
-export const zAnimatediffSparsectrlLcmOutput = z.object({
-  seed: z.int().register(z.globalRegistry, {
-    description: 'The seed used to generate the video.',
+export const zGetFalAiVeo3FastRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiVeo3FastRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
   }),
-  video: zFalAiAnimatediffSparsectrlLcmFile,
+  query: z.optional(z.never()),
 })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiVeo3FastRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiVeo3FastData = z.object({
+  body: zSchemaVeo3FastInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiVeo3FastResponse = zSchemaQueueStatus
+
+export const zGetFalAiVeo3FastRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiVeo3FastRequestsByRequestIdResponse =
+  zSchemaVeo3FastOutput
+
+export const zGetFalAiMinimaxHailuo02StandardTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiMinimaxHailuo02StandardTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiMinimaxHailuo02StandardTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiMinimaxHailuo02StandardTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiMinimaxHailuo02StandardTextToVideoData = z.object({
+  body: zSchemaMinimaxHailuo02StandardTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiMinimaxHailuo02StandardTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiMinimaxHailuo02StandardTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiMinimaxHailuo02StandardTextToVideoRequestsByRequestIdResponse =
+  zSchemaMinimaxHailuo02StandardTextToVideoOutput
+
+export const zGetFalAiVeo3RequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiVeo3RequestsByRequestIdStatusResponse = zSchemaQueueStatus
+
+export const zPutFalAiVeo3RequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiVeo3RequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiVeo3Data = z.object({
+  body: zSchemaVeo3Input,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiVeo3Response = zSchemaQueueStatus
+
+export const zGetFalAiVeo3RequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiVeo3RequestsByRequestIdResponse = zSchemaVeo3Output
+
+export const zGetFalAiKlingVideoV2MasterTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoV2MasterTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoV2MasterTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoV2MasterTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoV2MasterTextToVideoData = z.object({
+  body: zSchemaKlingVideoV2MasterTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKlingVideoV2MasterTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoV2MasterTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoV2MasterTextToVideoRequestsByRequestIdResponse =
+  zSchemaKlingVideoV2MasterTextToVideoOutput
+
+export const zGetFalAiPixverseV56TextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiPixverseV56TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiPixverseV56TextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiPixverseV56TextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiPixverseV56TextToVideoData = z.object({
+  body: zSchemaPixverseV56TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiPixverseV56TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiPixverseV56TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiPixverseV56TextToVideoRequestsByRequestIdResponse =
+  zSchemaPixverseV56TextToVideoOutput
+
+export const zGetFalAiLtx219bDistilledTextToVideoLoraRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtx219bDistilledTextToVideoLoraRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtx219bDistilledTextToVideoLoraRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtx219bDistilledTextToVideoLoraRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLtx219bDistilledTextToVideoLoraData = z.object({
+  body: zSchemaLtx219bDistilledTextToVideoLoraInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtx219bDistilledTextToVideoLoraResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiLtx219bDistilledTextToVideoLoraRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtx219bDistilledTextToVideoLoraRequestsByRequestIdResponse =
+  zSchemaLtx219bDistilledTextToVideoLoraOutput
+
+export const zGetFalAiLtx219bDistilledTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtx219bDistilledTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtx219bDistilledTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtx219bDistilledTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLtx219bDistilledTextToVideoData = z.object({
+  body: zSchemaLtx219bDistilledTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtx219bDistilledTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiLtx219bDistilledTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtx219bDistilledTextToVideoRequestsByRequestIdResponse =
+  zSchemaLtx219bDistilledTextToVideoOutput
+
+export const zGetFalAiLtx219bTextToVideoLoraRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtx219bTextToVideoLoraRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtx219bTextToVideoLoraRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtx219bTextToVideoLoraRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLtx219bTextToVideoLoraData = z.object({
+  body: zSchemaLtx219bTextToVideoLoraInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtx219bTextToVideoLoraResponse = zSchemaQueueStatus
+
+export const zGetFalAiLtx219bTextToVideoLoraRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtx219bTextToVideoLoraRequestsByRequestIdResponse =
+  zSchemaLtx219bTextToVideoLoraOutput
+
+export const zGetFalAiLtx219bTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtx219bTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtx219bTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtx219bTextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiLtx219bTextToVideoData = z.object({
+  body: zSchemaLtx219bTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtx219bTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiLtx219bTextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtx219bTextToVideoRequestsByRequestIdResponse =
+  zSchemaLtx219bTextToVideoOutput
+
+export const zGetFalAiKandinsky5ProTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKandinsky5ProTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKandinsky5ProTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKandinsky5ProTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKandinsky5ProTextToVideoData = z.object({
+  body: zSchemaKandinsky5ProTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKandinsky5ProTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiKandinsky5ProTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKandinsky5ProTextToVideoRequestsByRequestIdResponse =
+  zSchemaKandinsky5ProTextToVideoOutput
+
+export const zGetFalAiBytedanceSeedanceV15ProTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiBytedanceSeedanceV15ProTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiBytedanceSeedanceV15ProTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiBytedanceSeedanceV15ProTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiBytedanceSeedanceV15ProTextToVideoData = z.object({
+  body: zSchemaBytedanceSeedanceV15ProTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiBytedanceSeedanceV15ProTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiBytedanceSeedanceV15ProTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiBytedanceSeedanceV15ProTextToVideoRequestsByRequestIdResponse =
+  zSchemaBytedanceSeedanceV15ProTextToVideoOutput
+
+export const zGetWanV26TextToVideoRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetWanV26TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutWanV26TextToVideoRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutWanV26TextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostWanV26TextToVideoData = z.object({
+  body: zSchemaV26TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostWanV26TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetWanV26TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetWanV26TextToVideoRequestsByRequestIdResponse =
+  zSchemaV26TextToVideoOutput
+
+export const zGetVeedFabric10TextRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetVeedFabric10TextRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutVeedFabric10TextRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutVeedFabric10TextRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostVeedFabric10TextData = z.object({
+  body: zSchemaFabric10TextInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostVeedFabric10TextResponse = zSchemaQueueStatus
+
+export const zGetVeedFabric10TextRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetVeedFabric10TextRequestsByRequestIdResponse =
+  zSchemaFabric10TextOutput
+
+export const zGetFalAiKlingVideoV26ProTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoV26ProTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoV26ProTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoV26ProTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoV26ProTextToVideoData = z.object({
+  body: zSchemaKlingVideoV26ProTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKlingVideoV26ProTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoV26ProTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoV26ProTextToVideoRequestsByRequestIdResponse =
+  zSchemaKlingVideoV26ProTextToVideoOutput
+
+export const zGetFalAiPixverseV55TextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiPixverseV55TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiPixverseV55TextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiPixverseV55TextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiPixverseV55TextToVideoData = z.object({
+  body: zSchemaPixverseV55TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiPixverseV55TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiPixverseV55TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiPixverseV55TextToVideoRequestsByRequestIdResponse =
+  zSchemaPixverseV55TextToVideoOutput
+
+export const zGetFalAiLtx2TextToVideoFastRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtx2TextToVideoFastRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtx2TextToVideoFastRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtx2TextToVideoFastRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiLtx2TextToVideoFastData = z.object({
+  body: zSchemaLtx2TextToVideoFastInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtx2TextToVideoFastResponse = zSchemaQueueStatus
+
+export const zGetFalAiLtx2TextToVideoFastRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtx2TextToVideoFastRequestsByRequestIdResponse =
+  zSchemaLtx2TextToVideoFastOutput
+
+export const zGetFalAiLtx2TextToVideoRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtx2TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtx2TextToVideoRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtx2TextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiLtx2TextToVideoData = z.object({
+  body: zSchemaLtx2TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtx2TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiLtx2TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtx2TextToVideoRequestsByRequestIdResponse =
+  zSchemaLtx2TextToVideoOutput
+
+export const zGetFalAiHunyuanVideoV15TextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiHunyuanVideoV15TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiHunyuanVideoV15TextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiHunyuanVideoV15TextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiHunyuanVideoV15TextToVideoData = z.object({
+  body: zSchemaHunyuanVideoV15TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiHunyuanVideoV15TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiHunyuanVideoV15TextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiHunyuanVideoV15TextToVideoRequestsByRequestIdResponse =
+  zSchemaHunyuanVideoV15TextToVideoOutput
+
+export const zGetFalAiInfinityStarTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiInfinityStarTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiInfinityStarTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiInfinityStarTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiInfinityStarTextToVideoData = z.object({
+  body: zSchemaInfinityStarTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiInfinityStarTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiInfinityStarTextToVideoRequestsByRequestIdData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiInfinityStarTextToVideoRequestsByRequestIdResponse =
+  zSchemaInfinityStarTextToVideoOutput
+
+export const zGetFalAiSanaVideoRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiSanaVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiSanaVideoRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiSanaVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiSanaVideoData = z.object({
+  body: zSchemaSanaVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiSanaVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiSanaVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiSanaVideoRequestsByRequestIdResponse =
+  zSchemaSanaVideoOutput
+
+export const zGetFalAiLongcatVideoTextToVideo720pRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLongcatVideoTextToVideo720pRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLongcatVideoTextToVideo720pRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLongcatVideoTextToVideo720pRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLongcatVideoTextToVideo720pData = z.object({
+  body: zSchemaLongcatVideoTextToVideo720pInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLongcatVideoTextToVideo720pResponse = zSchemaQueueStatus
+
+export const zGetFalAiLongcatVideoTextToVideo720pRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLongcatVideoTextToVideo720pRequestsByRequestIdResponse =
+  zSchemaLongcatVideoTextToVideo720pOutput
+
+export const zGetFalAiLongcatVideoTextToVideo480pRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLongcatVideoTextToVideo480pRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLongcatVideoTextToVideo480pRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLongcatVideoTextToVideo480pRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLongcatVideoTextToVideo480pData = z.object({
+  body: zSchemaLongcatVideoTextToVideo480pInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLongcatVideoTextToVideo480pResponse = zSchemaQueueStatus
+
+export const zGetFalAiLongcatVideoTextToVideo480pRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLongcatVideoTextToVideo480pRequestsByRequestIdResponse =
+  zSchemaLongcatVideoTextToVideo480pOutput
+
+export const zGetFalAiLongcatVideoDistilledTextToVideo720pRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLongcatVideoDistilledTextToVideo720pRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLongcatVideoDistilledTextToVideo720pRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLongcatVideoDistilledTextToVideo720pRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLongcatVideoDistilledTextToVideo720pData = z.object({
+  body: zSchemaLongcatVideoDistilledTextToVideo720pInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLongcatVideoDistilledTextToVideo720pResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiLongcatVideoDistilledTextToVideo720pRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLongcatVideoDistilledTextToVideo720pRequestsByRequestIdResponse =
+  zSchemaLongcatVideoDistilledTextToVideo720pOutput
+
+export const zGetFalAiLongcatVideoDistilledTextToVideo480pRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLongcatVideoDistilledTextToVideo480pRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLongcatVideoDistilledTextToVideo480pRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLongcatVideoDistilledTextToVideo480pRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLongcatVideoDistilledTextToVideo480pData = z.object({
+  body: zSchemaLongcatVideoDistilledTextToVideo480pInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLongcatVideoDistilledTextToVideo480pResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiLongcatVideoDistilledTextToVideo480pRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLongcatVideoDistilledTextToVideo480pRequestsByRequestIdResponse =
+  zSchemaLongcatVideoDistilledTextToVideo480pOutput
+
+export const zGetFalAiMinimaxHailuo23StandardTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiMinimaxHailuo23StandardTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiMinimaxHailuo23StandardTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiMinimaxHailuo23StandardTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiMinimaxHailuo23StandardTextToVideoData = z.object({
+  body: zSchemaMinimaxHailuo23StandardTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiMinimaxHailuo23StandardTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiMinimaxHailuo23StandardTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiMinimaxHailuo23StandardTextToVideoRequestsByRequestIdResponse =
+  zSchemaMinimaxHailuo23StandardTextToVideoOutput
+
+export const zGetFalAiMinimaxHailuo23ProTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiMinimaxHailuo23ProTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiMinimaxHailuo23ProTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiMinimaxHailuo23ProTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiMinimaxHailuo23ProTextToVideoData = z.object({
+  body: zSchemaMinimaxHailuo23ProTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiMinimaxHailuo23ProTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiMinimaxHailuo23ProTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiMinimaxHailuo23ProTextToVideoRequestsByRequestIdResponse =
+  zSchemaMinimaxHailuo23ProTextToVideoOutput
+
+export const zGetFalAiBytedanceSeedanceV1ProFastTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiBytedanceSeedanceV1ProFastTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiBytedanceSeedanceV1ProFastTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiBytedanceSeedanceV1ProFastTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiBytedanceSeedanceV1ProFastTextToVideoData = z.object({
+  body: zSchemaBytedanceSeedanceV1ProFastTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiBytedanceSeedanceV1ProFastTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiBytedanceSeedanceV1ProFastTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiBytedanceSeedanceV1ProFastTextToVideoRequestsByRequestIdResponse =
+  zSchemaBytedanceSeedanceV1ProFastTextToVideoOutput
+
+export const zGetFalAiViduQ2TextToVideoRequestsByRequestIdStatusData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  },
+)
+
+/**
+ * The request status.
+ */
+export const zGetFalAiViduQ2TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiViduQ2TextToVideoRequestsByRequestIdCancelData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiViduQ2TextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiViduQ2TextToVideoData = z.object({
+  body: zSchemaViduQ2TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiViduQ2TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiViduQ2TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiViduQ2TextToVideoRequestsByRequestIdResponse =
+  zSchemaViduQ2TextToVideoOutput
+
+export const zGetFalAiKreaWan14bTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKreaWan14bTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKreaWan14bTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKreaWan14bTextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiKreaWan14bTextToVideoData = z.object({
+  body: zSchemaKreaWan14bTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKreaWan14bTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiKreaWan14bTextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKreaWan14bTextToVideoRequestsByRequestIdResponse =
+  zSchemaKreaWan14bTextToVideoOutput
+
+export const zGetFalAiWanAlphaRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWanAlphaRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWanAlphaRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWanAlphaRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiWanAlphaData = z.object({
+  body: zSchemaWanAlphaInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWanAlphaResponse = zSchemaQueueStatus
+
+export const zGetFalAiWanAlphaRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWanAlphaRequestsByRequestIdResponse =
+  zSchemaWanAlphaOutput
+
+export const zGetFalAiKandinsky5TextToVideoDistillRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKandinsky5TextToVideoDistillRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKandinsky5TextToVideoDistillRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKandinsky5TextToVideoDistillRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKandinsky5TextToVideoDistillData = z.object({
+  body: zSchemaKandinsky5TextToVideoDistillInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKandinsky5TextToVideoDistillResponse = zSchemaQueueStatus
+
+export const zGetFalAiKandinsky5TextToVideoDistillRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKandinsky5TextToVideoDistillRequestsByRequestIdResponse =
+  zSchemaKandinsky5TextToVideoDistillOutput
+
+export const zGetFalAiKandinsky5TextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKandinsky5TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKandinsky5TextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKandinsky5TextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiKandinsky5TextToVideoData = z.object({
+  body: zSchemaKandinsky5TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKandinsky5TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiKandinsky5TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKandinsky5TextToVideoRequestsByRequestIdResponse =
+  zSchemaKandinsky5TextToVideoOutput
+
+export const zGetFalAiVeo31FastRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiVeo31FastRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiVeo31FastRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiVeo31FastRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiVeo31FastData = z.object({
+  body: zSchemaVeo31FastInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiVeo31FastResponse = zSchemaQueueStatus
+
+export const zGetFalAiVeo31FastRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiVeo31FastRequestsByRequestIdResponse =
+  zSchemaVeo31FastOutput
+
+export const zGetFalAiVeo31RequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiVeo31RequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiVeo31RequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiVeo31RequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiVeo31Data = z.object({
+  body: zSchemaVeo31Input,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiVeo31Response = zSchemaQueueStatus
+
+export const zGetFalAiVeo31RequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiVeo31RequestsByRequestIdResponse = zSchemaVeo31Output
+
+export const zGetFalAiSora2TextToVideoProRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiSora2TextToVideoProRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiSora2TextToVideoProRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiSora2TextToVideoProRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiSora2TextToVideoProData = z.object({
+  body: zSchemaSora2TextToVideoProInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiSora2TextToVideoProResponse = zSchemaQueueStatus
+
+export const zGetFalAiSora2TextToVideoProRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiSora2TextToVideoProRequestsByRequestIdResponse =
+  zSchemaSora2TextToVideoProOutput
+
+export const zGetFalAiSora2TextToVideoRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiSora2TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiSora2TextToVideoRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiSora2TextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiSora2TextToVideoData = z.object({
+  body: zSchemaSora2TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiSora2TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiSora2TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiSora2TextToVideoRequestsByRequestIdResponse =
+  zSchemaSora2TextToVideoOutput
+
+export const zGetFalAiOviRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiOviRequestsByRequestIdStatusResponse = zSchemaQueueStatus
+
+export const zPutFalAiOviRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiOviRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiOviData = z.object({
+  body: zSchemaOviInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiOviResponse = zSchemaQueueStatus
+
+export const zGetFalAiOviRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiOviRequestsByRequestIdResponse = zSchemaOviOutput
+
+export const zGetFalAiWan25PreviewTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWan25PreviewTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWan25PreviewTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWan25PreviewTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiWan25PreviewTextToVideoData = z.object({
+  body: zSchemaWan25PreviewTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWan25PreviewTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiWan25PreviewTextToVideoRequestsByRequestIdData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWan25PreviewTextToVideoRequestsByRequestIdResponse =
+  zSchemaWan25PreviewTextToVideoOutput
+
+export const zGetArgilAvatarsTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetArgilAvatarsTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutArgilAvatarsTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutArgilAvatarsTextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostArgilAvatarsTextToVideoData = z.object({
+  body: zSchemaAvatarsTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostArgilAvatarsTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetArgilAvatarsTextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetArgilAvatarsTextToVideoRequestsByRequestIdResponse =
+  zSchemaAvatarsTextToVideoOutput
+
+export const zGetFalAiPixverseV5TextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiPixverseV5TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiPixverseV5TextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiPixverseV5TextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiPixverseV5TextToVideoData = z.object({
+  body: zSchemaPixverseV5TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiPixverseV5TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiPixverseV5TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiPixverseV5TextToVideoRequestsByRequestIdResponse =
+  zSchemaPixverseV5TextToVideoOutput
+
+export const zGetFalAiInfinitalkSingleTextRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiInfinitalkSingleTextRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiInfinitalkSingleTextRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiInfinitalkSingleTextRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiInfinitalkSingleTextData = z.object({
+  body: zSchemaInfinitalkSingleTextInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiInfinitalkSingleTextResponse = zSchemaQueueStatus
+
+export const zGetFalAiInfinitalkSingleTextRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiInfinitalkSingleTextRequestsByRequestIdResponse =
+  zSchemaInfinitalkSingleTextOutput
+
+export const zGetMoonvalleyMareyT2vRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetMoonvalleyMareyT2vRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutMoonvalleyMareyT2vRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutMoonvalleyMareyT2vRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostMoonvalleyMareyT2vData = z.object({
+  body: zSchemaMareyT2vInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostMoonvalleyMareyT2vResponse = zSchemaQueueStatus
+
+export const zGetMoonvalleyMareyT2vRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetMoonvalleyMareyT2vRequestsByRequestIdResponse =
+  zSchemaMareyT2vOutput
+
+export const zGetFalAiWanV22A14bTextToVideoLoraRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWanV22A14bTextToVideoLoraRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWanV22A14bTextToVideoLoraRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWanV22A14bTextToVideoLoraRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiWanV22A14bTextToVideoLoraData = z.object({
+  body: zSchemaWanV22A14bTextToVideoLoraInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWanV22A14bTextToVideoLoraResponse = zSchemaQueueStatus
+
+export const zGetFalAiWanV22A14bTextToVideoLoraRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWanV22A14bTextToVideoLoraRequestsByRequestIdResponse =
+  zSchemaWanV22A14bTextToVideoLoraOutput
+
+export const zGetFalAiWanV225bTextToVideoDistillRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWanV225bTextToVideoDistillRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWanV225bTextToVideoDistillRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWanV225bTextToVideoDistillRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiWanV225bTextToVideoDistillData = z.object({
+  body: zSchemaWanV225bTextToVideoDistillInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWanV225bTextToVideoDistillResponse = zSchemaQueueStatus
+
+export const zGetFalAiWanV225bTextToVideoDistillRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWanV225bTextToVideoDistillRequestsByRequestIdResponse =
+  zSchemaWanV225bTextToVideoDistillOutput
+
+export const zGetFalAiWanV225bTextToVideoFastWanRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWanV225bTextToVideoFastWanRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWanV225bTextToVideoFastWanRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWanV225bTextToVideoFastWanRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiWanV225bTextToVideoFastWanData = z.object({
+  body: zSchemaWanV225bTextToVideoFastWanInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWanV225bTextToVideoFastWanResponse = zSchemaQueueStatus
+
+export const zGetFalAiWanV225bTextToVideoFastWanRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWanV225bTextToVideoFastWanRequestsByRequestIdResponse =
+  zSchemaWanV225bTextToVideoFastWanOutput
+
+export const zGetFalAiWanV22A14bTextToVideoTurboRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWanV22A14bTextToVideoTurboRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWanV22A14bTextToVideoTurboRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWanV22A14bTextToVideoTurboRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiWanV22A14bTextToVideoTurboData = z.object({
+  body: zSchemaWanV22A14bTextToVideoTurboInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWanV22A14bTextToVideoTurboResponse = zSchemaQueueStatus
+
+export const zGetFalAiWanV22A14bTextToVideoTurboRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWanV22A14bTextToVideoTurboRequestsByRequestIdResponse =
+  zSchemaWanV22A14bTextToVideoTurboOutput
+
+export const zGetFalAiWanV225bTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWanV225bTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWanV225bTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWanV225bTextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiWanV225bTextToVideoData = z.object({
+  body: zSchemaWanV225bTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWanV225bTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiWanV225bTextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWanV225bTextToVideoRequestsByRequestIdResponse =
+  zSchemaWanV225bTextToVideoOutput
+
+export const zGetFalAiWanV22A14bTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWanV22A14bTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWanV22A14bTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWanV22A14bTextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiWanV22A14bTextToVideoData = z.object({
+  body: zSchemaWanV22A14bTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWanV22A14bTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiWanV22A14bTextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWanV22A14bTextToVideoRequestsByRequestIdResponse =
+  zSchemaWanV22A14bTextToVideoOutput
+
+export const zGetFalAiLtxv13B098DistilledRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtxv13B098DistilledRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtxv13B098DistilledRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtxv13B098DistilledRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiLtxv13B098DistilledData = z.object({
+  body: zSchemaLtxv13B098DistilledInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtxv13B098DistilledResponse = zSchemaQueueStatus
+
+export const zGetFalAiLtxv13B098DistilledRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtxv13B098DistilledRequestsByRequestIdResponse =
+  zSchemaLtxv13B098DistilledOutput
+
+export const zGetFalAiMinimaxHailuo02ProTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiMinimaxHailuo02ProTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiMinimaxHailuo02ProTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiMinimaxHailuo02ProTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiMinimaxHailuo02ProTextToVideoData = z.object({
+  body: zSchemaMinimaxHailuo02ProTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiMinimaxHailuo02ProTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiMinimaxHailuo02ProTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiMinimaxHailuo02ProTextToVideoRequestsByRequestIdResponse =
+  zSchemaMinimaxHailuo02ProTextToVideoOutput
+
+export const zGetFalAiBytedanceSeedanceV1ProTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiBytedanceSeedanceV1ProTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiBytedanceSeedanceV1ProTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiBytedanceSeedanceV1ProTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiBytedanceSeedanceV1ProTextToVideoData = z.object({
+  body: zSchemaBytedanceSeedanceV1ProTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiBytedanceSeedanceV1ProTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiBytedanceSeedanceV1ProTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiBytedanceSeedanceV1ProTextToVideoRequestsByRequestIdResponse =
+  zSchemaBytedanceSeedanceV1ProTextToVideoOutput
+
+export const zGetFalAiBytedanceSeedanceV1LiteTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiBytedanceSeedanceV1LiteTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiBytedanceSeedanceV1LiteTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiBytedanceSeedanceV1LiteTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiBytedanceSeedanceV1LiteTextToVideoData = z.object({
+  body: zSchemaBytedanceSeedanceV1LiteTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiBytedanceSeedanceV1LiteTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiBytedanceSeedanceV1LiteTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiBytedanceSeedanceV1LiteTextToVideoRequestsByRequestIdResponse =
+  zSchemaBytedanceSeedanceV1LiteTextToVideoOutput
+
+export const zGetFalAiKlingVideoV21MasterTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoV21MasterTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoV21MasterTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoV21MasterTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoV21MasterTextToVideoData = z.object({
+  body: zSchemaKlingVideoV21MasterTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKlingVideoV21MasterTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoV21MasterTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoV21MasterTextToVideoRequestsByRequestIdResponse =
+  zSchemaKlingVideoV21MasterTextToVideoOutput
+
+export const zGetVeedAvatarsTextToVideoRequestsByRequestIdStatusData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  },
+)
+
+/**
+ * The request status.
+ */
+export const zGetVeedAvatarsTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutVeedAvatarsTextToVideoRequestsByRequestIdCancelData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * The request was cancelled.
+ */
+export const zPutVeedAvatarsTextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostVeedAvatarsTextToVideoData = z.object({
+  body: zSchemaAvatarsTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostVeedAvatarsTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetVeedAvatarsTextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetVeedAvatarsTextToVideoRequestsByRequestIdResponse =
+  zSchemaAvatarsTextToVideoOutput
+
+export const zGetFalAiLtxVideo13bDevRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtxVideo13bDevRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtxVideo13bDevRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtxVideo13bDevRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiLtxVideo13bDevData = z.object({
+  body: zSchemaLtxVideo13bDevInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtxVideo13bDevResponse = zSchemaQueueStatus
+
+export const zGetFalAiLtxVideo13bDevRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtxVideo13bDevRequestsByRequestIdResponse =
+  zSchemaLtxVideo13bDevOutput
+
+export const zGetFalAiLtxVideo13bDistilledRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtxVideo13bDistilledRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtxVideo13bDistilledRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtxVideo13bDistilledRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiLtxVideo13bDistilledData = z.object({
+  body: zSchemaLtxVideo13bDistilledInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtxVideo13bDistilledResponse = zSchemaQueueStatus
+
+export const zGetFalAiLtxVideo13bDistilledRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtxVideo13bDistilledRequestsByRequestIdResponse =
+  zSchemaLtxVideo13bDistilledOutput
+
+export const zGetFalAiPixverseV45TextToVideoFastRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiPixverseV45TextToVideoFastRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiPixverseV45TextToVideoFastRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiPixverseV45TextToVideoFastRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiPixverseV45TextToVideoFastData = z.object({
+  body: zSchemaPixverseV45TextToVideoFastInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiPixverseV45TextToVideoFastResponse = zSchemaQueueStatus
+
+export const zGetFalAiPixverseV45TextToVideoFastRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiPixverseV45TextToVideoFastRequestsByRequestIdResponse =
+  zSchemaPixverseV45TextToVideoFastOutput
+
+export const zGetFalAiPixverseV45TextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiPixverseV45TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiPixverseV45TextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiPixverseV45TextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiPixverseV45TextToVideoData = z.object({
+  body: zSchemaPixverseV45TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiPixverseV45TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiPixverseV45TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiPixverseV45TextToVideoRequestsByRequestIdResponse =
+  zSchemaPixverseV45TextToVideoOutput
+
+export const zGetFalAiViduQ1TextToVideoRequestsByRequestIdStatusData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  },
+)
+
+/**
+ * The request status.
+ */
+export const zGetFalAiViduQ1TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiViduQ1TextToVideoRequestsByRequestIdCancelData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiViduQ1TextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiViduQ1TextToVideoData = z.object({
+  body: zSchemaViduQ1TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiViduQ1TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiViduQ1TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiViduQ1TextToVideoRequestsByRequestIdResponse =
+  zSchemaViduQ1TextToVideoOutput
+
+export const zGetFalAiMagiRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiMagiRequestsByRequestIdStatusResponse = zSchemaQueueStatus
+
+export const zPutFalAiMagiRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiMagiRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiMagiData = z.object({
+  body: zSchemaMagiInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiMagiResponse = zSchemaQueueStatus
+
+export const zGetFalAiMagiRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiMagiRequestsByRequestIdResponse = zSchemaMagiOutput
+
+export const zGetFalAiMagiDistilledRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiMagiDistilledRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiMagiDistilledRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiMagiDistilledRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiMagiDistilledData = z.object({
+  body: zSchemaMagiDistilledInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiMagiDistilledResponse = zSchemaQueueStatus
+
+export const zGetFalAiMagiDistilledRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiMagiDistilledRequestsByRequestIdResponse =
+  zSchemaMagiDistilledOutput
+
+export const zGetFalAiPixverseV4TextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiPixverseV4TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiPixverseV4TextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiPixverseV4TextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiPixverseV4TextToVideoData = z.object({
+  body: zSchemaPixverseV4TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiPixverseV4TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiPixverseV4TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiPixverseV4TextToVideoRequestsByRequestIdResponse =
+  zSchemaPixverseV4TextToVideoOutput
+
+export const zGetFalAiPixverseV4TextToVideoFastRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiPixverseV4TextToVideoFastRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiPixverseV4TextToVideoFastRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiPixverseV4TextToVideoFastRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiPixverseV4TextToVideoFastData = z.object({
+  body: zSchemaPixverseV4TextToVideoFastInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiPixverseV4TextToVideoFastResponse = zSchemaQueueStatus
+
+export const zGetFalAiPixverseV4TextToVideoFastRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiPixverseV4TextToVideoFastRequestsByRequestIdResponse =
+  zSchemaPixverseV4TextToVideoFastOutput
+
+export const zGetFalAiKlingVideoLipsyncAudioToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoLipsyncAudioToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoLipsyncAudioToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoLipsyncAudioToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoLipsyncAudioToVideoData = z.object({
+  body: zSchemaKlingVideoLipsyncAudioToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKlingVideoLipsyncAudioToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoLipsyncAudioToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoLipsyncAudioToVideoRequestsByRequestIdResponse =
+  zSchemaKlingVideoLipsyncAudioToVideoOutput
+
+export const zGetFalAiKlingVideoLipsyncTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoLipsyncTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoLipsyncTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoLipsyncTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoLipsyncTextToVideoData = z.object({
+  body: zSchemaKlingVideoLipsyncTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKlingVideoLipsyncTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoLipsyncTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoLipsyncTextToVideoRequestsByRequestIdResponse =
+  zSchemaKlingVideoLipsyncTextToVideoOutput
+
+export const zGetFalAiWanT2vLoraRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWanT2vLoraRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWanT2vLoraRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWanT2vLoraRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiWanT2vLoraData = z.object({
+  body: zSchemaWanT2vLoraInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWanT2vLoraResponse = zSchemaQueueStatus
+
+export const zGetFalAiWanT2vLoraRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWanT2vLoraRequestsByRequestIdResponse =
+  zSchemaWanT2vLoraOutput
+
+export const zGetFalAiLumaDreamMachineRay2FlashRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLumaDreamMachineRay2FlashRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLumaDreamMachineRay2FlashRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLumaDreamMachineRay2FlashRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLumaDreamMachineRay2FlashData = z.object({
+  body: zSchemaLumaDreamMachineRay2FlashInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLumaDreamMachineRay2FlashResponse = zSchemaQueueStatus
+
+export const zGetFalAiLumaDreamMachineRay2FlashRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLumaDreamMachineRay2FlashRequestsByRequestIdResponse =
+  zSchemaLumaDreamMachineRay2FlashOutput
+
+export const zGetFalAiPikaV2TurboTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiPikaV2TurboTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiPikaV2TurboTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiPikaV2TurboTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiPikaV2TurboTextToVideoData = z.object({
+  body: zSchemaPikaV2TurboTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiPikaV2TurboTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiPikaV2TurboTextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiPikaV2TurboTextToVideoRequestsByRequestIdResponse =
+  zSchemaPikaV2TurboTextToVideoOutput
+
+export const zGetFalAiPikaV21TextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiPikaV21TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiPikaV21TextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiPikaV21TextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiPikaV21TextToVideoData = z.object({
+  body: zSchemaPikaV21TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiPikaV21TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiPikaV21TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiPikaV21TextToVideoRequestsByRequestIdResponse =
+  zSchemaPikaV21TextToVideoOutput
+
+export const zGetFalAiPikaV22TextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiPikaV22TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiPikaV22TextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiPikaV22TextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiPikaV22TextToVideoData = z.object({
+  body: zSchemaPikaV22TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiPikaV22TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiPikaV22TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiPikaV22TextToVideoRequestsByRequestIdResponse =
+  zSchemaPikaV22TextToVideoOutput
+
+export const zGetFalAiWanProTextToVideoRequestsByRequestIdStatusData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  },
+)
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWanProTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWanProTextToVideoRequestsByRequestIdCancelData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWanProTextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiWanProTextToVideoData = z.object({
+  body: zSchemaWanProTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWanProTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiWanProTextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWanProTextToVideoRequestsByRequestIdResponse =
+  zSchemaWanProTextToVideoOutput
+
+export const zGetFalAiKlingVideoV15ProEffectsRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoV15ProEffectsRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoV15ProEffectsRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoV15ProEffectsRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoV15ProEffectsData = z.object({
+  body: zSchemaKlingVideoV15ProEffectsInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKlingVideoV15ProEffectsResponse = zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoV15ProEffectsRequestsByRequestIdData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoV15ProEffectsRequestsByRequestIdResponse =
+  zSchemaKlingVideoV15ProEffectsOutput
+
+export const zGetFalAiKlingVideoV16ProEffectsRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoV16ProEffectsRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoV16ProEffectsRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoV16ProEffectsRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoV16ProEffectsData = z.object({
+  body: zSchemaKlingVideoV16ProEffectsInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKlingVideoV16ProEffectsResponse = zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoV16ProEffectsRequestsByRequestIdData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoV16ProEffectsRequestsByRequestIdResponse =
+  zSchemaKlingVideoV16ProEffectsOutput
+
+export const zGetFalAiKlingVideoV1StandardEffectsRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoV1StandardEffectsRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoV1StandardEffectsRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoV1StandardEffectsRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoV1StandardEffectsData = z.object({
+  body: zSchemaKlingVideoV1StandardEffectsInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKlingVideoV1StandardEffectsResponse = zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoV1StandardEffectsRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoV1StandardEffectsRequestsByRequestIdResponse =
+  zSchemaKlingVideoV1StandardEffectsOutput
+
+export const zGetFalAiKlingVideoV16StandardEffectsRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoV16StandardEffectsRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoV16StandardEffectsRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoV16StandardEffectsRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoV16StandardEffectsData = z.object({
+  body: zSchemaKlingVideoV16StandardEffectsInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKlingVideoV16StandardEffectsResponse = zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoV16StandardEffectsRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoV16StandardEffectsRequestsByRequestIdResponse =
+  zSchemaKlingVideoV16StandardEffectsOutput
+
+export const zGetFalAiLtxVideoV095RequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtxVideoV095RequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtxVideoV095RequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtxVideoV095RequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiLtxVideoV095Data = z.object({
+  body: zSchemaLtxVideoV095Input,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtxVideoV095Response = zSchemaQueueStatus
+
+export const zGetFalAiLtxVideoV095RequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtxVideoV095RequestsByRequestIdResponse =
+  zSchemaLtxVideoV095Output
+
+export const zGetFalAiKlingVideoV16ProTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoV16ProTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoV16ProTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoV16ProTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoV16ProTextToVideoData = z.object({
+  body: zSchemaKlingVideoV16ProTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKlingVideoV16ProTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoV16ProTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoV16ProTextToVideoRequestsByRequestIdResponse =
+  zSchemaKlingVideoV16ProTextToVideoOutput
+
+export const zGetFalAiWanT2vRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWanT2vRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWanT2vRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWanT2vRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiWanT2vData = z.object({
+  body: zSchemaWanT2vInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWanT2vResponse = zSchemaQueueStatus
+
+export const zGetFalAiWanT2vRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWanT2vRequestsByRequestIdResponse = zSchemaWanT2vOutput
+
+export const zGetFalAiVeo2RequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiVeo2RequestsByRequestIdStatusResponse = zSchemaQueueStatus
+
+export const zPutFalAiVeo2RequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiVeo2RequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiVeo2Data = z.object({
+  body: zSchemaVeo2Input,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiVeo2Response = zSchemaQueueStatus
+
+export const zGetFalAiVeo2RequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiVeo2RequestsByRequestIdResponse = zSchemaVeo2Output
+
+export const zGetFalAiMinimaxVideo01DirectorRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiMinimaxVideo01DirectorRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiMinimaxVideo01DirectorRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiMinimaxVideo01DirectorRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiMinimaxVideo01DirectorData = z.object({
+  body: zSchemaMinimaxVideo01DirectorInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiMinimaxVideo01DirectorResponse = zSchemaQueueStatus
+
+export const zGetFalAiMinimaxVideo01DirectorRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiMinimaxVideo01DirectorRequestsByRequestIdResponse =
+  zSchemaMinimaxVideo01DirectorOutput
+
+export const zGetFalAiPixverseV35TextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiPixverseV35TextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiPixverseV35TextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiPixverseV35TextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiPixverseV35TextToVideoData = z.object({
+  body: zSchemaPixverseV35TextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiPixverseV35TextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiPixverseV35TextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiPixverseV35TextToVideoRequestsByRequestIdResponse =
+  zSchemaPixverseV35TextToVideoOutput
+
+export const zGetFalAiPixverseV35TextToVideoFastRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiPixverseV35TextToVideoFastRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiPixverseV35TextToVideoFastRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiPixverseV35TextToVideoFastRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiPixverseV35TextToVideoFastData = z.object({
+  body: zSchemaPixverseV35TextToVideoFastInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiPixverseV35TextToVideoFastResponse = zSchemaQueueStatus
+
+export const zGetFalAiPixverseV35TextToVideoFastRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiPixverseV35TextToVideoFastRequestsByRequestIdResponse =
+  zSchemaPixverseV35TextToVideoFastOutput
+
+export const zGetFalAiLumaDreamMachineRay2RequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLumaDreamMachineRay2RequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLumaDreamMachineRay2RequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLumaDreamMachineRay2RequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiLumaDreamMachineRay2Data = z.object({
+  body: zSchemaLumaDreamMachineRay2Input,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLumaDreamMachineRay2Response = zSchemaQueueStatus
+
+export const zGetFalAiLumaDreamMachineRay2RequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLumaDreamMachineRay2RequestsByRequestIdResponse =
+  zSchemaLumaDreamMachineRay2Output
+
+export const zGetFalAiHunyuanVideoLoraRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiHunyuanVideoLoraRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiHunyuanVideoLoraRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiHunyuanVideoLoraRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiHunyuanVideoLoraData = z.object({
+  body: zSchemaHunyuanVideoLoraInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiHunyuanVideoLoraResponse = zSchemaQueueStatus
+
+export const zGetFalAiHunyuanVideoLoraRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiHunyuanVideoLoraRequestsByRequestIdResponse =
+  zSchemaHunyuanVideoLoraOutput
+
+export const zGetFalAiTranspixarRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiTranspixarRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiTranspixarRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiTranspixarRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiTranspixarData = z.object({
+  body: zSchemaTranspixarInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiTranspixarResponse = zSchemaQueueStatus
+
+export const zGetFalAiTranspixarRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiTranspixarRequestsByRequestIdResponse =
+  zSchemaTranspixarOutput
+
+export const zGetFalAiCogvideox5bRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiCogvideox5bRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiCogvideox5bRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiCogvideox5bRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiCogvideox5bData = z.object({
+  body: zSchemaCogvideox5bInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiCogvideox5bResponse = zSchemaQueueStatus
+
+export const zGetFalAiCogvideox5bRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiCogvideox5bRequestsByRequestIdResponse =
+  zSchemaCogvideox5bOutput
+
+export const zGetFalAiKlingVideoV16StandardTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoV16StandardTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoV16StandardTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoV16StandardTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoV16StandardTextToVideoData = z.object({
+  body: zSchemaKlingVideoV16StandardTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKlingVideoV16StandardTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoV16StandardTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoV16StandardTextToVideoRequestsByRequestIdResponse =
+  zSchemaKlingVideoV16StandardTextToVideoOutput
+
+export const zGetFalAiMinimaxVideo01LiveRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiMinimaxVideo01LiveRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiMinimaxVideo01LiveRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiMinimaxVideo01LiveRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiMinimaxVideo01LiveData = z.object({
+  body: zSchemaMinimaxVideo01LiveInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiMinimaxVideo01LiveResponse = zSchemaQueueStatus
+
+export const zGetFalAiMinimaxVideo01LiveRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiMinimaxVideo01LiveRequestsByRequestIdResponse =
+  zSchemaMinimaxVideo01LiveOutput
+
+export const zGetFalAiKlingVideoV1StandardTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoV1StandardTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoV1StandardTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoV1StandardTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoV1StandardTextToVideoData = z.object({
+  body: zSchemaKlingVideoV1StandardTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKlingVideoV1StandardTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoV1StandardTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoV1StandardTextToVideoRequestsByRequestIdResponse =
+  zSchemaKlingVideoV1StandardTextToVideoOutput
+
+export const zGetFalAiKlingVideoV15ProTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiKlingVideoV15ProTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoV15ProTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoV15ProTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoV15ProTextToVideoData = z.object({
+  body: zSchemaKlingVideoV15ProTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiKlingVideoV15ProTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoV15ProTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiKlingVideoV15ProTextToVideoRequestsByRequestIdResponse =
+  zSchemaKlingVideoV15ProTextToVideoOutput
+
+export const zGetFalAiMochiV1RequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiMochiV1RequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiMochiV1RequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiMochiV1RequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiMochiV1Data = z.object({
+  body: zSchemaMochiV1Input,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiMochiV1Response = zSchemaQueueStatus
+
+export const zGetFalAiMochiV1RequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiMochiV1RequestsByRequestIdResponse = zSchemaMochiV1Output
+
+export const zGetFalAiHunyuanVideoRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiHunyuanVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiHunyuanVideoRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiHunyuanVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiHunyuanVideoData = z.object({
+  body: zSchemaHunyuanVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiHunyuanVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiHunyuanVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiHunyuanVideoRequestsByRequestIdResponse =
+  zSchemaHunyuanVideoOutput
+
+export const zGetFalAiLtxVideoRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtxVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtxVideoRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtxVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiLtxVideoData = z.object({
+  body: zSchemaLtxVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtxVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiLtxVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtxVideoRequestsByRequestIdResponse =
+  zSchemaLtxVideoOutput
+
+export const zGetFalAiFastSvdTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiFastSvdTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiFastSvdTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiFastSvdTextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiFastSvdTextToVideoData = z.object({
+  body: zSchemaFastSvdTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiFastSvdTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiFastSvdTextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiFastSvdTextToVideoRequestsByRequestIdResponse =
+  zSchemaFastSvdTextToVideoOutput
+
+export const zGetFalAiFastSvdLcmTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiFastSvdLcmTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiFastSvdLcmTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiFastSvdLcmTextToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiFastSvdLcmTextToVideoData = z.object({
+  body: zSchemaFastSvdLcmTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiFastSvdLcmTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiFastSvdLcmTextToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiFastSvdLcmTextToVideoRequestsByRequestIdResponse =
+  zSchemaFastSvdLcmTextToVideoOutput
+
+export const zGetFalAiT2vTurboRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiT2vTurboRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiT2vTurboRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiT2vTurboRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiT2vTurboData = z.object({
+  body: zSchemaT2vTurboInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiT2vTurboResponse = zSchemaQueueStatus
+
+export const zGetFalAiT2vTurboRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiT2vTurboRequestsByRequestIdResponse =
+  zSchemaT2vTurboOutput
+
+export const zGetFalAiFastAnimatediffTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiFastAnimatediffTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiFastAnimatediffTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiFastAnimatediffTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiFastAnimatediffTextToVideoData = z.object({
+  body: zSchemaFastAnimatediffTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiFastAnimatediffTextToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiFastAnimatediffTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiFastAnimatediffTextToVideoRequestsByRequestIdResponse =
+  zSchemaFastAnimatediffTextToVideoOutput
+
+export const zGetFalAiFastAnimatediffTurboTextToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiFastAnimatediffTurboTextToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiFastAnimatediffTurboTextToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiFastAnimatediffTurboTextToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiFastAnimatediffTurboTextToVideoData = z.object({
+  body: zSchemaFastAnimatediffTurboTextToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiFastAnimatediffTurboTextToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiFastAnimatediffTurboTextToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiFastAnimatediffTurboTextToVideoRequestsByRequestIdResponse =
+  zSchemaFastAnimatediffTurboTextToVideoOutput
+
+export const zGetFalAiMinimaxVideo01RequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiMinimaxVideo01RequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiMinimaxVideo01RequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiMinimaxVideo01RequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiMinimaxVideo01Data = z.object({
+  body: zSchemaMinimaxVideo01Input,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiMinimaxVideo01Response = zSchemaQueueStatus
+
+export const zGetFalAiMinimaxVideo01RequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiMinimaxVideo01RequestsByRequestIdResponse =
+  zSchemaMinimaxVideo01Output
+
+export const zGetFalAiAnimatediffSparsectrlLcmRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiAnimatediffSparsectrlLcmRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiAnimatediffSparsectrlLcmRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiAnimatediffSparsectrlLcmRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiAnimatediffSparsectrlLcmData = z.object({
+  body: zSchemaAnimatediffSparsectrlLcmInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiAnimatediffSparsectrlLcmResponse = zSchemaQueueStatus
+
+export const zGetFalAiAnimatediffSparsectrlLcmRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiAnimatediffSparsectrlLcmRequestsByRequestIdResponse =
+  zSchemaAnimatediffSparsectrlLcmOutput

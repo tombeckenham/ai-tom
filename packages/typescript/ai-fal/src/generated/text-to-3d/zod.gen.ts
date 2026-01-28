@@ -2,57 +2,10 @@
 
 import { z } from 'zod'
 
-export const zFile = z.object({
-  url: z.url(),
-  content_type: z.optional(z.string()),
-  file_name: z.optional(z.string()),
-  file_size: z.optional(z.int()),
-})
-
-export const zQueueStatus = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'FAILED']),
-  response_url: z.optional(z.url()),
-})
-
-/**
- * HYMotionInput
- */
-export const zHunyuanMotionFastInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'Text prompt describing the motion to generate.',
-  }),
-  duration: z
-    .optional(
-      z.number().gte(0.5).lte(12).register(z.globalRegistry, {
-        description: 'Motion duration in seconds (0.5-12.0).',
-      }),
-    )
-    .default(5),
-  guidance_scale: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description:
-          'Classifier-free guidance scale. Higher = more faithful to prompt.',
-      }),
-    )
-    .default(5),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'Random seed for reproducible generation.',
-    }),
-  ),
-  output_format: z.optional(
-    z.enum(['fbx', 'dict']).register(z.globalRegistry, {
-      description:
-        "Output format: 'fbx' for animation files, 'dict' for raw JSON.",
-    }),
-  ),
-})
-
 /**
  * File
  */
-export const zFalAiHunyuanMotionFastFile = z.object({
+export const zSchemaFile = z.object({
   file_size: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'The size of the file in bytes.',
@@ -80,188 +33,78 @@ export const zFalAiHunyuanMotionFastFile = z.object({
 })
 
 /**
- * HYMotionOutput
+ * TextureFiles
+ *
+ * Texture files downloaded and uploaded to CDN
  */
-export const zHunyuanMotionFastOutput = z.object({
-  fbx_file: z.optional(zFalAiHunyuanMotionFastFile),
-  motion_json: z.optional(zFalAiHunyuanMotionFastFile),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'Seed used for generation.',
-  }),
-})
-
-/**
- * HYMotionInput
- */
-export const zHunyuanMotionInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'Text prompt describing the motion to generate.',
-  }),
-  duration: z
-    .optional(
-      z.number().gte(0.5).lte(12).register(z.globalRegistry, {
-        description: 'Motion duration in seconds (0.5-12.0).',
-      }),
-    )
-    .default(5),
-  guidance_scale: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description:
-          'Classifier-free guidance scale. Higher = more faithful to prompt.',
-      }),
-    )
-    .default(5),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'Random seed for reproducible generation.',
-    }),
-  ),
-  output_format: z.optional(
-    z.enum(['fbx', 'dict']).register(z.globalRegistry, {
-      description:
-        "Output format: 'fbx' for animation files, 'dict' for raw JSON.",
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiHunyuanMotionFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * HYMotionOutput
- */
-export const zHunyuanMotionOutput = z.object({
-  fbx_file: z.optional(zFalAiHunyuanMotionFile),
-  motion_json: z.optional(zFalAiHunyuanMotionFile),
-  seed: z.int().register(z.globalRegistry, {
-    description: 'Seed used for generation.',
-  }),
-})
-
-/**
- * TextTo3DInput
- */
-export const zHunyuan3dV3TextTo3dInput = z.object({
-  enable_pbr: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to enable PBR material generation',
-      }),
-    )
-    .default(false),
-  polygon_type: z.optional(
-    z.enum(['triangle', 'quadrilateral']).register(z.globalRegistry, {
-      description:
-        'Polygon type. Only takes effect when GenerateType is LowPoly.',
-    }),
-  ),
-  face_count: z
-    .optional(
-      z.int().gte(40000).lte(1500000).register(z.globalRegistry, {
-        description: 'Target face count. Range: 40000-1500000',
-      }),
-    )
-    .default(500000),
-  prompt: z.string().max(1024).register(z.globalRegistry, {
-    description:
-      'Text description of the 3D content to generate. Supports up to 1024 UTF-8 characters.',
-  }),
-  generate_type: z.optional(
-    z.enum(['Normal', 'LowPoly', 'Geometry']).register(z.globalRegistry, {
-      description:
-        'Generation type. Normal: textured model. LowPoly: polygon reduction. Geometry: white model without texture.',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiHunyuan3dV3TextTo3dFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
+export const zSchemaTextureFiles = z
+  .object({
+    base_color: zSchemaFile,
+    normal: z.optional(zSchemaFile),
+    roughness: z.optional(zSchemaFile),
+    metallic: z.optional(zSchemaFile),
+  })
+  .register(z.globalRegistry, {
+    description: 'Texture files downloaded and uploaded to CDN',
+  })
 
 /**
  * ModelUrls
+ *
+ * 3D model files in various formats
  */
-export const zModelUrls = z.object({
-  fbx: z.optional(zFalAiHunyuan3dV3TextTo3dFile),
-  usdz: z.optional(zFalAiHunyuan3dV3TextTo3dFile),
-  glb: z.optional(zFalAiHunyuan3dV3TextTo3dFile),
-  obj: z.optional(zFalAiHunyuan3dV3TextTo3dFile),
-})
+export const zSchemaModelUrls = z
+  .object({
+    usdz: z.optional(zSchemaFile),
+    fbx: z.optional(zSchemaFile),
+    blend: z.optional(zSchemaFile),
+    stl: z.optional(zSchemaFile),
+    glb: z.optional(zSchemaFile),
+    obj: z.optional(zSchemaFile),
+  })
+  .register(z.globalRegistry, {
+    description: '3D model files in various formats',
+  })
 
 /**
  * TextTo3DOutput
+ *
+ * Output for Text to 3D generation
  */
-export const zHunyuan3dV3TextTo3dOutput = z.object({
-  model_urls: zModelUrls,
-  thumbnail: z.optional(zFalAiHunyuan3dV3TextTo3dFile),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The seed used for generation',
+export const zSchemaMeshyV6PreviewTextTo3dOutput = z
+  .object({
+    prompt: z.string().register(z.globalRegistry, {
+      description: 'The text prompt used for generation',
     }),
-  ),
-  model_glb: zFalAiHunyuan3dV3TextTo3dFile,
-})
+    thumbnail: z.optional(zSchemaFile),
+    actual_prompt: z.optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The actual prompt used if prompt expansion was enabled',
+      }),
+    ),
+    texture_urls: z.optional(
+      z.array(zSchemaTextureFiles).register(z.globalRegistry, {
+        description: 'Array of texture file objects',
+      }),
+    ),
+    model_glb: zSchemaFile,
+    seed: z.optional(
+      z.int().register(z.globalRegistry, {
+        description: 'The seed used for generation',
+      }),
+    ),
+    model_urls: zSchemaModelUrls,
+  })
+  .register(z.globalRegistry, {
+    description: 'Output for Text to 3D generation',
+  })
 
 /**
  * TextTo3DInput
  *
  * Input for Text to 3D conversion
  */
-export const zMeshyV6PreviewTextTo3dInput = z
+export const zSchemaMeshyV6PreviewTextTo3dInput = z
   .object({
     prompt: z.string().max(600).register(z.globalRegistry, {
       description:
@@ -360,98 +203,497 @@ export const zMeshyV6PreviewTextTo3dInput = z
   })
 
 /**
- * File
+ * TextTo3DOutput
  */
-export const zFalAiMeshyV6PreviewTextTo3dFile = z.object({
-  file_size: z.optional(
+export const zSchemaHunyuan3dV3TextTo3dOutput = z.object({
+  model_urls: zSchemaModelUrls,
+  thumbnail: z.optional(zSchemaFile),
+  seed: z.optional(
     z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
+      description: 'The seed used for generation',
     }),
   ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
+  model_glb: zSchemaFile,
+})
+
+/**
+ * TextTo3DInput
+ */
+export const zSchemaHunyuan3dV3TextTo3dInput = z.object({
+  enable_pbr: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable PBR material generation',
+      }),
+    )
+    .default(false),
+  polygon_type: z.optional(
+    z.enum(['triangle', 'quadrilateral']).register(z.globalRegistry, {
       description:
-        'The name of the file. It will be auto-generated if not provided.',
+        'Polygon type. Only takes effect when GenerateType is LowPoly.',
     }),
   ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+  face_count: z
+    .optional(
+      z.int().gte(40000).lte(1500000).register(z.globalRegistry, {
+        description: 'Target face count. Range: 40000-1500000',
+      }),
+    )
+    .default(500000),
+  prompt: z.string().max(1024).register(z.globalRegistry, {
+    description:
+      'Text description of the 3D content to generate. Supports up to 1024 UTF-8 characters.',
   }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
+  generate_type: z.optional(
+    z.enum(['Normal', 'LowPoly', 'Geometry']).register(z.globalRegistry, {
+      description:
+        'Generation type. Normal: textured model. LowPoly: polygon reduction. Geometry: white model without texture.',
     }),
   ),
 })
 
 /**
- * TextureFiles
- *
- * Texture files downloaded and uploaded to CDN
+ * HYMotionOutput
  */
-export const zTextureFiles = z
-  .object({
-    base_color: zFalAiMeshyV6PreviewTextTo3dFile,
-    normal: z.optional(zFalAiMeshyV6PreviewTextTo3dFile),
-    roughness: z.optional(zFalAiMeshyV6PreviewTextTo3dFile),
-    metallic: z.optional(zFalAiMeshyV6PreviewTextTo3dFile),
-  })
-  .register(z.globalRegistry, {
-    description: 'Texture files downloaded and uploaded to CDN',
-  })
+export const zSchemaHunyuanMotionOutput = z.object({
+  fbx_file: z.optional(zSchemaFile),
+  motion_json: z.optional(zSchemaFile),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'Seed used for generation.',
+  }),
+})
 
 /**
- * ModelUrls
- *
- * 3D model files in various formats
+ * HYMotionInput
  */
-export const zFalAiMeshyV6PreviewTextTo3dModelUrls = z
-  .object({
-    usdz: z.optional(zFalAiMeshyV6PreviewTextTo3dFile),
-    fbx: z.optional(zFalAiMeshyV6PreviewTextTo3dFile),
-    blend: z.optional(zFalAiMeshyV6PreviewTextTo3dFile),
-    stl: z.optional(zFalAiMeshyV6PreviewTextTo3dFile),
-    glb: z.optional(zFalAiMeshyV6PreviewTextTo3dFile),
-    obj: z.optional(zFalAiMeshyV6PreviewTextTo3dFile),
-  })
-  .register(z.globalRegistry, {
-    description: '3D model files in various formats',
-  })
-
-/**
- * TextTo3DOutput
- *
- * Output for Text to 3D generation
- */
-export const zMeshyV6PreviewTextTo3dOutput = z
-  .object({
-    prompt: z.string().register(z.globalRegistry, {
-      description: 'The text prompt used for generation',
+export const zSchemaHunyuanMotionInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'Text prompt describing the motion to generate.',
+  }),
+  duration: z
+    .optional(
+      z.number().gte(0.5).lte(12).register(z.globalRegistry, {
+        description: 'Motion duration in seconds (0.5-12.0).',
+      }),
+    )
+    .default(5),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description:
+          'Classifier-free guidance scale. Higher = more faithful to prompt.',
+      }),
+    )
+    .default(5),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'Random seed for reproducible generation.',
     }),
-    thumbnail: z.optional(zFalAiMeshyV6PreviewTextTo3dFile),
-    actual_prompt: z.optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The actual prompt used if prompt expansion was enabled',
+  ),
+  output_format: z.optional(
+    z.enum(['fbx', 'dict']).register(z.globalRegistry, {
+      description:
+        "Output format: 'fbx' for animation files, 'dict' for raw JSON.",
+    }),
+  ),
+})
+
+/**
+ * HYMotionOutput
+ */
+export const zSchemaHunyuanMotionFastOutput = z.object({
+  fbx_file: z.optional(zSchemaFile),
+  motion_json: z.optional(zSchemaFile),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'Seed used for generation.',
+  }),
+})
+
+/**
+ * HYMotionInput
+ */
+export const zSchemaHunyuanMotionFastInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'Text prompt describing the motion to generate.',
+  }),
+  duration: z
+    .optional(
+      z.number().gte(0.5).lte(12).register(z.globalRegistry, {
+        description: 'Motion duration in seconds (0.5-12.0).',
+      }),
+    )
+    .default(5),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description:
+          'Classifier-free guidance scale. Higher = more faithful to prompt.',
+      }),
+    )
+    .default(5),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'Random seed for reproducible generation.',
+    }),
+  ),
+  output_format: z.optional(
+    z.enum(['fbx', 'dict']).register(z.globalRegistry, {
+      description:
+        "Output format: 'fbx' for animation files, 'dict' for raw JSON.",
+    }),
+  ),
+})
+
+export const zSchemaQueueStatus = z.object({
+  status: z.enum(['IN_QUEUE', 'IN_PROGRESS', 'COMPLETED']),
+  request_id: z.string().register(z.globalRegistry, {
+    description: 'The request id.',
+  }),
+  response_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The response url.',
+    }),
+  ),
+  status_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The status url.',
+    }),
+  ),
+  cancel_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The cancel url.',
+    }),
+  ),
+  logs: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The logs.',
+    }),
+  ),
+  metrics: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The metrics.',
+    }),
+  ),
+  queue_position: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The queue position.',
+    }),
+  ),
+})
+
+export const zGetFalAiHunyuanMotionFastRequestsByRequestIdStatusData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
       }),
     ),
-    texture_urls: z.optional(
-      z.array(zTextureFiles).register(z.globalRegistry, {
-        description: 'Array of texture file objects',
+  },
+)
+
+/**
+ * The request status.
+ */
+export const zGetFalAiHunyuanMotionFastRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiHunyuanMotionFastRequestsByRequestIdCancelData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiHunyuanMotionFastRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
       }),
     ),
-    model_glb: zFalAiMeshyV6PreviewTextTo3dFile,
-    seed: z.optional(
-      z.int().register(z.globalRegistry, {
-        description: 'The seed used for generation',
-      }),
-    ),
-    model_urls: zFalAiMeshyV6PreviewTextTo3dModelUrls,
   })
   .register(z.globalRegistry, {
-    description: 'Output for Text to 3D generation',
+    description: 'The request was cancelled.',
   })
+
+export const zPostFalAiHunyuanMotionFastData = z.object({
+  body: zSchemaHunyuanMotionFastInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiHunyuanMotionFastResponse = zSchemaQueueStatus
+
+export const zGetFalAiHunyuanMotionFastRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiHunyuanMotionFastRequestsByRequestIdResponse =
+  zSchemaHunyuanMotionFastOutput
+
+export const zGetFalAiHunyuanMotionRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiHunyuanMotionRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiHunyuanMotionRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiHunyuanMotionRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiHunyuanMotionData = z.object({
+  body: zSchemaHunyuanMotionInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiHunyuanMotionResponse = zSchemaQueueStatus
+
+export const zGetFalAiHunyuanMotionRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiHunyuanMotionRequestsByRequestIdResponse =
+  zSchemaHunyuanMotionOutput
+
+export const zGetFalAiHunyuan3dV3TextTo3dRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiHunyuan3dV3TextTo3dRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiHunyuan3dV3TextTo3dRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiHunyuan3dV3TextTo3dRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiHunyuan3dV3TextTo3dData = z.object({
+  body: zSchemaHunyuan3dV3TextTo3dInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiHunyuan3dV3TextTo3dResponse = zSchemaQueueStatus
+
+export const zGetFalAiHunyuan3dV3TextTo3dRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiHunyuan3dV3TextTo3dRequestsByRequestIdResponse =
+  zSchemaHunyuan3dV3TextTo3dOutput
+
+export const zGetFalAiMeshyV6PreviewTextTo3dRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiMeshyV6PreviewTextTo3dRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiMeshyV6PreviewTextTo3dRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiMeshyV6PreviewTextTo3dRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiMeshyV6PreviewTextTo3dData = z.object({
+  body: zSchemaMeshyV6PreviewTextTo3dInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiMeshyV6PreviewTextTo3dResponse = zSchemaQueueStatus
+
+export const zGetFalAiMeshyV6PreviewTextTo3dRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiMeshyV6PreviewTextTo3dRequestsByRequestIdResponse =
+  zSchemaMeshyV6PreviewTextTo3dOutput

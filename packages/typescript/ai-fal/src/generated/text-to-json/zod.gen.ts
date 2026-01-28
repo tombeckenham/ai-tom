@@ -2,22 +2,175 @@
 
 import { z } from 'zod'
 
-export const zFile = z.object({
-  url: z.url(),
-  content_type: z.optional(z.string()),
-  file_name: z.optional(z.string()),
-  file_size: z.optional(z.int()),
+export const zSchemaFiboGenerateStructuredPromptOutput = z.unknown()
+
+/**
+ * Lighting
+ */
+export const zSchemaLighting = z.object({
+  shadows: z.optional(z.union([z.string(), z.unknown()])),
+  conditions: z.optional(z.union([z.string(), z.unknown()])),
+  direction: z.optional(z.union([z.string(), z.unknown()])),
 })
 
-export const zQueueStatus = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'FAILED']),
-  response_url: z.optional(z.url()),
+/**
+ * PhotographicCharacteristics
+ */
+export const zSchemaPhotographicCharacteristics = z.object({
+  focus: z.optional(z.union([z.string(), z.unknown()])),
+  lens_focal_length: z.optional(z.union([z.string(), z.unknown()])),
+  camera_angle: z.optional(z.union([z.string(), z.unknown()])),
+  depth_of_field: z.optional(z.union([z.string(), z.unknown()])),
 })
+
+/**
+ * PromptObject
+ */
+export const zSchemaPromptObject = z.object({
+  clothing: z.optional(z.union([z.string(), z.unknown()])),
+  description: z.optional(z.union([z.string(), z.unknown()])),
+  skin_tone_and_texture: z.optional(z.union([z.string(), z.unknown()])),
+  appearance_details: z.optional(z.union([z.string(), z.unknown()])),
+  number_of_objects: z.optional(z.union([z.int(), z.unknown()])),
+  expression: z.optional(z.union([z.string(), z.unknown()])),
+  pose: z.optional(z.union([z.string(), z.unknown()])),
+  shape_and_color: z.optional(z.union([z.string(), z.unknown()])),
+  relationship: z.string().register(z.globalRegistry, {
+    description:
+      'The relationship of the object to other objects in the image.',
+  }),
+  texture: z.optional(z.union([z.string(), z.unknown()])),
+  gender: z.optional(z.union([z.string(), z.unknown()])),
+  relative_size: z.optional(z.union([z.string(), z.unknown()])),
+  location: z.optional(z.union([z.string(), z.unknown()])),
+  orientation: z.optional(z.union([z.string(), z.unknown()])),
+  action: z.optional(z.union([z.string(), z.unknown()])),
+})
+
+/**
+ * Aesthetics
+ */
+export const zSchemaAesthetics = z.object({
+  composition: z.optional(z.union([z.string(), z.unknown()])),
+  mood_atmosphere: z.optional(z.union([z.string(), z.unknown()])),
+  color_scheme: z.optional(z.union([z.string(), z.unknown()])),
+})
+
+/**
+ * StructuredPrompt
+ */
+export const zSchemaStructuredPrompt = z.object({
+  background_setting: z.optional(z.union([z.string(), z.unknown()])),
+  artistic_style: z.optional(z.union([z.string(), z.unknown()])),
+  aesthetics: z.optional(z.union([zSchemaAesthetics, z.unknown()])),
+  text_render: z.optional(z.union([z.array(z.unknown()), z.unknown()])),
+  objects: z.optional(z.union([z.array(zSchemaPromptObject), z.unknown()])),
+  style_medium: z.optional(z.union([z.string(), z.unknown()])),
+  photographic_characteristics: z.optional(
+    z.union([zSchemaPhotographicCharacteristics, z.unknown()]),
+  ),
+  context: z.optional(z.union([z.string(), z.unknown()])),
+  lighting: z.optional(z.union([zSchemaLighting, z.unknown()])),
+  short_description: z.optional(z.union([z.string(), z.unknown()])),
+})
+
+/**
+ * StructuredPromptModel
+ */
+export const zSchemaFiboGenerateStructuredPromptInput = z.object({
+  prompt: z.optional(z.union([z.string(), z.unknown()])),
+  seed: z
+    .optional(
+      z.int().register(z.globalRegistry, {
+        description: 'Random seed for reproducibility.',
+      }),
+    )
+    .default(5555),
+  structured_prompt: z.optional(
+    z.union([zSchemaStructuredPrompt, z.unknown()]),
+  ),
+  image_url: z.optional(z.union([z.string(), z.unknown()])),
+})
+
+/**
+ * Aesthetics
+ */
+export const zSchemaBriaFiboVlmAesthetics = z.object({
+  preference_score: z.string().register(z.globalRegistry, {
+    description: 'The preference score of the image.',
+  }),
+  composition: z.optional(z.union([z.string(), z.unknown()])),
+  mood_atmosphere: z.optional(z.union([z.string(), z.unknown()])),
+  aesthetic_score: z.string().register(z.globalRegistry, {
+    description: 'The aesthetic score of the image.',
+  }),
+  color_scheme: z.optional(z.union([z.string(), z.unknown()])),
+})
+
+/**
+ * StructuredPrompt
+ */
+export const zSchemaBriaFiboVlmStructuredPrompt = z.object({
+  background_setting: z.optional(z.union([z.string(), z.unknown()])),
+  artistic_style: z.optional(z.union([z.string(), z.unknown()])),
+  style_medium: z.optional(z.union([z.string(), z.unknown()])),
+  text_render: z.optional(z.union([z.array(z.unknown()), z.unknown()])),
+  objects: z.optional(z.union([z.array(zSchemaPromptObject), z.unknown()])),
+  context: z.optional(z.union([z.string(), z.unknown()])),
+  photographic_characteristics: z.optional(
+    z.union([zSchemaPhotographicCharacteristics, z.unknown()]),
+  ),
+  aesthetics: z.optional(z.union([zSchemaBriaFiboVlmAesthetics, z.unknown()])),
+  lighting: z.optional(z.union([zSchemaLighting, z.unknown()])),
+  short_description: z.optional(z.union([z.string(), z.unknown()])),
+})
+
+export const zSchemaFiboLiteGenerateStructuredPromptLiteOutput = z.unknown()
+
+/**
+ * StructuredPromptModel
+ */
+export const zSchemaFiboLiteGenerateStructuredPromptLiteInput = z.object({
+  prompt: z.optional(z.union([z.string(), z.unknown()])),
+  seed: z
+    .optional(
+      z.int().register(z.globalRegistry, {
+        description: 'Random seed for reproducibility.',
+      }),
+    )
+    .default(5555),
+  structured_prompt: z.optional(
+    z.union([zSchemaBriaFiboVlmStructuredPrompt, z.unknown()]),
+  ),
+  image_url: z.optional(z.union([z.string(), z.unknown()])),
+})
+
+export const zSchemaFiboLiteGenerateStructuredPromptOutput = z.unknown()
+
+/**
+ * StructuredPromptModel
+ */
+export const zSchemaFiboLiteGenerateStructuredPromptInput = z.object({
+  prompt: z.optional(z.union([z.string(), z.unknown()])),
+  seed: z
+    .optional(
+      z.int().register(z.globalRegistry, {
+        description: 'Random seed for reproducibility.',
+      }),
+    )
+    .default(5555),
+  structured_prompt: z.optional(
+    z.union([zSchemaStructuredPrompt, z.unknown()]),
+  ),
+  image_url: z.optional(z.union([z.string(), z.unknown()])),
+})
+
+export const zSchemaFiboEditEditStructuredInstructionOutput = z.unknown()
 
 /**
  * StructuredInstructionInputModel
  */
-export const zFiboEditEditStructuredInstructionInput = z.object({
+export const zSchemaFiboEditEditStructuredInstructionInput = z.object({
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -38,302 +191,366 @@ export const zFiboEditEditStructuredInstructionInput = z.object({
   image_url: z.optional(z.union([z.string(), z.unknown()])),
 })
 
-export const zFiboEditEditStructuredInstructionOutput = z.unknown()
-
-/**
- * PromptObject
- */
-export const zPromptObject = z.object({
-  relative_size: z.optional(z.union([z.string(), z.unknown()])),
-  description: z.optional(z.union([z.string(), z.unknown()])),
-  skin_tone_and_texture: z.optional(z.union([z.string(), z.unknown()])),
-  appearance_details: z.optional(z.union([z.string(), z.unknown()])),
-  number_of_objects: z.optional(z.union([z.int(), z.unknown()])),
-  pose: z.optional(z.union([z.string(), z.unknown()])),
-  expression: z.optional(z.union([z.string(), z.unknown()])),
-  shape_and_color: z.optional(z.union([z.string(), z.unknown()])),
-  relationship: z.string().register(z.globalRegistry, {
-    description:
-      'The relationship of the object to other objects in the image.',
+export const zSchemaQueueStatus = z.object({
+  status: z.enum(['IN_QUEUE', 'IN_PROGRESS', 'COMPLETED']),
+  request_id: z.string().register(z.globalRegistry, {
+    description: 'The request id.',
   }),
-  texture: z.optional(z.union([z.string(), z.unknown()])),
-  gender: z.optional(z.union([z.string(), z.unknown()])),
-  clothing: z.optional(z.union([z.string(), z.unknown()])),
-  location: z.optional(z.union([z.string(), z.unknown()])),
-  orientation: z.optional(z.union([z.string(), z.unknown()])),
-  action: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * PhotographicCharacteristics
- */
-export const zPhotographicCharacteristics = z.object({
-  focus: z.optional(z.union([z.string(), z.unknown()])),
-  lens_focal_length: z.optional(z.union([z.string(), z.unknown()])),
-  camera_angle: z.optional(z.union([z.string(), z.unknown()])),
-  depth_of_field: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * Aesthetics
- */
-export const zAesthetics = z.object({
-  composition: z.optional(z.union([z.string(), z.unknown()])),
-  mood_atmosphere: z.optional(z.union([z.string(), z.unknown()])),
-  color_scheme: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * Lighting
- */
-export const zLighting = z.object({
-  shadows: z.optional(z.union([z.string(), z.unknown()])),
-  conditions: z.optional(z.union([z.string(), z.unknown()])),
-  direction: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * StructuredPrompt
- */
-export const zStructuredPrompt = z.object({
-  background_setting: z.optional(z.union([z.string(), z.unknown()])),
-  artistic_style: z.optional(z.union([z.string(), z.unknown()])),
-  context: z.optional(z.union([z.string(), z.unknown()])),
-  text_render: z.optional(z.union([z.array(z.unknown()), z.unknown()])),
-  objects: z.optional(z.union([z.array(zPromptObject), z.unknown()])),
-  style_medium: z.optional(z.union([z.string(), z.unknown()])),
-  photographic_characteristics: z.optional(
-    z.union([zPhotographicCharacteristics, z.unknown()]),
+  response_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The response url.',
+    }),
   ),
-  aesthetics: z.optional(z.union([zAesthetics, z.unknown()])),
-  lighting: z.optional(z.union([zLighting, z.unknown()])),
-  short_description: z.optional(z.union([z.string(), z.unknown()])),
+  status_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The status url.',
+    }),
+  ),
+  cancel_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The cancel url.',
+    }),
+  ),
+  logs: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The logs.',
+    }),
+  ),
+  metrics: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The metrics.',
+    }),
+  ),
+  queue_position: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The queue position.',
+    }),
+  ),
 })
 
-/**
- * StructuredPromptModel
- */
-export const zFiboLiteGenerateStructuredPromptInput = z.object({
-  prompt: z.optional(z.union([z.string(), z.unknown()])),
-  seed: z
-    .optional(
-      z.int().register(z.globalRegistry, {
-        description: 'Random seed for reproducibility.',
-      }),
-    )
-    .default(5555),
-  structured_prompt: z.optional(z.union([zStructuredPrompt, z.unknown()])),
-  image_url: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-export const zFiboLiteGenerateStructuredPromptOutput = z.unknown()
-
-/**
- * PromptObject
- */
-export const zBriaFiboLiteGenerateStructuredPromptLitePromptObject = z.object({
-  relative_size: z.optional(z.union([z.string(), z.unknown()])),
-  description: z.optional(z.union([z.string(), z.unknown()])),
-  skin_tone_and_texture: z.optional(z.union([z.string(), z.unknown()])),
-  appearance_details: z.optional(z.union([z.string(), z.unknown()])),
-  number_of_objects: z.optional(z.union([z.int(), z.unknown()])),
-  pose: z.optional(z.union([z.string(), z.unknown()])),
-  expression: z.optional(z.union([z.string(), z.unknown()])),
-  shape_and_color: z.optional(z.union([z.string(), z.unknown()])),
-  relationship: z.string().register(z.globalRegistry, {
-    description:
-      'The relationship of the object to other objects in the image.',
-  }),
-  texture: z.optional(z.union([z.string(), z.unknown()])),
-  gender: z.optional(z.union([z.string(), z.unknown()])),
-  clothing: z.optional(z.union([z.string(), z.unknown()])),
-  location: z.optional(z.union([z.string(), z.unknown()])),
-  orientation: z.optional(z.union([z.string(), z.unknown()])),
-  action: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * PhotographicCharacteristics
- */
-export const zBriaFiboLiteGenerateStructuredPromptLitePhotographicCharacteristics =
+export const zGetBriaFiboEditEditStructuredInstructionRequestsByRequestIdStatusData =
   z.object({
-    focus: z.optional(z.union([z.string(), z.unknown()])),
-    lens_focal_length: z.optional(z.union([z.string(), z.unknown()])),
-    camera_angle: z.optional(z.union([z.string(), z.unknown()])),
-    depth_of_field: z.optional(z.union([z.string(), z.unknown()])),
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
   })
 
 /**
- * Aesthetics
+ * The request status.
  */
-export const zBriaFiboVlmAesthetics = z.object({
-  preference_score: z.string().register(z.globalRegistry, {
-    description: 'The preference score of the image.',
-  }),
-  composition: z.optional(z.union([z.string(), z.unknown()])),
-  mood_atmosphere: z.optional(z.union([z.string(), z.unknown()])),
-  aesthetic_score: z.string().register(z.globalRegistry, {
-    description: 'The aesthetic score of the image.',
-  }),
-  color_scheme: z.optional(z.union([z.string(), z.unknown()])),
-})
+export const zGetBriaFiboEditEditStructuredInstructionRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
 
-/**
- * Lighting
- */
-export const zBriaFiboLiteGenerateStructuredPromptLiteLighting = z.object({
-  shadows: z.optional(z.union([z.string(), z.unknown()])),
-  conditions: z.optional(z.union([z.string(), z.unknown()])),
-  direction: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * StructuredPrompt
- */
-export const zBriaFiboVlmStructuredPrompt = z.object({
-  background_setting: z.optional(z.union([z.string(), z.unknown()])),
-  artistic_style: z.optional(z.union([z.string(), z.unknown()])),
-  style_medium: z.optional(z.union([z.string(), z.unknown()])),
-  text_render: z.optional(z.union([z.array(z.unknown()), z.unknown()])),
-  objects: z.optional(
-    z.union([
-      z.array(zBriaFiboLiteGenerateStructuredPromptLitePromptObject),
-      z.unknown(),
-    ]),
-  ),
-  context: z.optional(z.union([z.string(), z.unknown()])),
-  photographic_characteristics: z.optional(
-    z.union([
-      zBriaFiboLiteGenerateStructuredPromptLitePhotographicCharacteristics,
-      z.unknown(),
-    ]),
-  ),
-  aesthetics: z.optional(z.union([zBriaFiboVlmAesthetics, z.unknown()])),
-  lighting: z.optional(
-    z.union([zBriaFiboLiteGenerateStructuredPromptLiteLighting, z.unknown()]),
-  ),
-  short_description: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * StructuredPromptModel
- */
-export const zFiboLiteGenerateStructuredPromptLiteInput = z.object({
-  prompt: z.optional(z.union([z.string(), z.unknown()])),
-  seed: z
-    .optional(
-      z.int().register(z.globalRegistry, {
-        description: 'Random seed for reproducibility.',
-      }),
-    )
-    .default(5555),
-  structured_prompt: z.optional(
-    z.union([zBriaFiboVlmStructuredPrompt, z.unknown()]),
-  ),
-  image_url: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-export const zFiboLiteGenerateStructuredPromptLiteOutput = z.unknown()
-
-/**
- * PromptObject
- */
-export const zBriaFiboGenerateStructuredPromptPromptObject = z.object({
-  clothing: z.optional(z.union([z.string(), z.unknown()])),
-  description: z.optional(z.union([z.string(), z.unknown()])),
-  skin_tone_and_texture: z.optional(z.union([z.string(), z.unknown()])),
-  appearance_details: z.optional(z.union([z.string(), z.unknown()])),
-  number_of_objects: z.optional(z.union([z.int(), z.unknown()])),
-  expression: z.optional(z.union([z.string(), z.unknown()])),
-  pose: z.optional(z.union([z.string(), z.unknown()])),
-  shape_and_color: z.optional(z.union([z.string(), z.unknown()])),
-  relationship: z.string().register(z.globalRegistry, {
-    description:
-      'The relationship of the object to other objects in the image.',
-  }),
-  texture: z.optional(z.union([z.string(), z.unknown()])),
-  gender: z.optional(z.union([z.string(), z.unknown()])),
-  relative_size: z.optional(z.union([z.string(), z.unknown()])),
-  location: z.optional(z.union([z.string(), z.unknown()])),
-  orientation: z.optional(z.union([z.string(), z.unknown()])),
-  action: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * Aesthetics
- */
-export const zBriaFiboGenerateStructuredPromptAesthetics = z.object({
-  composition: z.optional(z.union([z.string(), z.unknown()])),
-  mood_atmosphere: z.optional(z.union([z.string(), z.unknown()])),
-  color_scheme: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * PhotographicCharacteristics
- */
-export const zBriaFiboGenerateStructuredPromptPhotographicCharacteristics =
+export const zPutBriaFiboEditEditStructuredInstructionRequestsByRequestIdCancelData =
   z.object({
-    focus: z.optional(z.union([z.string(), z.unknown()])),
-    lens_focal_length: z.optional(z.union([z.string(), z.unknown()])),
-    camera_angle: z.optional(z.union([z.string(), z.unknown()])),
-    depth_of_field: z.optional(z.union([z.string(), z.unknown()])),
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
   })
 
 /**
- * Lighting
+ * The request was cancelled.
  */
-export const zBriaFiboGenerateStructuredPromptLighting = z.object({
-  shadows: z.optional(z.union([z.string(), z.unknown()])),
-  conditions: z.optional(z.union([z.string(), z.unknown()])),
-  direction: z.optional(z.union([z.string(), z.unknown()])),
+export const zPutBriaFiboEditEditStructuredInstructionRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostBriaFiboEditEditStructuredInstructionData = z.object({
+  body: zSchemaFiboEditEditStructuredInstructionInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
 })
 
 /**
- * StructuredPrompt
+ * The request status.
  */
-export const zBriaFiboGenerateStructuredPromptStructuredPrompt = z.object({
-  background_setting: z.optional(z.union([z.string(), z.unknown()])),
-  artistic_style: z.optional(z.union([z.string(), z.unknown()])),
-  context: z.optional(z.union([z.string(), z.unknown()])),
-  text_render: z.optional(z.union([z.array(z.unknown()), z.unknown()])),
-  objects: z.optional(
-    z.union([
-      z.array(zBriaFiboGenerateStructuredPromptPromptObject),
-      z.unknown(),
-    ]),
-  ),
-  aesthetics: z.optional(
-    z.union([zBriaFiboGenerateStructuredPromptAesthetics, z.unknown()]),
-  ),
-  photographic_characteristics: z.optional(
-    z.union([
-      zBriaFiboGenerateStructuredPromptPhotographicCharacteristics,
-      z.unknown(),
-    ]),
-  ),
-  style_medium: z.optional(z.union([z.string(), z.unknown()])),
-  lighting: z.optional(
-    z.union([zBriaFiboGenerateStructuredPromptLighting, z.unknown()]),
-  ),
-  short_description: z.optional(z.union([z.string(), z.unknown()])),
-})
+export const zPostBriaFiboEditEditStructuredInstructionResponse =
+  zSchemaQueueStatus
 
-/**
- * StructuredPromptModel
- */
-export const zFiboGenerateStructuredPromptInput = z.object({
-  prompt: z.optional(z.union([z.string(), z.unknown()])),
-  seed: z
-    .optional(
-      z.int().register(z.globalRegistry, {
-        description: 'Random seed for reproducibility.',
+export const zGetBriaFiboEditEditStructuredInstructionRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
       }),
-    )
-    .default(5555),
-  structured_prompt: z.optional(
-    z.union([zBriaFiboGenerateStructuredPromptStructuredPrompt, z.unknown()]),
-  ),
-  image_url: z.optional(z.union([z.string(), z.unknown()])),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetBriaFiboEditEditStructuredInstructionRequestsByRequestIdResponse =
+  zSchemaFiboEditEditStructuredInstructionOutput
+
+export const zGetBriaFiboLiteGenerateStructuredPromptRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetBriaFiboLiteGenerateStructuredPromptRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutBriaFiboLiteGenerateStructuredPromptRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutBriaFiboLiteGenerateStructuredPromptRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostBriaFiboLiteGenerateStructuredPromptData = z.object({
+  body: zSchemaFiboLiteGenerateStructuredPromptInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
 })
 
-export const zFiboGenerateStructuredPromptOutput = z.unknown()
+/**
+ * The request status.
+ */
+export const zPostBriaFiboLiteGenerateStructuredPromptResponse =
+  zSchemaQueueStatus
+
+export const zGetBriaFiboLiteGenerateStructuredPromptRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetBriaFiboLiteGenerateStructuredPromptRequestsByRequestIdResponse =
+  zSchemaFiboLiteGenerateStructuredPromptOutput
+
+export const zGetBriaFiboLiteGenerateStructuredPromptLiteRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetBriaFiboLiteGenerateStructuredPromptLiteRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutBriaFiboLiteGenerateStructuredPromptLiteRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutBriaFiboLiteGenerateStructuredPromptLiteRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostBriaFiboLiteGenerateStructuredPromptLiteData = z.object({
+  body: zSchemaFiboLiteGenerateStructuredPromptLiteInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostBriaFiboLiteGenerateStructuredPromptLiteResponse =
+  zSchemaQueueStatus
+
+export const zGetBriaFiboLiteGenerateStructuredPromptLiteRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetBriaFiboLiteGenerateStructuredPromptLiteRequestsByRequestIdResponse =
+  zSchemaFiboLiteGenerateStructuredPromptLiteOutput
+
+export const zGetBriaFiboGenerateStructuredPromptRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetBriaFiboGenerateStructuredPromptRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutBriaFiboGenerateStructuredPromptRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutBriaFiboGenerateStructuredPromptRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostBriaFiboGenerateStructuredPromptData = z.object({
+  body: zSchemaFiboGenerateStructuredPromptInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostBriaFiboGenerateStructuredPromptResponse = zSchemaQueueStatus
+
+export const zGetBriaFiboGenerateStructuredPromptRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetBriaFiboGenerateStructuredPromptRequestsByRequestIdResponse =
+  zSchemaFiboGenerateStructuredPromptOutput

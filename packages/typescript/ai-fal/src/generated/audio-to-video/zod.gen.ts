@@ -2,42 +2,10 @@
 
 import { z } from 'zod'
 
-export const zFile = z.object({
-  url: z.url(),
-  content_type: z.optional(z.string()),
-  file_name: z.optional(z.string()),
-  file_size: z.optional(z.int()),
-})
-
-export const zQueueStatus = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'FAILED']),
-  response_url: z.optional(z.url()),
-})
-
-/**
- * DubbingRequest
- */
-export const zElevenlabsDubbingInput = z.object({
-  video_url: z.optional(z.union([z.string(), z.unknown()])),
-  audio_url: z.optional(z.union([z.string(), z.unknown()])),
-  highest_resolution: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Whether to use the highest resolution for dubbing.',
-      }),
-    )
-    .default(true),
-  target_lang: z.string().register(z.globalRegistry, {
-    description: 'Target language code for dubbing (ISO 639-1)',
-  }),
-  source_lang: z.optional(z.union([z.string(), z.unknown()])),
-  num_speakers: z.optional(z.union([z.int().gte(1).lte(50), z.unknown()])),
-})
-
 /**
  * File
  */
-export const zFalAiElevenlabsDubbingFile = z.object({
+export const zSchemaFile = z.object({
   file_size: z.optional(z.union([z.int(), z.unknown()])),
   file_name: z.optional(z.union([z.string(), z.unknown()])),
   content_type: z.optional(z.union([z.string(), z.unknown()])),
@@ -47,313 +15,300 @@ export const zFalAiElevenlabsDubbingFile = z.object({
 })
 
 /**
- * DubbingVideoOutput
+ * EchoMimicResponse
  */
-export const zElevenlabsDubbingOutput = z.object({
-  target_lang: z.string().register(z.globalRegistry, {
-    description: 'The target language of the dubbed content',
-  }),
-  video: zFalAiElevenlabsDubbingFile,
+export const zSchemaEchomimicV3Output = z.object({
+  video: zSchemaFile,
 })
 
 /**
- * BoundingBox
+ * EchoMimicRequest
  */
-export const zBoundingBox = z.object({
-  y: z.number().register(z.globalRegistry, {
-    description: 'Y-coordinate of the top-left corner',
+export const zSchemaEchomimicV3Input = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to use for the video generation.',
   }),
-  x: z.number().register(z.globalRegistry, {
-    description: 'X-coordinate of the top-left corner',
-  }),
-  h: z.number().register(z.globalRegistry, {
-    description: 'Height of the bounding box',
-  }),
-  w: z.number().register(z.globalRegistry, {
-    description: 'Width of the bounding box',
-  }),
-  label: z.string().register(z.globalRegistry, {
-    description: 'Label of the bounding box',
-  }),
-})
-
-/**
- * MultiSpeakerImageAudioToVideoRequest
- *
- * Request model for multi-speaker image+audio to video generation.
- */
-export const zLongcatMultiAvatarImageAudioToVideoInput = z
-  .object({
-    prompt: z
-      .optional(
-        z.string().register(z.globalRegistry, {
-          description: 'The prompt to guide the video generation.',
-        }),
-      )
-      .default(
-        'Two people are having a conversation with natural expressions and movements.',
-      ),
-    num_inference_steps: z
-      .optional(
-        z.int().gte(10).lte(100).register(z.globalRegistry, {
-          description: 'The number of inference steps to use.',
-        }),
-      )
-      .default(30),
-    audio_url_person2: z
-      .optional(
-        z.string().register(z.globalRegistry, {
-          description: 'The URL of the audio file for person 2 (right side).',
-        }),
-      )
-      .default(
-        'https://raw.githubusercontent.com/meituan-longcat/LongCat-Video/refs/heads/main/assets/avatar/multi/sing_woman.WAV',
-      ),
-    enable_safety_checker: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description: 'Whether to enable safety checker.',
-        }),
-      )
-      .default(true),
-    bbox_person1: z.optional(zBoundingBox),
-    negative_prompt: z
-      .optional(
-        z.string().register(z.globalRegistry, {
-          description: 'The negative prompt to avoid in the video generation.',
-        }),
-      )
-      .default(
-        'Close-up, Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
-      ),
-    text_guidance_scale: z
-      .optional(
-        z.number().gte(1).lte(10).register(z.globalRegistry, {
-          description: 'The text guidance scale for classifier-free guidance.',
-        }),
-      )
-      .default(4),
-    resolution: z.optional(
-      z.enum(['480p', '720p']).register(z.globalRegistry, {
-        description:
-          'Resolution of the generated video (480p or 720p). Billing is per video-second (16 frames): 480p is 1 unit per second and 720p is 4 units per second.',
-      }),
-    ),
-    audio_type: z.optional(
-      z.enum(['para', 'add']).register(z.globalRegistry, {
-        description:
-          "How to combine the two audio tracks. 'para' (parallel) plays both simultaneously, 'add' (sequential) plays person 1 first then person 2.",
-      }),
-    ),
-    image_url: z.string().register(z.globalRegistry, {
-      description: 'The URL of the image containing two speakers.',
-    }),
-    audio_url_person1: z
-      .optional(
-        z.string().register(z.globalRegistry, {
-          description: 'The URL of the audio file for person 1 (left side).',
-        }),
-      )
-      .default(
-        'https://raw.githubusercontent.com/meituan-longcat/LongCat-Video/refs/heads/main/assets/avatar/multi/sing_man.WAV',
-      ),
-    seed: z.optional(
-      z.int().register(z.globalRegistry, {
-        description: 'The seed for the random number generator.',
-      }),
-    ),
-    audio_guidance_scale: z
-      .optional(
-        z.number().gte(1).lte(10).register(z.globalRegistry, {
-          description:
-            'The audio guidance scale. Higher values may lead to exaggerated mouth movements.',
-        }),
-      )
-      .default(4),
-    bbox_person2: z.optional(zBoundingBox),
-    num_segments: z
-      .optional(
-        z.int().gte(1).lte(10).register(z.globalRegistry, {
-          description:
-            'Number of video segments to generate. Each segment adds ~5 seconds of video. First segment is ~5.8s, additional segments are 5s each.',
-        }),
-      )
-      .default(1),
-  })
-  .register(z.globalRegistry, {
+  audio_url: z.string().register(z.globalRegistry, {
     description:
-      'Request model for multi-speaker image+audio to video generation.',
-  })
-
-/**
- * File
- */
-export const zFalAiLongcatMultiAvatarImageAudioToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+      'The URL of the audio to use as a reference for the video generation.',
   }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
+  image_url: z.string().register(z.globalRegistry, {
+    description:
+      'The URL of the image to use as a reference for the video generation.',
+  }),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description: 'The guidance scale to use for the video generation.',
+      }),
+    )
+    .default(4.5),
+  audio_guidance_scale: z
+    .optional(
+      z.number().gte(0).lte(10).register(z.globalRegistry, {
+        description:
+          'The audio guidance scale to use for the video generation.',
+      }),
+    )
+    .default(2.5),
+  num_frames_per_generation: z
+    .optional(
+      z.int().gte(49).lte(161).register(z.globalRegistry, {
+        description: 'The number of frames to generate at once.',
+      }),
+    )
+    .default(121),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The negative prompt to use for the video generation.',
+      }),
+    )
+    .default(''),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The seed to use for the video generation.',
     }),
   ),
 })
 
 /**
- * MultiSpeakerImageAudioToVideoResponse
- *
- * Response model for multi-speaker image+audio to video generation.
+ * StableAvatarResponse
  */
-export const zLongcatMultiAvatarImageAudioToVideoOutput = z
+export const zSchemaStableAvatarOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * StableAvatarRequest
+ */
+export const zSchemaStableAvatarInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to use for the video generation.',
+  }),
+  aspect_ratio: z.optional(
+    z.enum(['16:9', '1:1', '9:16', 'auto']).register(z.globalRegistry, {
+      description:
+        "The aspect ratio of the video to generate. If 'auto', the aspect ratio will be determined by the reference image.",
+    }),
+  ),
+  perturbation: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'The amount of perturbation to use for the video generation. 0.0 means no perturbation, 1.0 means full perturbation.',
+      }),
+    )
+    .default(0.1),
+  image_url: z.string().register(z.globalRegistry, {
+    description:
+      'The URL of the image to use as a reference for the video generation.',
+  }),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description: 'The guidance scale to use for the video generation.',
+      }),
+    )
+    .default(5),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The seed to use for the video generation.',
+    }),
+  ),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(10).lte(50).register(z.globalRegistry, {
+        description:
+          'The number of inference steps to use for the video generation.',
+      }),
+    )
+    .default(50),
+  audio_url: z.string().register(z.globalRegistry, {
+    description:
+      'The URL of the audio to use as a reference for the video generation.',
+  }),
+  audio_guidance_scale: z
+    .optional(
+      z.number().gte(0).lte(10).register(z.globalRegistry, {
+        description:
+          'The audio guidance scale to use for the video generation.',
+      }),
+    )
+    .default(4),
+})
+
+/**
+ * WanS2VResponse
+ */
+export const zSchemaWanV2214bSpeechToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * WanS2VRequest
+ */
+export const zSchemaWanV2214bSpeechToVideoInput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The text prompt used for video generation.',
+  }),
+  shift: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description: 'Shift value for the video. Must be between 1.0 and 10.0.',
+      }),
+    )
+    .default(5),
+  frames_per_second: z
+    .optional(
+      z.int().gte(4).lte(60).register(z.globalRegistry, {
+        description:
+          'Frames per second of the generated video. Must be between 4 to 60. When using interpolation and `adjust_fps_for_interpolation` is set to true (default true,) the final FPS will be multiplied by the number of interpolated frames plus one. For example, if the generated frames per second is 16 and the number of interpolated frames is 1, the final frames per second will be 32. If `adjust_fps_for_interpolation` is set to false, this value will be used as-is.',
+      }),
+    )
+    .default(16),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description:
+          'Classifier-free guidance scale. Higher values give better adherence to the prompt but may decrease quality.',
+      }),
+    )
+    .default(3.5),
+  num_frames: z
+    .optional(
+      z.int().gte(40).lte(120).register(z.globalRegistry, {
+        description:
+          'Number of frames to generate. Must be between 40 to 120, (must be multiple of 4).',
+      }),
+    )
+    .default(80),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If set to true, input data will be checked for safety before processing.',
+      }),
+    )
+    .default(false),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'Negative prompt for video generation.',
+      }),
+    )
+    .default(''),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description:
+        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
+    }),
+  ),
+  resolution: z.optional(
+    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
+      description: 'Resolution of the generated video (480p, 580p, or 720p).',
+    }),
+  ),
+  enable_output_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'If set to true, output video will be checked for safety after generation.',
+      }),
+    )
+    .default(false),
+  image_url: z.string().register(z.globalRegistry, {
+    description:
+      'URL of the input image. If the input image does not match the chosen aspect ratio, it is resized and center cropped.',
+  }),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description:
+        'The quality of the output video. Higher quality means better visual quality but larger file size.',
+    }),
+  ),
+  audio_url: z.string().register(z.globalRegistry, {
+    description: 'The URL of the audio file.',
+  }),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(2).lte(40).register(z.globalRegistry, {
+        description:
+          'Number of inference steps for sampling. Higher values give better quality but take longer.',
+      }),
+    )
+    .default(27),
+  seed: z.optional(
+    z.int().register(z.globalRegistry, {
+      description:
+        'Random seed for reproducibility. If None, a random seed is chosen.',
+    }),
+  ),
+})
+
+/**
+ * AvatarsAppOutput
+ */
+export const zSchemaAvatarsAudioToVideoOutput = z.object({
+  video: zSchemaFile,
+})
+
+/**
+ * Audio2VideoInput
+ */
+export const zSchemaAvatarsAudioToVideoInput = z.object({
+  audio_url: z.url().min(1).max(2083),
+  avatar_id: z
+    .enum([
+      'emily_vertical_primary',
+      'emily_vertical_secondary',
+      'marcus_vertical_primary',
+      'marcus_vertical_secondary',
+      'mira_vertical_primary',
+      'mira_vertical_secondary',
+      'jasmine_vertical_primary',
+      'jasmine_vertical_secondary',
+      'jasmine_vertical_walking',
+      'aisha_vertical_walking',
+      'elena_vertical_primary',
+      'elena_vertical_secondary',
+      'any_male_vertical_primary',
+      'any_female_vertical_primary',
+      'any_male_vertical_secondary',
+      'any_female_vertical_secondary',
+      'any_female_vertical_walking',
+      'emily_primary',
+      'emily_side',
+      'marcus_primary',
+      'marcus_side',
+      'aisha_walking',
+      'elena_primary',
+      'elena_side',
+      'any_male_primary',
+      'any_female_primary',
+      'any_male_side',
+      'any_female_side',
+    ])
+    .register(z.globalRegistry, {
+      description: 'The avatar to use for the video',
+    }),
+})
+
+/**
+ * AudioToVideoResponse
+ *
+ * Response model for audio-to-video generation (no reference image).
+ */
+export const zSchemaLongcatSingleAvatarAudioToVideoOutput = z
   .object({
     seed: z.int().register(z.globalRegistry, {
       description: 'The seed used for generation.',
     }),
-    video: zFalAiLongcatMultiAvatarImageAudioToVideoFile,
+    video: zSchemaFile,
   })
   .register(z.globalRegistry, {
     description:
-      'Response model for multi-speaker image+audio to video generation.',
-  })
-
-/**
- * ImageAudioToVideoRequest
- *
- * Request model for image+audio to video generation.
- */
-export const zLongcatSingleAvatarImageAudioToVideoInput = z
-  .object({
-    prompt: z.string().register(z.globalRegistry, {
-      description: 'The prompt to guide the video generation.',
-    }),
-    resolution: z.optional(
-      z.enum(['480p', '720p']).register(z.globalRegistry, {
-        description:
-          'Resolution of the generated video (480p or 720p). Billing is per video-second (16 frames): 480p is 1 unit per second and 720p is 4 units per second.',
-      }),
-    ),
-    enable_safety_checker: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description: 'Whether to enable safety checker.',
-        }),
-      )
-      .default(true),
-    audio_guidance_scale: z
-      .optional(
-        z.number().gte(1).lte(10).register(z.globalRegistry, {
-          description:
-            'The audio guidance scale. Higher values may lead to exaggerated mouth movements.',
-        }),
-      )
-      .default(4),
-    num_segments: z
-      .optional(
-        z.int().gte(1).lte(10).register(z.globalRegistry, {
-          description:
-            'Number of video segments to generate. Each segment adds ~5 seconds of video. First segment is ~5.8s, additional segments are 5s each.',
-        }),
-      )
-      .default(1),
-    image_url: z.string().register(z.globalRegistry, {
-      description: 'The URL of the image to animate.',
-    }),
-    audio_url: z.string().register(z.globalRegistry, {
-      description: 'The URL of the audio file to drive the avatar.',
-    }),
-    num_inference_steps: z
-      .optional(
-        z.int().gte(10).lte(100).register(z.globalRegistry, {
-          description: 'The number of inference steps to use.',
-        }),
-      )
-      .default(30),
-    seed: z.optional(
-      z.int().register(z.globalRegistry, {
-        description: 'The seed for the random number generator.',
-      }),
-    ),
-    negative_prompt: z
-      .optional(
-        z.string().register(z.globalRegistry, {
-          description: 'The negative prompt to avoid in the video generation.',
-        }),
-      )
-      .default(
-        'Close-up, Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
-      ),
-    text_guidance_scale: z
-      .optional(
-        z.number().gte(1).lte(10).register(z.globalRegistry, {
-          description: 'The text guidance scale for classifier-free guidance.',
-        }),
-      )
-      .default(4),
-  })
-  .register(z.globalRegistry, {
-    description: 'Request model for image+audio to video generation.',
-  })
-
-/**
- * File
- */
-export const zFalAiLongcatSingleAvatarImageAudioToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * ImageAudioToVideoResponse
- *
- * Response model for image+audio to video generation.
- */
-export const zLongcatSingleAvatarImageAudioToVideoOutput = z
-  .object({
-    seed: z.int().register(z.globalRegistry, {
-      description: 'The seed used for generation.',
-    }),
-    video: zFalAiLongcatSingleAvatarImageAudioToVideoFile,
-  })
-  .register(z.globalRegistry, {
-    description: 'Response model for image+audio to video generation.',
+      'Response model for audio-to-video generation (no reference image).',
   })
 
 /**
@@ -361,7 +316,7 @@ export const zLongcatSingleAvatarImageAudioToVideoOutput = z
  *
  * Request model for audio-to-video generation.
  */
-export const zLongcatSingleAvatarAudioToVideoInput = z
+export const zSchemaLongcatSingleAvatarAudioToVideoInput = z
   .object({
     prompt: z
       .optional(
@@ -438,467 +393,2137 @@ export const zLongcatSingleAvatarAudioToVideoInput = z
   })
 
 /**
- * File
- */
-export const zFalAiLongcatSingleAvatarAudioToVideoFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * AudioToVideoResponse
+ * ImageAudioToVideoResponse
  *
- * Response model for audio-to-video generation (no reference image).
+ * Response model for image+audio to video generation.
  */
-export const zLongcatSingleAvatarAudioToVideoOutput = z
+export const zSchemaLongcatSingleAvatarImageAudioToVideoOutput = z
   .object({
     seed: z.int().register(z.globalRegistry, {
       description: 'The seed used for generation.',
     }),
-    video: zFalAiLongcatSingleAvatarAudioToVideoFile,
+    video: zSchemaFile,
+  })
+  .register(z.globalRegistry, {
+    description: 'Response model for image+audio to video generation.',
+  })
+
+/**
+ * ImageAudioToVideoRequest
+ *
+ * Request model for image+audio to video generation.
+ */
+export const zSchemaLongcatSingleAvatarImageAudioToVideoInput = z
+  .object({
+    prompt: z.string().register(z.globalRegistry, {
+      description: 'The prompt to guide the video generation.',
+    }),
+    resolution: z.optional(
+      z.enum(['480p', '720p']).register(z.globalRegistry, {
+        description:
+          'Resolution of the generated video (480p or 720p). Billing is per video-second (16 frames): 480p is 1 unit per second and 720p is 4 units per second.',
+      }),
+    ),
+    enable_safety_checker: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether to enable safety checker.',
+        }),
+      )
+      .default(true),
+    audio_guidance_scale: z
+      .optional(
+        z.number().gte(1).lte(10).register(z.globalRegistry, {
+          description:
+            'The audio guidance scale. Higher values may lead to exaggerated mouth movements.',
+        }),
+      )
+      .default(4),
+    num_segments: z
+      .optional(
+        z.int().gte(1).lte(10).register(z.globalRegistry, {
+          description:
+            'Number of video segments to generate. Each segment adds ~5 seconds of video. First segment is ~5.8s, additional segments are 5s each.',
+        }),
+      )
+      .default(1),
+    image_url: z.string().register(z.globalRegistry, {
+      description: 'The URL of the image to animate.',
+    }),
+    audio_url: z.string().register(z.globalRegistry, {
+      description: 'The URL of the audio file to drive the avatar.',
+    }),
+    num_inference_steps: z
+      .optional(
+        z.int().gte(10).lte(100).register(z.globalRegistry, {
+          description: 'The number of inference steps to use.',
+        }),
+      )
+      .default(30),
+    seed: z.optional(
+      z.int().register(z.globalRegistry, {
+        description: 'The seed for the random number generator.',
+      }),
+    ),
+    negative_prompt: z
+      .optional(
+        z.string().register(z.globalRegistry, {
+          description: 'The negative prompt to avoid in the video generation.',
+        }),
+      )
+      .default(
+        'Close-up, Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
+      ),
+    text_guidance_scale: z
+      .optional(
+        z.number().gte(1).lte(10).register(z.globalRegistry, {
+          description: 'The text guidance scale for classifier-free guidance.',
+        }),
+      )
+      .default(4),
+  })
+  .register(z.globalRegistry, {
+    description: 'Request model for image+audio to video generation.',
+  })
+
+/**
+ * BoundingBox
+ */
+export const zSchemaBoundingBox = z.object({
+  y: z.number().register(z.globalRegistry, {
+    description: 'Y-coordinate of the top-left corner',
+  }),
+  x: z.number().register(z.globalRegistry, {
+    description: 'X-coordinate of the top-left corner',
+  }),
+  h: z.number().register(z.globalRegistry, {
+    description: 'Height of the bounding box',
+  }),
+  w: z.number().register(z.globalRegistry, {
+    description: 'Width of the bounding box',
+  }),
+  label: z.string().register(z.globalRegistry, {
+    description: 'Label of the bounding box',
+  }),
+})
+
+/**
+ * MultiSpeakerImageAudioToVideoResponse
+ *
+ * Response model for multi-speaker image+audio to video generation.
+ */
+export const zSchemaLongcatMultiAvatarImageAudioToVideoOutput = z
+  .object({
+    seed: z.int().register(z.globalRegistry, {
+      description: 'The seed used for generation.',
+    }),
+    video: zSchemaFile,
   })
   .register(z.globalRegistry, {
     description:
-      'Response model for audio-to-video generation (no reference image).',
+      'Response model for multi-speaker image+audio to video generation.',
   })
 
 /**
- * InferenceRequest
+ * MultiSpeakerImageAudioToVideoRequest
+ *
+ * Request model for multi-speaker image+audio to video generation.
  */
-export const zAvatarsAudioToVideoInput = z.object({
-  avatar: z.enum([
-    'Mia outdoor (UGC)',
-    'Lara (Masterclass)',
-    'Ines (UGC)',
-    'Maria (Masterclass)',
-    'Emma (UGC)',
-    'Sienna (Masterclass)',
-    'Elena (UGC)',
-    'Jasmine (Masterclass)',
-    'Amara (Masterclass)',
-    'Ryan podcast (UGC)',
-    'Tyler (Masterclass)',
-    'Jayse (Masterclass)',
-    'Paul (Masterclass)',
-    'Matteo (UGC)',
-    'Daniel car (UGC)',
-    'Dario (Masterclass)',
-    'Viva (Masterclass)',
-    'Chen (Masterclass)',
-    'Alex (Masterclass)',
-    'Vanessa (UGC)',
-    'Laurent (UGC)',
-    'Noemie car (UGC)',
-    'Brandon (UGC)',
-    'Byron (Masterclass)',
-    'Calista (Masterclass)',
-    'Milo (Masterclass)',
-    'Fabien (Masterclass)',
-    'Rose (UGC)',
-  ]),
-  remove_background: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
+export const zSchemaLongcatMultiAvatarImageAudioToVideoInput = z
+  .object({
+    prompt: z
+      .optional(
+        z.string().register(z.globalRegistry, {
+          description: 'The prompt to guide the video generation.',
+        }),
+      )
+      .default(
+        'Two people are having a conversation with natural expressions and movements.',
+      ),
+    num_inference_steps: z
+      .optional(
+        z.int().gte(10).lte(100).register(z.globalRegistry, {
+          description: 'The number of inference steps to use.',
+        }),
+      )
+      .default(30),
+    audio_url_person2: z
+      .optional(
+        z.string().register(z.globalRegistry, {
+          description: 'The URL of the audio file for person 2 (right side).',
+        }),
+      )
+      .default(
+        'https://raw.githubusercontent.com/meituan-longcat/LongCat-Video/refs/heads/main/assets/avatar/multi/sing_woman.WAV',
+      ),
+    enable_safety_checker: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether to enable safety checker.',
+        }),
+      )
+      .default(true),
+    bbox_person1: z.optional(zSchemaBoundingBox),
+    negative_prompt: z
+      .optional(
+        z.string().register(z.globalRegistry, {
+          description: 'The negative prompt to avoid in the video generation.',
+        }),
+      )
+      .default(
+        'Close-up, Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
+      ),
+    text_guidance_scale: z
+      .optional(
+        z.number().gte(1).lte(10).register(z.globalRegistry, {
+          description: 'The text guidance scale for classifier-free guidance.',
+        }),
+      )
+      .default(4),
+    resolution: z.optional(
+      z.enum(['480p', '720p']).register(z.globalRegistry, {
         description:
-          'Enabling the remove background feature will result in a 50% increase in the price.',
+          'Resolution of the generated video (480p or 720p). Billing is per video-second (16 frames): 480p is 1 unit per second and 720p is 4 units per second.',
       }),
-    )
-    .default(false),
-  audio_url: z.string(),
+    ),
+    audio_type: z.optional(
+      z.enum(['para', 'add']).register(z.globalRegistry, {
+        description:
+          "How to combine the two audio tracks. 'para' (parallel) plays both simultaneously, 'add' (sequential) plays person 1 first then person 2.",
+      }),
+    ),
+    image_url: z.string().register(z.globalRegistry, {
+      description: 'The URL of the image containing two speakers.',
+    }),
+    audio_url_person1: z
+      .optional(
+        z.string().register(z.globalRegistry, {
+          description: 'The URL of the audio file for person 1 (left side).',
+        }),
+      )
+      .default(
+        'https://raw.githubusercontent.com/meituan-longcat/LongCat-Video/refs/heads/main/assets/avatar/multi/sing_man.WAV',
+      ),
+    seed: z.optional(
+      z.int().register(z.globalRegistry, {
+        description: 'The seed for the random number generator.',
+      }),
+    ),
+    audio_guidance_scale: z
+      .optional(
+        z.number().gte(1).lte(10).register(z.globalRegistry, {
+          description:
+            'The audio guidance scale. Higher values may lead to exaggerated mouth movements.',
+        }),
+      )
+      .default(4),
+    bbox_person2: z.optional(zSchemaBoundingBox),
+    num_segments: z
+      .optional(
+        z.int().gte(1).lte(10).register(z.globalRegistry, {
+          description:
+            'Number of video segments to generate. Each segment adds ~5 seconds of video. First segment is ~5.8s, additional segments are 5s each.',
+        }),
+      )
+      .default(1),
+  })
+  .register(z.globalRegistry, {
+    description:
+      'Request model for multi-speaker image+audio to video generation.',
+  })
+
+/**
+ * DubbingVideoOutput
+ */
+export const zSchemaElevenlabsDubbingOutput = z.object({
+  target_lang: z.string().register(z.globalRegistry, {
+    description: 'The target language of the dubbed content',
+  }),
+  video: zSchemaFile,
 })
 
 /**
- * Video
+ * DubbingRequest
  */
-export const zVideo = z.object({
+export const zSchemaElevenlabsDubbingInput = z.object({
+  video_url: z.optional(z.union([z.string(), z.unknown()])),
+  audio_url: z.optional(z.union([z.string(), z.unknown()])),
+  highest_resolution: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to use the highest resolution for dubbing.',
+      }),
+    )
+    .default(true),
+  target_lang: z.string().register(z.globalRegistry, {
+    description: 'Target language code for dubbing (ISO 639-1)',
+  }),
+  source_lang: z.optional(z.union([z.string(), z.unknown()])),
+  num_speakers: z.optional(z.union([z.int().gte(1).lte(50), z.unknown()])),
+})
+
+/**
+ * VideoFile
+ */
+export const zSchemaVideoFile = z.object({
   file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
+  duration: z.optional(z.union([z.number(), z.unknown()])),
+  height: z.optional(z.union([z.int(), z.unknown()])),
   url: z.string().register(z.globalRegistry, {
     description: 'The URL where the file can be downloaded from.',
   }),
+  width: z.optional(z.union([z.int(), z.unknown()])),
+  fps: z.optional(z.union([z.number(), z.unknown()])),
+  file_name: z.optional(z.union([z.string(), z.unknown()])),
+  content_type: z.optional(z.union([z.string(), z.unknown()])),
+  num_frames: z.optional(z.union([z.int(), z.unknown()])),
 })
 
 /**
- * InferenceResult
+ * LTX2AudioToVideoOutput
  */
-export const zAvatarsAudioToVideoOutput = z.object({
-  moderation_transcription: z.optional(z.union([z.string(), z.unknown()])),
-  moderation_error: z.optional(z.union([z.string(), z.unknown()])),
-  moderation_flagged: z.optional(z.boolean()).default(false),
-  video: z.optional(z.union([zVideo, z.unknown()])),
-})
-
-/**
- * WanS2VRequest
- */
-export const zWanV2214bSpeechToVideoInput = z.object({
+export const zSchemaLtx219bAudioToVideoOutput = z.object({
   prompt: z.string().register(z.globalRegistry, {
-    description: 'The text prompt used for video generation.',
+    description: 'The prompt used for the generation.',
   }),
-  shift: z
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for the random number generator.',
+  }),
+  video: zSchemaVideoFile,
+})
+
+/**
+ * ImageSize
+ */
+export const zSchemaImageSize = z.object({
+  height: z
     .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description: 'Shift value for the video. Must be between 1.0 and 10.0.',
+      z.int().lte(14142).register(z.globalRegistry, {
+        description: 'The height of the generated image.',
       }),
     )
-    .default(5),
-  frames_per_second: z.optional(z.union([z.int().gte(4).lte(60), z.unknown()])),
-  guidance_scale: z
+    .default(512),
+  width: z
     .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
+      z.int().lte(14142).register(z.globalRegistry, {
+        description: 'The width of the generated image.',
+      }),
+    )
+    .default(512),
+})
+
+/**
+ * LTX2AudioToVideoInput
+ */
+export const zSchemaLtx219bAudioToVideoInput = z.object({
+  match_audio_length: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
         description:
-          'Classifier-free guidance scale. Higher values give better adherence to the prompt but may decrease quality.',
+          'When enabled, the number of frames will be calculated based on the audio duration and FPS. When disabled, use the specified num_frames.',
       }),
     )
-    .default(3.5),
-  num_frames: z
+    .default(true),
+  use_multiscale: z
     .optional(
-      z.int().gte(40).lte(120).register(z.globalRegistry, {
+      z.boolean().register(z.globalRegistry, {
         description:
-          'Number of frames to generate. Must be between 40 to 120, (must be multiple of 4).',
+          'Whether to use multi-scale generation. If True, the model will generate the video at a smaller scale first, then use the smaller video to guide the generation of a video at or above your requested size. This results in better coherence and details.',
       }),
     )
-    .default(80),
+    .default(true),
+  acceleration: z.optional(
+    z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
+      description: 'The acceleration level to use.',
+    }),
+  ),
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video from.',
+  }),
+  fps: z
+    .optional(
+      z.number().gte(1).lte(60).register(z.globalRegistry, {
+        description: 'The frames per second of the generated video.',
+      }),
+    )
+    .default(25),
+  camera_lora: z.optional(
+    z
+      .enum([
+        'dolly_in',
+        'dolly_out',
+        'dolly_left',
+        'dolly_right',
+        'jib_up',
+        'jib_down',
+        'static',
+        'none',
+      ])
+      .register(z.globalRegistry, {
+        description:
+          'The camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
+      }),
+  ),
+  video_size: z.optional(
+    z.union([
+      zSchemaImageSize,
+      z.enum([
+        'auto',
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ]),
+  ),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, input data will be checked for safety before processing.',
+        description: 'Whether to enable the safety checker.',
       }),
     )
-    .default(false),
-  negative_prompt: z
+    .default(true),
+  num_frames: z
     .optional(
-      z.string().register(z.globalRegistry, {
-        description: 'Negative prompt for video generation.',
-      }),
-    )
-    .default(''),
-  video_write_mode: z.optional(
-    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
-      description:
-        'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
-    }),
-  ),
-  resolution: z.optional(
-    z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
-      description: 'Resolution of the generated video (480p, 580p, or 720p).',
-    }),
-  ),
-  enable_output_safety_checker: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description:
-          'If set to true, output video will be checked for safety after generation.',
-      }),
-    )
-    .default(false),
-  image_url: z.string().register(z.globalRegistry, {
-    description:
-      'URL of the input image. If the input image does not match the chosen aspect ratio, it is resized and center cropped.',
-  }),
-  video_quality: z.optional(
-    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
-      description:
-        'The quality of the output video. Higher quality means better visual quality but larger file size.',
-    }),
-  ),
-  audio_url: z.string().register(z.globalRegistry, {
-    description: 'The URL of the audio file.',
-  }),
-  seed: z.optional(z.union([z.int(), z.unknown()])),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(2).lte(40).register(z.globalRegistry, {
-        description:
-          'Number of inference steps for sampling. Higher values give better quality but take longer.',
-      }),
-    )
-    .default(27),
-})
-
-/**
- * File
- */
-export const zFalAiWanV2214bSpeechToVideoFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * WanS2VResponse
- */
-export const zWanV2214bSpeechToVideoOutput = z.object({
-  video: zFalAiWanV2214bSpeechToVideoFile,
-})
-
-/**
- * StableAvatarRequest
- */
-export const zStableAvatarInput = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to use for the video generation.',
-  }),
-  aspect_ratio: z.optional(
-    z.enum(['16:9', '1:1', '9:16', 'auto']).register(z.globalRegistry, {
-      description:
-        "The aspect ratio of the video to generate. If 'auto', the aspect ratio will be determined by the reference image.",
-    }),
-  ),
-  perturbation: z
-    .optional(
-      z.number().gte(0).lte(1).register(z.globalRegistry, {
-        description:
-          'The amount of perturbation to use for the video generation. 0.0 means no perturbation, 1.0 means full perturbation.',
-      }),
-    )
-    .default(0.1),
-  image_url: z.string().register(z.globalRegistry, {
-    description:
-      'The URL of the image to use as a reference for the video generation.',
-  }),
-  guidance_scale: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description: 'The guidance scale to use for the video generation.',
-      }),
-    )
-    .default(5),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The seed to use for the video generation.',
-    }),
-  ),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(10).lte(50).register(z.globalRegistry, {
-        description:
-          'The number of inference steps to use for the video generation.',
-      }),
-    )
-    .default(50),
-  audio_url: z.string().register(z.globalRegistry, {
-    description:
-      'The URL of the audio to use as a reference for the video generation.',
-  }),
-  audio_guidance_scale: z
-    .optional(
-      z.number().gte(0).lte(10).register(z.globalRegistry, {
-        description:
-          'The audio guidance scale to use for the video generation.',
-      }),
-    )
-    .default(4),
-})
-
-/**
- * File
- */
-export const zFalAiStableAvatarFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * StableAvatarResponse
- */
-export const zStableAvatarOutput = z.object({
-  video: zFalAiStableAvatarFile,
-})
-
-/**
- * EchoMimicRequest
- */
-export const zEchomimicV3Input = z.object({
-  prompt: z.string().register(z.globalRegistry, {
-    description: 'The prompt to use for the video generation.',
-  }),
-  audio_url: z.string().register(z.globalRegistry, {
-    description:
-      'The URL of the audio to use as a reference for the video generation.',
-  }),
-  image_url: z.string().register(z.globalRegistry, {
-    description:
-      'The URL of the image to use as a reference for the video generation.',
-  }),
-  guidance_scale: z
-    .optional(
-      z.number().gte(1).lte(10).register(z.globalRegistry, {
-        description: 'The guidance scale to use for the video generation.',
-      }),
-    )
-    .default(4.5),
-  audio_guidance_scale: z
-    .optional(
-      z.number().gte(0).lte(10).register(z.globalRegistry, {
-        description:
-          'The audio guidance scale to use for the video generation.',
-      }),
-    )
-    .default(2.5),
-  num_frames_per_generation: z
-    .optional(
-      z.int().gte(49).lte(161).register(z.globalRegistry, {
-        description: 'The number of frames to generate at once.',
+      z.int().gte(9).lte(481).register(z.globalRegistry, {
+        description: 'The number of frames to generate.',
       }),
     )
     .default(121),
+  image_strength: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'The strength of the image to use for the video generation.',
+      }),
+    )
+    .default(1),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
-        description: 'The negative prompt to use for the video generation.',
+        description: 'The negative prompt to generate the video from.',
       }),
     )
-    .default(''),
-  seed: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The seed to use for the video generation.',
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description: 'The guidance scale to use.',
+      }),
+    )
+    .default(3),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description: 'The write mode of the generated video.',
     }),
   ),
-})
-
-/**
- * File
- */
-export const zFalAiEchomimicV3File = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
+  video_output_type: z.optional(
+    z
+      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+      .register(z.globalRegistry, {
+        description: 'The output type of the generated video.',
+      }),
+  ),
+  camera_lora_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'The scale of the camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
+      }),
+    )
+    .default(1),
+  preprocess_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to preprocess the audio before using it as conditioning.',
+      }),
+    )
+    .default(true),
+  image_url: z.optional(z.union([z.string(), z.unknown()])),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description: 'The quality of the generated video.',
     }),
   ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+  sync_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      }),
+    )
+    .default(false),
+  audio_url: z.string().register(z.globalRegistry, {
+    description: 'The URL of the audio to generate the video from.',
   }),
-  file_data: z.optional(
+  audio_strength: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'Audio conditioning strength. Values below 1.0 will allow the model to change the audio, while a value of exactly 1.0 will use the input audio without modification.',
+      }),
+    )
+    .default(1),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(8).lte(50).register(z.globalRegistry, {
+        description: 'The number of inference steps to use.',
+      }),
+    )
+    .default(40),
+  seed: z.optional(z.union([z.int(), z.unknown()])),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable prompt expansion.',
+      }),
+    )
+    .default(false),
+})
+
+/**
+ * LTX2AudioToVideoOutput
+ */
+export const zSchemaLtx219bDistilledAudioToVideoOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for the generation.',
+  }),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for the random number generator.',
+  }),
+  video: zSchemaVideoFile,
+})
+
+/**
+ * LTX2DistilledAudioToVideoInput
+ */
+export const zSchemaLtx219bDistilledAudioToVideoInput = z.object({
+  match_audio_length: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'When enabled, the number of frames will be calculated based on the audio duration and FPS. When disabled, use the specified num_frames.',
+      }),
+    )
+    .default(true),
+  use_multiscale: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to use multi-scale generation. If True, the model will generate the video at a smaller scale first, then use the smaller video to guide the generation of a video at or above your requested size. This results in better coherence and details.',
+      }),
+    )
+    .default(true),
+  acceleration: z.optional(
+    z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
+      description: 'The acceleration level to use.',
+    }),
+  ),
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video from.',
+  }),
+  fps: z
+    .optional(
+      z.number().gte(1).lte(60).register(z.globalRegistry, {
+        description: 'The frames per second of the generated video.',
+      }),
+    )
+    .default(25),
+  camera_lora: z.optional(
+    z
+      .enum([
+        'dolly_in',
+        'dolly_out',
+        'dolly_left',
+        'dolly_right',
+        'jib_up',
+        'jib_down',
+        'static',
+        'none',
+      ])
+      .register(z.globalRegistry, {
+        description:
+          'The camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
+      }),
+  ),
+  video_size: z.optional(
+    z.union([
+      zSchemaImageSize,
+      z.enum([
+        'auto',
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ]),
+  ),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable the safety checker.',
+      }),
+    )
+    .default(true),
+  num_frames: z
+    .optional(
+      z.int().gte(9).lte(481).register(z.globalRegistry, {
+        description: 'The number of frames to generate.',
+      }),
+    )
+    .default(121),
+  image_strength: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'The strength of the image to use for the video generation.',
+      }),
+    )
+    .default(1),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The negative prompt to generate the video from.',
+      }),
+    )
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  camera_lora_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'The scale of the camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
+      }),
+    )
+    .default(1),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description: 'The write mode of the generated video.',
+    }),
+  ),
+  video_output_type: z.optional(
+    z
+      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+      .register(z.globalRegistry, {
+        description: 'The output type of the generated video.',
+      }),
+  ),
+  preprocess_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to preprocess the audio before using it as conditioning.',
+      }),
+    )
+    .default(true),
+  image_url: z.optional(z.union([z.string(), z.unknown()])),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description: 'The quality of the generated video.',
+    }),
+  ),
+  sync_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      }),
+    )
+    .default(false),
+  audio_url: z.string().register(z.globalRegistry, {
+    description: 'The URL of the audio to generate the video from.',
+  }),
+  audio_strength: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'Audio conditioning strength. Values below 1.0 will allow the model to change the audio, while a value of exactly 1.0 will use the input audio without modification.',
+      }),
+    )
+    .default(1),
+  seed: z.optional(z.union([z.int(), z.unknown()])),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable prompt expansion.',
+      }),
+    )
+    .default(false),
+})
+
+/**
+ * LTX2AudioToVideoOutput
+ */
+export const zSchemaLtx219bAudioToVideoLoraOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for the generation.',
+  }),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for the random number generator.',
+  }),
+  video: zSchemaVideoFile,
+})
+
+/**
+ * LoRAInput
+ *
+ * LoRA weight configuration.
+ */
+export const zSchemaLoRaInput = z
+  .object({
+    path: z.string().register(z.globalRegistry, {
+      description: 'URL, HuggingFace repo ID (owner/repo) to lora weights.',
+    }),
+    scale: z
+      .optional(
+        z.number().gte(0).lte(4).register(z.globalRegistry, {
+          description: 'Scale factor for LoRA application (0.0 to 4.0).',
+        }),
+      )
+      .default(1),
+    weight_name: z.optional(z.union([z.string(), z.unknown()])),
+  })
+  .register(z.globalRegistry, {
+    description: 'LoRA weight configuration.',
+  })
+
+/**
+ * LTX2LoRAAudioToVideoInput
+ */
+export const zSchemaLtx219bAudioToVideoLoraInput = z.object({
+  match_audio_length: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'When enabled, the number of frames will be calculated based on the audio duration and FPS. When disabled, use the specified num_frames.',
+      }),
+    )
+    .default(true),
+  use_multiscale: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to use multi-scale generation. If True, the model will generate the video at a smaller scale first, then use the smaller video to guide the generation of a video at or above your requested size. This results in better coherence and details.',
+      }),
+    )
+    .default(true),
+  acceleration: z.optional(
+    z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
+      description: 'The acceleration level to use.',
+    }),
+  ),
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video from.',
+  }),
+  fps: z
+    .optional(
+      z.number().gte(1).lte(60).register(z.globalRegistry, {
+        description: 'The frames per second of the generated video.',
+      }),
+    )
+    .default(25),
+  loras: z.array(zSchemaLoRaInput).register(z.globalRegistry, {
+    description: 'The LoRAs to use for the generation.',
+  }),
+  camera_lora: z.optional(
+    z
+      .enum([
+        'dolly_in',
+        'dolly_out',
+        'dolly_left',
+        'dolly_right',
+        'jib_up',
+        'jib_down',
+        'static',
+        'none',
+      ])
+      .register(z.globalRegistry, {
+        description:
+          'The camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
+      }),
+  ),
+  video_size: z.optional(
+    z.union([
+      zSchemaImageSize,
+      z.enum([
+        'auto',
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ]),
+  ),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable the safety checker.',
+      }),
+    )
+    .default(true),
+  num_frames: z
+    .optional(
+      z.int().gte(9).lte(481).register(z.globalRegistry, {
+        description: 'The number of frames to generate.',
+      }),
+    )
+    .default(121),
+  image_strength: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'The strength of the image to use for the video generation.',
+      }),
+    )
+    .default(1),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The negative prompt to generate the video from.',
+      }),
+    )
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  guidance_scale: z
+    .optional(
+      z.number().gte(1).lte(10).register(z.globalRegistry, {
+        description: 'The guidance scale to use.',
+      }),
+    )
+    .default(3),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description: 'The write mode of the generated video.',
+    }),
+  ),
+  video_output_type: z.optional(
+    z
+      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+      .register(z.globalRegistry, {
+        description: 'The output type of the generated video.',
+      }),
+  ),
+  camera_lora_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'The scale of the camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
+      }),
+    )
+    .default(1),
+  preprocess_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to preprocess the audio before using it as conditioning.',
+      }),
+    )
+    .default(true),
+  image_url: z.optional(z.union([z.string(), z.unknown()])),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description: 'The quality of the generated video.',
+    }),
+  ),
+  sync_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      }),
+    )
+    .default(false),
+  audio_url: z.string().register(z.globalRegistry, {
+    description: 'The URL of the audio to generate the video from.',
+  }),
+  audio_strength: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'Audio conditioning strength. Values below 1.0 will allow the model to change the audio, while a value of exactly 1.0 will use the input audio without modification.',
+      }),
+    )
+    .default(1),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(8).lte(50).register(z.globalRegistry, {
+        description: 'The number of inference steps to use.',
+      }),
+    )
+    .default(40),
+  seed: z.optional(z.union([z.int(), z.unknown()])),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable prompt expansion.',
+      }),
+    )
+    .default(false),
+})
+
+/**
+ * LTX2AudioToVideoOutput
+ */
+export const zSchemaLtx219bDistilledAudioToVideoLoraOutput = z.object({
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt used for the generation.',
+  }),
+  seed: z.int().register(z.globalRegistry, {
+    description: 'The seed used for the random number generator.',
+  }),
+  video: zSchemaVideoFile,
+})
+
+/**
+ * LTX2LoRADistilledAudioToVideoInput
+ */
+export const zSchemaLtx219bDistilledAudioToVideoLoraInput = z.object({
+  match_audio_length: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'When enabled, the number of frames will be calculated based on the audio duration and FPS. When disabled, use the specified num_frames.',
+      }),
+    )
+    .default(true),
+  use_multiscale: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to use multi-scale generation. If True, the model will generate the video at a smaller scale first, then use the smaller video to guide the generation of a video at or above your requested size. This results in better coherence and details.',
+      }),
+    )
+    .default(true),
+  acceleration: z.optional(
+    z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
+      description: 'The acceleration level to use.',
+    }),
+  ),
+  prompt: z.string().register(z.globalRegistry, {
+    description: 'The prompt to generate the video from.',
+  }),
+  fps: z
+    .optional(
+      z.number().gte(1).lte(60).register(z.globalRegistry, {
+        description: 'The frames per second of the generated video.',
+      }),
+    )
+    .default(25),
+  loras: z.array(zSchemaLoRaInput).register(z.globalRegistry, {
+    description: 'The LoRAs to use for the generation.',
+  }),
+  camera_lora: z.optional(
+    z
+      .enum([
+        'dolly_in',
+        'dolly_out',
+        'dolly_left',
+        'dolly_right',
+        'jib_up',
+        'jib_down',
+        'static',
+        'none',
+      ])
+      .register(z.globalRegistry, {
+        description:
+          'The camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
+      }),
+  ),
+  video_size: z.optional(
+    z.union([
+      zSchemaImageSize,
+      z.enum([
+        'auto',
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ]),
+  ),
+  enable_safety_checker: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable the safety checker.',
+      }),
+    )
+    .default(true),
+  num_frames: z
+    .optional(
+      z.int().gte(9).lte(481).register(z.globalRegistry, {
+        description: 'The number of frames to generate.',
+      }),
+    )
+    .default(121),
+  image_strength: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'The strength of the image to use for the video generation.',
+      }),
+    )
+    .default(1),
+  negative_prompt: z
+    .optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The negative prompt to generate the video from.',
+      }),
+    )
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  camera_lora_scale: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'The scale of the camera LoRA to use. This allows you to control the camera movement of the generated video more accurately than just prompting the model to move the camera.',
+      }),
+    )
+    .default(1),
+  video_write_mode: z.optional(
+    z.enum(['fast', 'balanced', 'small']).register(z.globalRegistry, {
+      description: 'The write mode of the generated video.',
+    }),
+  ),
+  video_output_type: z.optional(
+    z
+      .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+      .register(z.globalRegistry, {
+        description: 'The output type of the generated video.',
+      }),
+  ),
+  preprocess_audio: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Whether to preprocess the audio before using it as conditioning.',
+      }),
+    )
+    .default(true),
+  image_url: z.optional(z.union([z.string(), z.unknown()])),
+  video_quality: z.optional(
+    z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
+      description: 'The quality of the generated video.',
+    }),
+  ),
+  sync_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      }),
+    )
+    .default(false),
+  audio_url: z.string().register(z.globalRegistry, {
+    description: 'The URL of the audio to generate the video from.',
+  }),
+  audio_strength: z
+    .optional(
+      z.number().gte(0).lte(1).register(z.globalRegistry, {
+        description:
+          'Audio conditioning strength. Values below 1.0 will allow the model to change the audio, while a value of exactly 1.0 will use the input audio without modification.',
+      }),
+    )
+    .default(1),
+  seed: z.optional(z.union([z.int(), z.unknown()])),
+  enable_prompt_expansion: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether to enable prompt expansion.',
+      }),
+    )
+    .default(false),
+})
+
+export const zSchemaQueueStatus = z.object({
+  status: z.enum(['IN_QUEUE', 'IN_PROGRESS', 'COMPLETED']),
+  request_id: z.string().register(z.globalRegistry, {
+    description: 'The request id.',
+  }),
+  response_url: z.optional(
     z.string().register(z.globalRegistry, {
-      description: 'File data',
+      description: 'The response url.',
+    }),
+  ),
+  status_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The status url.',
+    }),
+  ),
+  cancel_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The cancel url.',
+    }),
+  ),
+  logs: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The logs.',
+    }),
+  ),
+  metrics: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The metrics.',
+    }),
+  ),
+  queue_position: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The queue position.',
     }),
   ),
 })
 
-/**
- * EchoMimicResponse
- */
-export const zEchomimicV3Output = z.object({
-  video: zFalAiEchomimicV3File,
-})
+export const zGetFalAiLtx219bDistilledAudioToVideoLoraRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
 
 /**
- * Audio2VideoInput
+ * The request status.
  */
-export const zVeedAvatarsAudioToVideoAvatarsAudioToVideoInput = z.object({
-  audio_url: z.url().min(1).max(2083),
-  avatar_id: z
-    .enum([
-      'emily_vertical_primary',
-      'emily_vertical_secondary',
-      'marcus_vertical_primary',
-      'marcus_vertical_secondary',
-      'mira_vertical_primary',
-      'mira_vertical_secondary',
-      'jasmine_vertical_primary',
-      'jasmine_vertical_secondary',
-      'jasmine_vertical_walking',
-      'aisha_vertical_walking',
-      'elena_vertical_primary',
-      'elena_vertical_secondary',
-      'any_male_vertical_primary',
-      'any_female_vertical_primary',
-      'any_male_vertical_secondary',
-      'any_female_vertical_secondary',
-      'any_female_vertical_walking',
-      'emily_primary',
-      'emily_side',
-      'marcus_primary',
-      'marcus_side',
-      'aisha_walking',
-      'elena_primary',
-      'elena_side',
-      'any_male_primary',
-      'any_female_primary',
-      'any_male_side',
-      'any_female_side',
-    ])
+export const zGetFalAiLtx219bDistilledAudioToVideoLoraRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtx219bDistilledAudioToVideoLoraRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtx219bDistilledAudioToVideoLoraRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
     .register(z.globalRegistry, {
-      description: 'The avatar to use for the video',
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLtx219bDistilledAudioToVideoLoraData = z.object({
+  body: zSchemaLtx219bDistilledAudioToVideoLoraInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtx219bDistilledAudioToVideoLoraResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiLtx219bDistilledAudioToVideoLoraRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
     }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtx219bDistilledAudioToVideoLoraRequestsByRequestIdResponse =
+  zSchemaLtx219bDistilledAudioToVideoLoraOutput
+
+export const zGetFalAiLtx219bAudioToVideoLoraRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtx219bAudioToVideoLoraRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtx219bAudioToVideoLoraRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtx219bAudioToVideoLoraRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLtx219bAudioToVideoLoraData = z.object({
+  body: zSchemaLtx219bAudioToVideoLoraInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
 })
 
 /**
- * File
+ * The request status.
  */
-export const zVeedAvatarsAudioToVideoFile = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+export const zPostFalAiLtx219bAudioToVideoLoraResponse = zSchemaQueueStatus
+
+export const zGetFalAiLtx219bAudioToVideoLoraRequestsByRequestIdData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtx219bAudioToVideoLoraRequestsByRequestIdResponse =
+  zSchemaLtx219bAudioToVideoLoraOutput
+
+export const zGetFalAiLtx219bDistilledAudioToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtx219bDistilledAudioToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtx219bDistilledAudioToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtx219bDistilledAudioToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLtx219bDistilledAudioToVideoData = z.object({
+  body: zSchemaLtx219bDistilledAudioToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtx219bDistilledAudioToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiLtx219bDistilledAudioToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLtx219bDistilledAudioToVideoRequestsByRequestIdResponse =
+  zSchemaLtx219bDistilledAudioToVideoOutput
+
+export const zGetFalAiLtx219bAudioToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLtx219bAudioToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLtx219bAudioToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLtx219bAudioToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiLtx219bAudioToVideoData = z.object({
+  body: zSchemaLtx219bAudioToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLtx219bAudioToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiLtx219bAudioToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
   }),
+  query: z.optional(z.never()),
 })
 
 /**
- * AvatarsAppOutput
+ * Result of the request.
  */
-export const zVeedAvatarsAudioToVideoAvatarsAudioToVideoOutput = z.object({
-  video: zVeedAvatarsAudioToVideoFile,
+export const zGetFalAiLtx219bAudioToVideoRequestsByRequestIdResponse =
+  zSchemaLtx219bAudioToVideoOutput
+
+export const zGetFalAiElevenlabsDubbingRequestsByRequestIdStatusData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  },
+)
+
+/**
+ * The request status.
+ */
+export const zGetFalAiElevenlabsDubbingRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiElevenlabsDubbingRequestsByRequestIdCancelData = z.object(
+  {
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  },
+)
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiElevenlabsDubbingRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiElevenlabsDubbingData = z.object({
+  body: zSchemaElevenlabsDubbingInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
 })
+
+/**
+ * The request status.
+ */
+export const zPostFalAiElevenlabsDubbingResponse = zSchemaQueueStatus
+
+export const zGetFalAiElevenlabsDubbingRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiElevenlabsDubbingRequestsByRequestIdResponse =
+  zSchemaElevenlabsDubbingOutput
+
+export const zGetFalAiLongcatMultiAvatarImageAudioToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLongcatMultiAvatarImageAudioToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLongcatMultiAvatarImageAudioToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLongcatMultiAvatarImageAudioToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLongcatMultiAvatarImageAudioToVideoData = z.object({
+  body: zSchemaLongcatMultiAvatarImageAudioToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLongcatMultiAvatarImageAudioToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiLongcatMultiAvatarImageAudioToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLongcatMultiAvatarImageAudioToVideoRequestsByRequestIdResponse =
+  zSchemaLongcatMultiAvatarImageAudioToVideoOutput
+
+export const zGetFalAiLongcatSingleAvatarImageAudioToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLongcatSingleAvatarImageAudioToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLongcatSingleAvatarImageAudioToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLongcatSingleAvatarImageAudioToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLongcatSingleAvatarImageAudioToVideoData = z.object({
+  body: zSchemaLongcatSingleAvatarImageAudioToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLongcatSingleAvatarImageAudioToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiLongcatSingleAvatarImageAudioToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLongcatSingleAvatarImageAudioToVideoRequestsByRequestIdResponse =
+  zSchemaLongcatSingleAvatarImageAudioToVideoOutput
+
+export const zGetFalAiLongcatSingleAvatarAudioToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiLongcatSingleAvatarAudioToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiLongcatSingleAvatarAudioToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiLongcatSingleAvatarAudioToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiLongcatSingleAvatarAudioToVideoData = z.object({
+  body: zSchemaLongcatSingleAvatarAudioToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiLongcatSingleAvatarAudioToVideoResponse =
+  zSchemaQueueStatus
+
+export const zGetFalAiLongcatSingleAvatarAudioToVideoRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiLongcatSingleAvatarAudioToVideoRequestsByRequestIdResponse =
+  zSchemaLongcatSingleAvatarAudioToVideoOutput
+
+export const zGetArgilAvatarsAudioToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetArgilAvatarsAudioToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutArgilAvatarsAudioToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutArgilAvatarsAudioToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostArgilAvatarsAudioToVideoData = z.object({
+  body: zSchemaAvatarsAudioToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostArgilAvatarsAudioToVideoResponse = zSchemaQueueStatus
+
+export const zGetArgilAvatarsAudioToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetArgilAvatarsAudioToVideoRequestsByRequestIdResponse =
+  zSchemaAvatarsAudioToVideoOutput
+
+export const zGetFalAiWanV2214bSpeechToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiWanV2214bSpeechToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiWanV2214bSpeechToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiWanV2214bSpeechToVideoRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiWanV2214bSpeechToVideoData = z.object({
+  body: zSchemaWanV2214bSpeechToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiWanV2214bSpeechToVideoResponse = zSchemaQueueStatus
+
+export const zGetFalAiWanV2214bSpeechToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiWanV2214bSpeechToVideoRequestsByRequestIdResponse =
+  zSchemaWanV2214bSpeechToVideoOutput
+
+export const zGetFalAiStableAvatarRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiStableAvatarRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiStableAvatarRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiStableAvatarRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiStableAvatarData = z.object({
+  body: zSchemaStableAvatarInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiStableAvatarResponse = zSchemaQueueStatus
+
+export const zGetFalAiStableAvatarRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiStableAvatarRequestsByRequestIdResponse =
+  zSchemaStableAvatarOutput
+
+export const zGetFalAiEchomimicV3RequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiEchomimicV3RequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiEchomimicV3RequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiEchomimicV3RequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiEchomimicV3Data = z.object({
+  body: zSchemaEchomimicV3Input,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiEchomimicV3Response = zSchemaQueueStatus
+
+export const zGetFalAiEchomimicV3RequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiEchomimicV3RequestsByRequestIdResponse =
+  zSchemaEchomimicV3Output
+
+export const zGetVeedAvatarsAudioToVideoRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetVeedAvatarsAudioToVideoRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutVeedAvatarsAudioToVideoRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutVeedAvatarsAudioToVideoRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostVeedAvatarsAudioToVideoData = z.object({
+  body: zSchemaAvatarsAudioToVideoInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostVeedAvatarsAudioToVideoResponse = zSchemaQueueStatus
+
+export const zGetVeedAvatarsAudioToVideoRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetVeedAvatarsAudioToVideoRequestsByRequestIdResponse =
+  zSchemaAvatarsAudioToVideoOutput

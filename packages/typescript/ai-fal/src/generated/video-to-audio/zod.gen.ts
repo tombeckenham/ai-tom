@@ -2,24 +2,177 @@
 
 import { z } from 'zod'
 
-export const zFile = z.object({
-  url: z.url(),
-  content_type: z.optional(z.string()),
-  file_name: z.optional(z.string()),
-  file_size: z.optional(z.int()),
+/**
+ * Audio
+ */
+export const zSchemaAudio = z.object({
+  file_size: z.optional(z.union([z.int(), z.unknown()])),
+  file_name: z.optional(z.union([z.string(), z.unknown()])),
+  content_type: z.optional(z.union([z.string(), z.unknown()])),
+  url: z.string().register(z.globalRegistry, {
+    description: 'The URL where the file can be downloaded from.',
+  }),
 })
 
-export const zQueueStatus = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'FAILED']),
-  response_url: z.optional(z.url()),
+/**
+ * AudioOutput
+ */
+export const zSchemaSfxV1VideoToAudioOutput = z.object({
+  audio: z.array(zSchemaAudio).register(z.globalRegistry, {
+    description: 'The generated sound effects audio',
+  }),
 })
+
+/**
+ * Input
+ */
+export const zSchemaSfxV1VideoToAudioInput = z.object({
+  num_samples: z.optional(z.union([z.int().gte(2).lte(8), z.unknown()])),
+  video_url: z.url().min(1).max(2083).register(z.globalRegistry, {
+    description:
+      'A video url that can accessed from the API to process and add sound effects',
+  }),
+  duration: z.optional(z.union([z.number().gte(1).lte(10), z.unknown()])),
+  seed: z.optional(z.union([z.int().gte(1), z.unknown()])),
+  text_prompt: z.optional(z.union([z.string(), z.unknown()])),
+})
+
+/**
+ * File
+ */
+export const zSchemaFile = z.object({
+  file_size: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The size of the file in bytes.',
+    }),
+  ),
+  file_name: z.optional(
+    z.string().register(z.globalRegistry, {
+      description:
+        'The name of the file. It will be auto-generated if not provided.',
+    }),
+  ),
+  content_type: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The mime type of the file.',
+    }),
+  ),
+  url: z.string().register(z.globalRegistry, {
+    description: 'The URL where the file can be downloaded from.',
+  }),
+  file_data: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
+  ),
+})
+
+/**
+ * VideoToAudioOutput
+ */
+export const zSchemaKlingVideoVideoToAudioOutput = z.object({
+  audio: zSchemaFile,
+  video: zSchemaFile,
+})
+
+/**
+ * VideoToAudioInput
+ */
+export const zSchemaKlingVideoVideoToAudioInput = z.object({
+  video_url: z.string().register(z.globalRegistry, {
+    description:
+      'The video URL to extract audio from. Only .mp4/.mov formats are supported. File size does not exceed 100MB. Video duration between 3.0s and 20.0s.',
+  }),
+  asmr_mode: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description:
+          'Enable ASMR mode. This mode enhances detailed sound effects and is suitable for highly immersive content scenarios.',
+      }),
+    )
+    .default(false),
+  background_music_prompt: z
+    .optional(
+      z.string().max(200).register(z.globalRegistry, {
+        description: 'Background music prompt. Cannot exceed 200 characters.',
+      }),
+    )
+    .default('intense car race'),
+  sound_effect_prompt: z
+    .optional(
+      z.string().max(200).register(z.globalRegistry, {
+        description: 'Sound effect prompt. Cannot exceed 200 characters.',
+      }),
+    )
+    .default('Car tires screech as they accelerate in a drag race'),
+})
+
+/**
+ * Audio
+ */
+export const zSchemaAudioOutput = z.object({
+  file_size: z.optional(z.union([z.int(), z.unknown()])),
+  file_name: z.optional(z.union([z.string(), z.unknown()])),
+  content_type: z.optional(z.union([z.string(), z.unknown()])),
+  url: z.string().register(z.globalRegistry, {
+    description: 'The URL where the file can be downloaded from.',
+  }),
+})
+
+/**
+ * AudioOutput
+ */
+export const zSchemaSfxV15VideoToAudioOutput = z.object({
+  audio: z.array(zSchemaAudioOutput).register(z.globalRegistry, {
+    description: 'The generated sound effects audio',
+  }),
+})
+
+/**
+ * Input
+ */
+export const zSchemaSfxV15VideoToAudioInput = z.object({
+  num_samples: z.optional(z.union([z.int().gte(2).lte(8), z.unknown()])),
+  duration: z.optional(z.union([z.number().gte(1).lte(10), z.unknown()])),
+  start_offset: z.optional(z.union([z.number().gte(0), z.unknown()])),
+  video_url: z.url().min(1).max(2083).register(z.globalRegistry, {
+    description:
+      'A video url that can accessed from the API to process and add sound effects',
+  }),
+  seed: z.optional(z.union([z.int().gte(1), z.unknown()])),
+  text_prompt: z.optional(z.union([z.string(), z.unknown()])),
+})
+
+/**
+ * SAMAudioVisualSeparateOutput
+ *
+ * Output for visual-prompted audio separation.
+ */
+export const zSchemaSamAudioVisualSeparateOutput = z
+  .object({
+    target: zSchemaFile,
+    duration: z.number().register(z.globalRegistry, {
+      description: 'Duration of the output audio in seconds.',
+    }),
+    sample_rate: z
+      .optional(
+        z.int().register(z.globalRegistry, {
+          description: 'Sample rate of the output audio in Hz.',
+        }),
+      )
+      .default(48000),
+    residual: zSchemaFile,
+  })
+  .register(z.globalRegistry, {
+    description: 'Output for visual-prompted audio separation.',
+  })
 
 /**
  * SAMAudioVisualInput
  *
  * Input for visual-prompted audio separation.
  */
-export const zSamAudioVisualSeparateInput = z
+export const zSchemaSamAudioVisualSeparateInput = z
   .object({
     prompt: z
       .optional(
@@ -61,188 +214,357 @@ export const zSamAudioVisualSeparateInput = z
     description: 'Input for visual-prompted audio separation.',
   })
 
-/**
- * File
- */
-export const zFalAiSamAudioVisualSeparateFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+export const zSchemaQueueStatus = z.object({
+  status: z.enum(['IN_QUEUE', 'IN_PROGRESS', 'COMPLETED']),
+  request_id: z.string().register(z.globalRegistry, {
+    description: 'The request id.',
   }),
-  file_data: z.optional(
+  response_url: z.optional(
     z.string().register(z.globalRegistry, {
-      description: 'File data',
+      description: 'The response url.',
+    }),
+  ),
+  status_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The status url.',
+    }),
+  ),
+  cancel_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The cancel url.',
+    }),
+  ),
+  logs: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The logs.',
+    }),
+  ),
+  metrics: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The metrics.',
+    }),
+  ),
+  queue_position: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The queue position.',
     }),
   ),
 })
 
-/**
- * SAMAudioVisualSeparateOutput
- *
- * Output for visual-prompted audio separation.
- */
-export const zSamAudioVisualSeparateOutput = z
-  .object({
-    target: zFalAiSamAudioVisualSeparateFile,
-    duration: z.number().register(z.globalRegistry, {
-      description: 'Duration of the output audio in seconds.',
+export const zGetFalAiSamAudioVisualSeparateRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
     }),
-    sample_rate: z
-      .optional(
-        z.int().register(z.globalRegistry, {
-          description: 'Sample rate of the output audio in Hz.',
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiSamAudioVisualSeparateRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiSamAudioVisualSeparateRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiSamAudioVisualSeparateRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
         }),
-      )
-      .default(48000),
-    residual: zFalAiSamAudioVisualSeparateFile,
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiSamAudioVisualSeparateData = z.object({
+  body: zSchemaSamAudioVisualSeparateInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiSamAudioVisualSeparateResponse = zSchemaQueueStatus
+
+export const zGetFalAiSamAudioVisualSeparateRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiSamAudioVisualSeparateRequestsByRequestIdResponse =
+  zSchemaSamAudioVisualSeparateOutput
+
+export const zGetMireloAiSfxV15VideoToAudioRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetMireloAiSfxV15VideoToAudioRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutMireloAiSfxV15VideoToAudioRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutMireloAiSfxV15VideoToAudioRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
   })
   .register(z.globalRegistry, {
-    description: 'Output for visual-prompted audio separation.',
+    description: 'The request was cancelled.',
+  })
+
+export const zPostMireloAiSfxV15VideoToAudioData = z.object({
+  body: zSchemaSfxV15VideoToAudioInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostMireloAiSfxV15VideoToAudioResponse = zSchemaQueueStatus
+
+export const zGetMireloAiSfxV15VideoToAudioRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetMireloAiSfxV15VideoToAudioRequestsByRequestIdResponse =
+  zSchemaSfxV15VideoToAudioOutput
+
+export const zGetFalAiKlingVideoVideoToAudioRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
   })
 
 /**
- * Input
+ * The request status.
  */
-export const zSfxV15VideoToAudioInput = z.object({
-  num_samples: z.optional(z.union([z.int().gte(2).lte(8), z.unknown()])),
-  duration: z.optional(z.union([z.number().gte(1).lte(10), z.unknown()])),
-  start_offset: z.optional(z.union([z.number().gte(0), z.unknown()])),
-  video_url: z.url().min(1).max(2083).register(z.globalRegistry, {
-    description:
-      'A video url that can accessed from the API to process and add sound effects',
-  }),
-  seed: z.optional(z.union([z.int().gte(1), z.unknown()])),
-  text_prompt: z.optional(z.union([z.string(), z.unknown()])),
+export const zGetFalAiKlingVideoVideoToAudioRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiKlingVideoVideoToAudioRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiKlingVideoVideoToAudioRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiKlingVideoVideoToAudioData = z.object({
+  body: zSchemaKlingVideoVideoToAudioInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
 })
 
 /**
- * Audio
+ * The request status.
  */
-export const zAudioOutput = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+export const zPostFalAiKlingVideoVideoToAudioResponse = zSchemaQueueStatus
+
+export const zGetFalAiKlingVideoVideoToAudioRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
   }),
+  query: z.optional(z.never()),
 })
 
 /**
- * VideoToAudioInput
+ * Result of the request.
  */
-export const zKlingVideoVideoToAudioInput = z.object({
-  video_url: z.string().register(z.globalRegistry, {
-    description:
-      'The video URL to extract audio from. Only .mp4/.mov formats are supported. File size does not exceed 100MB. Video duration between 3.0s and 20.0s.',
-  }),
-  asmr_mode: z
-    .optional(
+export const zGetFalAiKlingVideoVideoToAudioRequestsByRequestIdResponse =
+  zSchemaKlingVideoVideoToAudioOutput
+
+export const zGetMireloAiSfxV1VideoToAudioRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetMireloAiSfxV1VideoToAudioRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutMireloAiSfxV1VideoToAudioRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutMireloAiSfxV1VideoToAudioRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
       z.boolean().register(z.globalRegistry, {
-        description:
-          'Enable ASMR mode. This mode enhances detailed sound effects and is suitable for highly immersive content scenarios.',
+        description: 'Whether the request was cancelled successfully.',
       }),
-    )
-    .default(false),
-  background_music_prompt: z
-    .optional(
-      z.string().max(200).register(z.globalRegistry, {
-        description: 'Background music prompt. Cannot exceed 200 characters.',
-      }),
-    )
-    .default('intense car race'),
-  sound_effect_prompt: z
-    .optional(
-      z.string().max(200).register(z.globalRegistry, {
-        description: 'Sound effect prompt. Cannot exceed 200 characters.',
-      }),
-    )
-    .default('Car tires screech as they accelerate in a drag race'),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostMireloAiSfxV1VideoToAudioData = z.object({
+  body: zSchemaSfxV1VideoToAudioInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
 })
 
 /**
- * File
+ * The request status.
  */
-export const zFalAiKlingVideoVideoToAudioFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
+export const zPostMireloAiSfxV1VideoToAudioResponse = zSchemaQueueStatus
+
+export const zGetMireloAiSfxV1VideoToAudioRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
     }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
   }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
+  query: z.optional(z.never()),
 })
 
 /**
- * VideoToAudioOutput
+ * Result of the request.
  */
-export const zKlingVideoVideoToAudioOutput = z.object({
-  video: zFalAiKlingVideoVideoToAudioFile,
-  audio: zFalAiKlingVideoVideoToAudioFile,
-})
-
-/**
- * Input
- */
-export const zSfxV1VideoToAudioInput = z.object({
-  num_samples: z.optional(z.union([z.int().gte(2).lte(8), z.unknown()])),
-  video_url: z.url().min(1).max(2083).register(z.globalRegistry, {
-    description:
-      'A video url that can accessed from the API to process and add sound effects',
-  }),
-  duration: z.optional(z.union([z.number().gte(1).lte(10), z.unknown()])),
-  seed: z.optional(z.union([z.int().gte(1), z.unknown()])),
-  text_prompt: z.optional(z.union([z.string(), z.unknown()])),
-})
-
-/**
- * Audio
- */
-export const zAudio = z.object({
-  file_size: z.optional(z.union([z.int(), z.unknown()])),
-  file_name: z.optional(z.union([z.string(), z.unknown()])),
-  content_type: z.optional(z.union([z.string(), z.unknown()])),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-})
-
-/**
- * AudioOutput
- */
-export const zSfxV1VideoToAudioOutput = z.object({
-  audio: z.array(zAudio).register(z.globalRegistry, {
-    description: 'The generated sound effects audio',
-  }),
-})
+export const zGetMireloAiSfxV1VideoToAudioRequestsByRequestIdResponse =
+  zSchemaSfxV1VideoToAudioOutput

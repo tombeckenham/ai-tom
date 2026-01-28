@@ -2,24 +2,105 @@
 
 import { z } from 'zod'
 
-export const zFile = z.object({
-  url: z.url(),
-  content_type: z.optional(z.string()),
-  file_name: z.optional(z.string()),
-  file_size: z.optional(z.int()),
+/**
+ * File
+ */
+export const zSchemaFile = z.object({
+  file_size: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The size of the file in bytes.',
+    }),
+  ),
+  file_name: z.optional(
+    z.string().register(z.globalRegistry, {
+      description:
+        'The name of the file. It will be auto-generated if not provided.',
+    }),
+  ),
+  content_type: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The mime type of the file.',
+    }),
+  ),
+  url: z.string().register(z.globalRegistry, {
+    description: 'The URL where the file can be downloaded from.',
+  }),
+  file_data: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
+  ),
 })
 
-export const zQueueStatus = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'FAILED']),
-  response_url: z.optional(z.url()),
+/**
+ * ChatterboxOutput
+ */
+export const zSchemaChatterboxSpeechToSpeechOutput = z.object({
+  audio: zSchemaFile,
 })
+
+/**
+ * ChatterboxVCRequest
+ */
+export const zSchemaChatterboxSpeechToSpeechInput = z.object({
+  source_audio_url: z.string(),
+  target_voice_audio_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description:
+        'Optional URL to an audio file to use as a reference for the generated speech. If provided, the model will try to match the style and tone of the reference audio.',
+    }),
+  ),
+})
+
+/**
+ * Audio
+ */
+export const zSchemaAudio = z.object({
+  file_size: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The size of the file in bytes.',
+    }),
+  ),
+  file_name: z.optional(
+    z.string().register(z.globalRegistry, {
+      description:
+        'The name of the file. It will be auto-generated if not provided.',
+    }),
+  ),
+  content_type: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The mime type of the file.',
+    }),
+  ),
+  url: z.string().register(z.globalRegistry, {
+    description: 'The URL where the file can be downloaded from.',
+  }),
+  file_data: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
+  ),
+})
+
+/**
+ * STSOutput
+ *
+ * Output parameters for the speech-to-speech request.
+ */
+export const zSchemaChatterboxhdSpeechToSpeechOutput = z
+  .object({
+    audio: zSchemaAudio,
+  })
+  .register(z.globalRegistry, {
+    description: 'Output parameters for the speech-to-speech request.',
+  })
 
 /**
  * STSInput
  *
  * Input parameters for the speech-to-speech request.
  */
-export const zChatterboxhdSpeechToSpeechInput = z
+export const zSchemaChatterboxhdSpeechToSpeechInput = z
   .object({
     high_quality_audio: z
       .optional(
@@ -61,95 +142,202 @@ export const zChatterboxhdSpeechToSpeechInput = z
     description: 'Input parameters for the speech-to-speech request.',
   })
 
-/**
- * Audio
- */
-export const zAudio = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+export const zSchemaQueueStatus = z.object({
+  status: z.enum(['IN_QUEUE', 'IN_PROGRESS', 'COMPLETED']),
+  request_id: z.string().register(z.globalRegistry, {
+    description: 'The request id.',
   }),
-  file_data: z.optional(
+  response_url: z.optional(
     z.string().register(z.globalRegistry, {
-      description: 'File data',
+      description: 'The response url.',
     }),
   ),
-})
-
-/**
- * STSOutput
- *
- * Output parameters for the speech-to-speech request.
- */
-export const zChatterboxhdSpeechToSpeechOutput = z
-  .object({
-    audio: zAudio,
-  })
-  .register(z.globalRegistry, {
-    description: 'Output parameters for the speech-to-speech request.',
-  })
-
-/**
- * ChatterboxVCRequest
- */
-export const zChatterboxSpeechToSpeechInput = z.object({
-  source_audio_url: z.string(),
-  target_voice_audio_url: z.optional(
+  status_url: z.optional(
     z.string().register(z.globalRegistry, {
-      description:
-        'Optional URL to an audio file to use as a reference for the generated speech. If provided, the model will try to match the style and tone of the reference audio.',
+      description: 'The status url.',
     }),
   ),
-})
-
-/**
- * File
- */
-export const zFalAiChatterboxSpeechToSpeechFile = z.object({
-  file_size: z.optional(
+  cancel_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The cancel url.',
+    }),
+  ),
+  logs: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The logs.',
+    }),
+  ),
+  metrics: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The metrics.',
+    }),
+  ),
+  queue_position: z.optional(
     z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
+      description: 'The queue position.',
     }),
   ),
 })
 
+export const zGetResembleAiChatterboxhdSpeechToSpeechRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
 /**
- * ChatterboxOutput
+ * The request status.
  */
-export const zChatterboxSpeechToSpeechOutput = z.object({
-  audio: zFalAiChatterboxSpeechToSpeechFile,
+export const zGetResembleAiChatterboxhdSpeechToSpeechRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutResembleAiChatterboxhdSpeechToSpeechRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutResembleAiChatterboxhdSpeechToSpeechRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostResembleAiChatterboxhdSpeechToSpeechData = z.object({
+  body: zSchemaChatterboxhdSpeechToSpeechInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
 })
+
+/**
+ * The request status.
+ */
+export const zPostResembleAiChatterboxhdSpeechToSpeechResponse =
+  zSchemaQueueStatus
+
+export const zGetResembleAiChatterboxhdSpeechToSpeechRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetResembleAiChatterboxhdSpeechToSpeechRequestsByRequestIdResponse =
+  zSchemaChatterboxhdSpeechToSpeechOutput
+
+export const zGetFalAiChatterboxSpeechToSpeechRequestsByRequestIdStatusData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(
+      z.object({
+        logs: z.optional(
+          z.number().register(z.globalRegistry, {
+            description:
+              'Whether to include logs (`1`) in the response or not (`0`).',
+          }),
+        ),
+      }),
+    ),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiChatterboxSpeechToSpeechRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiChatterboxSpeechToSpeechRequestsByRequestIdCancelData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiChatterboxSpeechToSpeechRequestsByRequestIdCancelResponse =
+  z
+    .object({
+      success: z.optional(
+        z.boolean().register(z.globalRegistry, {
+          description: 'Whether the request was cancelled successfully.',
+        }),
+      ),
+    })
+    .register(z.globalRegistry, {
+      description: 'The request was cancelled.',
+    })
+
+export const zPostFalAiChatterboxSpeechToSpeechData = z.object({
+  body: zSchemaChatterboxSpeechToSpeechInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiChatterboxSpeechToSpeechResponse = zSchemaQueueStatus
+
+export const zGetFalAiChatterboxSpeechToSpeechRequestsByRequestIdData =
+  z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+      request_id: z.string().register(z.globalRegistry, {
+        description: 'Request ID',
+      }),
+    }),
+    query: z.optional(z.never()),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiChatterboxSpeechToSpeechRequestsByRequestIdResponse =
+  zSchemaChatterboxSpeechToSpeechOutput

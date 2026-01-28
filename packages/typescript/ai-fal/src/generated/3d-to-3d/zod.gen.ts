@@ -2,62 +2,10 @@
 
 import { z } from 'zod'
 
-export const zFile = z.object({
-  url: z.url(),
-  content_type: z.optional(z.string()),
-  file_name: z.optional(z.string()),
-  file_size: z.optional(z.int()),
-})
-
-export const zQueueStatus = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'FAILED']),
-  response_url: z.optional(z.url()),
-})
-
-/**
- * UltraShapeRequest
- */
-export const zUltrashapeInput = z.object({
-  octree_resolution: z
-    .optional(
-      z.int().gte(128).lte(1024).register(z.globalRegistry, {
-        description: 'Marching cubes resolution.',
-      }),
-    )
-    .default(1024),
-  remove_background: z
-    .optional(
-      z.boolean().register(z.globalRegistry, {
-        description: 'Remove image background.',
-      }),
-    )
-    .default(true),
-  num_inference_steps: z
-    .optional(
-      z.int().gte(1).lte(50).register(z.globalRegistry, {
-        description: 'Diffusion steps.',
-      }),
-    )
-    .default(50),
-  model_url: z.string().register(z.globalRegistry, {
-    description: 'URL of the coarse mesh (.glb or .obj) to refine.',
-  }),
-  seed: z
-    .optional(
-      z.int().register(z.globalRegistry, {
-        description: 'Random seed.',
-      }),
-    )
-    .default(42),
-  image_url: z.string().register(z.globalRegistry, {
-    description: 'URL of the reference image for mesh refinement.',
-  }),
-})
-
 /**
  * File
  */
-export const zFalAiUltrashapeFile = z.object({
+export const zSchemaFile = z.object({
   file_size: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'The size of the file in bytes.',
@@ -85,377 +33,28 @@ export const zFalAiUltrashapeFile = z.object({
 })
 
 /**
- * UltraShapeResponse
+ * HunyuanPartOutput
  */
-export const zUltrashapeOutput = z.object({
-  model_glb: zFalAiUltrashapeFile,
-})
-
-/**
- * SAM3DAlignmentInput
- */
-export const zSam33dAlignInput = z.object({
-  image_url: z.string().register(z.globalRegistry, {
-    description: 'URL of the original image used for MoGe depth estimation',
+export const zSchemaHunyuanPartOutput = z.object({
+  iou_scores: z.array(z.number()).register(z.globalRegistry, {
+    description: 'IoU scores for each of the three masks.',
   }),
-  body_mesh_url: z.string().register(z.globalRegistry, {
-    description: 'URL of the SAM-3D Body mesh file (.ply or .glb) to align',
+  best_mask_index: z.int().register(z.globalRegistry, {
+    description: 'Index of the best mask (1, 2, or 3) based on IoU score.',
   }),
-  object_mesh_url: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'Optional URL of SAM-3D Object mesh (.glb) to create combined scene',
-    }),
-  ),
-  focal_length: z.optional(
-    z.number().register(z.globalRegistry, {
-      description:
-        'Focal length from SAM-3D Body metadata. If not provided, estimated from MoGe.',
-    }),
-  ),
-  body_mask_url: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'URL of the human mask image. If not provided, uses full image.',
-    }),
-  ),
-})
-
-/**
- * File
- */
-export const zFalAiSam33dAlignFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
+  mask_2_mesh: zSchemaFile,
+  mask_1_mesh: zSchemaFile,
+  segmented_mesh: zSchemaFile,
+  seed: z.int().register(z.globalRegistry, {
+    description: 'Seed value used for generation.',
   }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
+  mask_3_mesh: zSchemaFile,
 })
-
-/**
- * SAM3DBodyAlignmentInfo
- *
- * Per-person alignment metadata.
- */
-export const zSam3dBodyAlignmentInfo = z
-  .object({
-    translation: z.array(z.number()).register(z.globalRegistry, {
-      description: 'Translation [tx, ty, tz]',
-    }),
-    cropped_vertices_count: z.int().register(z.globalRegistry, {
-      description: 'Number of cropped vertices',
-    }),
-    person_id: z.int().register(z.globalRegistry, {
-      description: 'Index of the person',
-    }),
-    target_points_count: z.int().register(z.globalRegistry, {
-      description: 'Number of target points for alignment',
-    }),
-    scale_factor: z.number().register(z.globalRegistry, {
-      description: 'Scale factor applied for alignment',
-    }),
-    focal_length: z.number().register(z.globalRegistry, {
-      description: 'Focal length used',
-    }),
-  })
-  .register(z.globalRegistry, {
-    description: 'Per-person alignment metadata.',
-  })
-
-/**
- * SAM3DAlignmentOutput
- */
-export const zSam33dAlignOutput = z.object({
-  scene_glb: z.optional(zFalAiSam33dAlignFile),
-  visualization: zFalAiSam33dAlignFile,
-  metadata: zSam3dBodyAlignmentInfo,
-  body_mesh_ply: zFalAiSam33dAlignFile,
-  model_glb: zFalAiSam33dAlignFile,
-})
-
-/**
- * RetextureInput
- *
- * Input for 3D Model Retexturing
- */
-export const zMeshyV5RetextureInput = z
-  .object({
-    enable_pbr: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description:
-            'Generate PBR Maps (metallic, roughness, normal) in addition to base color.',
-        }),
-      )
-      .default(false),
-    text_style_prompt: z.optional(
-      z.string().max(600).register(z.globalRegistry, {
-        description:
-          'Describe your desired texture style using text. Maximum 600 characters. Required if image_style_url is not provided.',
-      }),
-    ),
-    enable_safety_checker: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description:
-            'If set to true, input data will be checked for safety before processing.',
-        }),
-      )
-      .default(true),
-    enable_original_uv: z
-      .optional(
-        z.boolean().register(z.globalRegistry, {
-          description:
-            'Use the original UV mapping of the model instead of generating new UVs. If the model has no original UV, output quality may be reduced.',
-        }),
-      )
-      .default(true),
-    model_url: z.string().register(z.globalRegistry, {
-      description:
-        'URL or base64 data URI of a 3D model to texture. Supports .glb, .gltf, .obj, .fbx, .stl formats. Can be a publicly accessible URL or data URI with MIME type application/octet-stream.',
-    }),
-    image_style_url: z.optional(
-      z.string().register(z.globalRegistry, {
-        description:
-          '2D image to guide the texturing process. Supports .jpg, .jpeg, and .png formats. Required if text_style_prompt is not provided. If both are provided, image_style_url takes precedence.',
-      }),
-    ),
-  })
-  .register(z.globalRegistry, {
-    description: 'Input for 3D Model Retexturing',
-  })
-
-/**
- * File
- */
-export const zFalAiMeshyV5RetextureFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * ModelUrls
- *
- * 3D model files in various formats
- */
-export const zModelUrls = z
-  .object({
-    usdz: z.optional(zFalAiMeshyV5RetextureFile),
-    fbx: z.optional(zFalAiMeshyV5RetextureFile),
-    blend: z.optional(zFalAiMeshyV5RetextureFile),
-    stl: z.optional(zFalAiMeshyV5RetextureFile),
-    glb: z.optional(zFalAiMeshyV5RetextureFile),
-    obj: z.optional(zFalAiMeshyV5RetextureFile),
-  })
-  .register(z.globalRegistry, {
-    description: '3D model files in various formats',
-  })
-
-/**
- * TextureFiles
- *
- * Texture files downloaded and uploaded to CDN
- */
-export const zTextureFiles = z
-  .object({
-    base_color: zFalAiMeshyV5RetextureFile,
-    normal: z.optional(zFalAiMeshyV5RetextureFile),
-    roughness: z.optional(zFalAiMeshyV5RetextureFile),
-    metallic: z.optional(zFalAiMeshyV5RetextureFile),
-  })
-  .register(z.globalRegistry, {
-    description: 'Texture files downloaded and uploaded to CDN',
-  })
-
-/**
- * RetextureOutput
- *
- * Output for 3D Model Retexturing
- */
-export const zMeshyV5RetextureOutput = z
-  .object({
-    model_urls: zModelUrls,
-    text_style_prompt: z.optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The text prompt used for texturing (if provided)',
-      }),
-    ),
-    texture_urls: z.optional(
-      z.array(zTextureFiles).register(z.globalRegistry, {
-        description: 'Array of texture file objects',
-      }),
-    ),
-    thumbnail: z.optional(zFalAiMeshyV5RetextureFile),
-    image_style_url: z.optional(
-      z.string().register(z.globalRegistry, {
-        description: 'The image URL used for texturing (if provided)',
-      }),
-    ),
-    model_glb: zFalAiMeshyV5RetextureFile,
-  })
-  .register(z.globalRegistry, {
-    description: 'Output for 3D Model Retexturing',
-  })
-
-/**
- * RemeshInput
- *
- * Input for 3D Model Remeshing
- */
-export const zMeshyV5RemeshInput = z
-  .object({
-    resize_height: z
-      .optional(
-        z.number().gte(0).register(z.globalRegistry, {
-          description:
-            'Resize the model to a certain height measured in meters. Set to 0 for no resizing.',
-        }),
-      )
-      .default(0),
-    topology: z.optional(
-      z.enum(['quad', 'triangle']).register(z.globalRegistry, {
-        description:
-          'Specify the topology of the generated model. Quad for smooth surfaces, Triangle for detailed geometry.',
-      }),
-    ),
-    target_polycount: z
-      .optional(
-        z.int().gte(100).lte(300000).register(z.globalRegistry, {
-          description:
-            'Target number of polygons in the generated model. Actual count may vary based on geometry complexity.',
-        }),
-      )
-      .default(30000),
-    model_url: z.string().register(z.globalRegistry, {
-      description:
-        'URL or base64 data URI of a 3D model to remesh. Supports .glb, .gltf, .obj, .fbx, .stl formats. Can be a publicly accessible URL or data URI with MIME type application/octet-stream.',
-    }),
-    origin_at: z.optional(
-      z.enum(['bottom', 'center']).register(z.globalRegistry, {
-        description: 'Position of the origin. None means no effect.',
-      }),
-    ),
-    target_formats: z
-      .optional(
-        z
-          .array(z.enum(['glb', 'fbx', 'obj', 'usdz', 'blend', 'stl']))
-          .register(z.globalRegistry, {
-            description: 'List of target formats for the remeshed model.',
-          }),
-      )
-      .default(['glb']),
-  })
-  .register(z.globalRegistry, {
-    description: 'Input for 3D Model Remeshing',
-  })
-
-/**
- * File
- */
-export const zFalAiMeshyV5RemeshFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
-    }),
-  ),
-  file_name: z.optional(
-    z.string().register(z.globalRegistry, {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-    }),
-  ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
-    }),
-  ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'File data',
-    }),
-  ),
-})
-
-/**
- * ModelUrls
- *
- * 3D model files in various formats
- */
-export const zFalAiMeshyV5RemeshModelUrls = z
-  .object({
-    usdz: z.optional(zFalAiMeshyV5RemeshFile),
-    fbx: z.optional(zFalAiMeshyV5RemeshFile),
-    blend: z.optional(zFalAiMeshyV5RemeshFile),
-    stl: z.optional(zFalAiMeshyV5RemeshFile),
-    glb: z.optional(zFalAiMeshyV5RemeshFile),
-    obj: z.optional(zFalAiMeshyV5RemeshFile),
-  })
-  .register(z.globalRegistry, {
-    description: '3D model files in various formats',
-  })
-
-/**
- * RemeshOutput
- *
- * Output for 3D Model Remeshing
- */
-export const zMeshyV5RemeshOutput = z
-  .object({
-    model_urls: zFalAiMeshyV5RemeshModelUrls,
-    model_glb: z.optional(zFalAiMeshyV5RemeshFile),
-  })
-  .register(z.globalRegistry, {
-    description: 'Output for 3D Model Remeshing',
-  })
 
 /**
  * HunyuanPartInput
  */
-export const zHunyuanPartInput = z.object({
+export const zSchemaHunyuanPartInput = z.object({
   point_prompt_x: z
     .optional(
       z.number().gte(-1).lte(1).register(z.globalRegistry, {
@@ -514,50 +113,723 @@ export const zHunyuanPartInput = z.object({
 })
 
 /**
- * File
+ * ModelUrls
+ *
+ * 3D model files in various formats
  */
-export const zFalAiHunyuanPartFile = z.object({
-  file_size: z.optional(
-    z.int().register(z.globalRegistry, {
-      description: 'The size of the file in bytes.',
+export const zSchemaModelUrls = z
+  .object({
+    usdz: z.optional(zSchemaFile),
+    fbx: z.optional(zSchemaFile),
+    blend: z.optional(zSchemaFile),
+    stl: z.optional(zSchemaFile),
+    glb: z.optional(zSchemaFile),
+    obj: z.optional(zSchemaFile),
+  })
+  .register(z.globalRegistry, {
+    description: '3D model files in various formats',
+  })
+
+/**
+ * RemeshOutput
+ *
+ * Output for 3D Model Remeshing
+ */
+export const zSchemaMeshyV5RemeshOutput = z
+  .object({
+    model_urls: zSchemaModelUrls,
+    model_glb: z.optional(zSchemaFile),
+  })
+  .register(z.globalRegistry, {
+    description: 'Output for 3D Model Remeshing',
+  })
+
+/**
+ * RemeshInput
+ *
+ * Input for 3D Model Remeshing
+ */
+export const zSchemaMeshyV5RemeshInput = z
+  .object({
+    resize_height: z
+      .optional(
+        z.number().gte(0).register(z.globalRegistry, {
+          description:
+            'Resize the model to a certain height measured in meters. Set to 0 for no resizing.',
+        }),
+      )
+      .default(0),
+    topology: z.optional(
+      z.enum(['quad', 'triangle']).register(z.globalRegistry, {
+        description:
+          'Specify the topology of the generated model. Quad for smooth surfaces, Triangle for detailed geometry.',
+      }),
+    ),
+    target_polycount: z
+      .optional(
+        z.int().gte(100).lte(300000).register(z.globalRegistry, {
+          description:
+            'Target number of polygons in the generated model. Actual count may vary based on geometry complexity.',
+        }),
+      )
+      .default(30000),
+    model_url: z.string().register(z.globalRegistry, {
+      description:
+        'URL or base64 data URI of a 3D model to remesh. Supports .glb, .gltf, .obj, .fbx, .stl formats. Can be a publicly accessible URL or data URI with MIME type application/octet-stream.',
     }),
-  ),
-  file_name: z.optional(
+    origin_at: z.optional(
+      z.enum(['bottom', 'center']).register(z.globalRegistry, {
+        description: 'Position of the origin. None means no effect.',
+      }),
+    ),
+    target_formats: z
+      .optional(
+        z
+          .array(z.enum(['glb', 'fbx', 'obj', 'usdz', 'blend', 'stl']))
+          .register(z.globalRegistry, {
+            description: 'List of target formats for the remeshed model.',
+          }),
+      )
+      .default(['glb']),
+  })
+  .register(z.globalRegistry, {
+    description: 'Input for 3D Model Remeshing',
+  })
+
+/**
+ * TextureFiles
+ *
+ * Texture files downloaded and uploaded to CDN
+ */
+export const zSchemaTextureFiles = z
+  .object({
+    base_color: zSchemaFile,
+    normal: z.optional(zSchemaFile),
+    roughness: z.optional(zSchemaFile),
+    metallic: z.optional(zSchemaFile),
+  })
+  .register(z.globalRegistry, {
+    description: 'Texture files downloaded and uploaded to CDN',
+  })
+
+/**
+ * RetextureOutput
+ *
+ * Output for 3D Model Retexturing
+ */
+export const zSchemaMeshyV5RetextureOutput = z
+  .object({
+    model_urls: zSchemaModelUrls,
+    text_style_prompt: z.optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The text prompt used for texturing (if provided)',
+      }),
+    ),
+    texture_urls: z.optional(
+      z.array(zSchemaTextureFiles).register(z.globalRegistry, {
+        description: 'Array of texture file objects',
+      }),
+    ),
+    thumbnail: z.optional(zSchemaFile),
+    image_style_url: z.optional(
+      z.string().register(z.globalRegistry, {
+        description: 'The image URL used for texturing (if provided)',
+      }),
+    ),
+    model_glb: zSchemaFile,
+  })
+  .register(z.globalRegistry, {
+    description: 'Output for 3D Model Retexturing',
+  })
+
+/**
+ * RetextureInput
+ *
+ * Input for 3D Model Retexturing
+ */
+export const zSchemaMeshyV5RetextureInput = z
+  .object({
+    enable_pbr: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description:
+            'Generate PBR Maps (metallic, roughness, normal) in addition to base color.',
+        }),
+      )
+      .default(false),
+    text_style_prompt: z.optional(
+      z.string().max(600).register(z.globalRegistry, {
+        description:
+          'Describe your desired texture style using text. Maximum 600 characters. Required if image_style_url is not provided.',
+      }),
+    ),
+    enable_safety_checker: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description:
+            'If set to true, input data will be checked for safety before processing.',
+        }),
+      )
+      .default(true),
+    enable_original_uv: z
+      .optional(
+        z.boolean().register(z.globalRegistry, {
+          description:
+            'Use the original UV mapping of the model instead of generating new UVs. If the model has no original UV, output quality may be reduced.',
+        }),
+      )
+      .default(true),
+    model_url: z.string().register(z.globalRegistry, {
+      description:
+        'URL or base64 data URI of a 3D model to texture. Supports .glb, .gltf, .obj, .fbx, .stl formats. Can be a publicly accessible URL or data URI with MIME type application/octet-stream.',
+    }),
+    image_style_url: z.optional(
+      z.string().register(z.globalRegistry, {
+        description:
+          '2D image to guide the texturing process. Supports .jpg, .jpeg, and .png formats. Required if text_style_prompt is not provided. If both are provided, image_style_url takes precedence.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'Input for 3D Model Retexturing',
+  })
+
+/**
+ * SAM3DBodyAlignmentInfo
+ *
+ * Per-person alignment metadata.
+ */
+export const zSchemaSam3dBodyAlignmentInfo = z
+  .object({
+    translation: z.array(z.number()).register(z.globalRegistry, {
+      description: 'Translation [tx, ty, tz]',
+    }),
+    cropped_vertices_count: z.int().register(z.globalRegistry, {
+      description: 'Number of cropped vertices',
+    }),
+    person_id: z.int().register(z.globalRegistry, {
+      description: 'Index of the person',
+    }),
+    target_points_count: z.int().register(z.globalRegistry, {
+      description: 'Number of target points for alignment',
+    }),
+    scale_factor: z.number().register(z.globalRegistry, {
+      description: 'Scale factor applied for alignment',
+    }),
+    focal_length: z.number().register(z.globalRegistry, {
+      description: 'Focal length used',
+    }),
+  })
+  .register(z.globalRegistry, {
+    description: 'Per-person alignment metadata.',
+  })
+
+/**
+ * SAM3DAlignmentOutput
+ */
+export const zSchemaSam33dAlignOutput = z.object({
+  scene_glb: z.optional(zSchemaFile),
+  visualization: zSchemaFile,
+  metadata: zSchemaSam3dBodyAlignmentInfo,
+  body_mesh_ply: zSchemaFile,
+  model_glb: zSchemaFile,
+})
+
+/**
+ * SAM3DAlignmentInput
+ */
+export const zSchemaSam33dAlignInput = z.object({
+  image_url: z.string().register(z.globalRegistry, {
+    description: 'URL of the original image used for MoGe depth estimation',
+  }),
+  body_mesh_url: z.string().register(z.globalRegistry, {
+    description: 'URL of the SAM-3D Body mesh file (.ply or .glb) to align',
+  }),
+  object_mesh_url: z.optional(
     z.string().register(z.globalRegistry, {
       description:
-        'The name of the file. It will be auto-generated if not provided.',
+        'Optional URL of SAM-3D Object mesh (.glb) to create combined scene',
     }),
   ),
-  content_type: z.optional(
-    z.string().register(z.globalRegistry, {
-      description: 'The mime type of the file.',
+  focal_length: z.optional(
+    z.number().register(z.globalRegistry, {
+      description:
+        'Focal length from SAM-3D Body metadata. If not provided, estimated from MoGe.',
     }),
   ),
-  url: z.string().register(z.globalRegistry, {
-    description: 'The URL where the file can be downloaded from.',
-  }),
-  file_data: z.optional(
+  body_mask_url: z.optional(
     z.string().register(z.globalRegistry, {
-      description: 'File data',
+      description:
+        'URL of the human mask image. If not provided, uses full image.',
     }),
   ),
 })
 
 /**
- * HunyuanPartOutput
+ * UltraShapeResponse
  */
-export const zHunyuanPartOutput = z.object({
-  iou_scores: z.array(z.number()).register(z.globalRegistry, {
-    description: 'IoU scores for each of the three masks.',
-  }),
-  best_mask_index: z.int().register(z.globalRegistry, {
-    description: 'Index of the best mask (1, 2, or 3) based on IoU score.',
-  }),
-  mask_2_mesh: zFalAiHunyuanPartFile,
-  mask_1_mesh: zFalAiHunyuanPartFile,
-  segmented_mesh: zFalAiHunyuanPartFile,
-  seed: z.int().register(z.globalRegistry, {
-    description: 'Seed value used for generation.',
-  }),
-  mask_3_mesh: zFalAiHunyuanPartFile,
+export const zSchemaUltrashapeOutput = z.object({
+  model_glb: zSchemaFile,
 })
+
+/**
+ * UltraShapeRequest
+ */
+export const zSchemaUltrashapeInput = z.object({
+  octree_resolution: z
+    .optional(
+      z.int().gte(128).lte(1024).register(z.globalRegistry, {
+        description: 'Marching cubes resolution.',
+      }),
+    )
+    .default(1024),
+  remove_background: z
+    .optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Remove image background.',
+      }),
+    )
+    .default(true),
+  num_inference_steps: z
+    .optional(
+      z.int().gte(1).lte(50).register(z.globalRegistry, {
+        description: 'Diffusion steps.',
+      }),
+    )
+    .default(50),
+  model_url: z.string().register(z.globalRegistry, {
+    description: 'URL of the coarse mesh (.glb or .obj) to refine.',
+  }),
+  seed: z
+    .optional(
+      z.int().register(z.globalRegistry, {
+        description: 'Random seed.',
+      }),
+    )
+    .default(42),
+  image_url: z.string().register(z.globalRegistry, {
+    description: 'URL of the reference image for mesh refinement.',
+  }),
+})
+
+export const zSchemaQueueStatus = z.object({
+  status: z.enum(['IN_QUEUE', 'IN_PROGRESS', 'COMPLETED']),
+  request_id: z.string().register(z.globalRegistry, {
+    description: 'The request id.',
+  }),
+  response_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The response url.',
+    }),
+  ),
+  status_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The status url.',
+    }),
+  ),
+  cancel_url: z.optional(
+    z.string().register(z.globalRegistry, {
+      description: 'The cancel url.',
+    }),
+  ),
+  logs: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The logs.',
+    }),
+  ),
+  metrics: z.optional(
+    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+      description: 'The metrics.',
+    }),
+  ),
+  queue_position: z.optional(
+    z.int().register(z.globalRegistry, {
+      description: 'The queue position.',
+    }),
+  ),
+})
+
+export const zGetFalAiUltrashapeRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiUltrashapeRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiUltrashapeRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiUltrashapeRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiUltrashapeData = z.object({
+  body: zSchemaUltrashapeInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiUltrashapeResponse = zSchemaQueueStatus
+
+export const zGetFalAiUltrashapeRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiUltrashapeRequestsByRequestIdResponse =
+  zSchemaUltrashapeOutput
+
+export const zGetFalAiSam33dAlignRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiSam33dAlignRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiSam33dAlignRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiSam33dAlignRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiSam33dAlignData = z.object({
+  body: zSchemaSam33dAlignInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiSam33dAlignResponse = zSchemaQueueStatus
+
+export const zGetFalAiSam33dAlignRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiSam33dAlignRequestsByRequestIdResponse =
+  zSchemaSam33dAlignOutput
+
+export const zGetFalAiMeshyV5RetextureRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiMeshyV5RetextureRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiMeshyV5RetextureRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiMeshyV5RetextureRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiMeshyV5RetextureData = z.object({
+  body: zSchemaMeshyV5RetextureInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiMeshyV5RetextureResponse = zSchemaQueueStatus
+
+export const zGetFalAiMeshyV5RetextureRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiMeshyV5RetextureRequestsByRequestIdResponse =
+  zSchemaMeshyV5RetextureOutput
+
+export const zGetFalAiMeshyV5RemeshRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiMeshyV5RemeshRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiMeshyV5RemeshRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiMeshyV5RemeshRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiMeshyV5RemeshData = z.object({
+  body: zSchemaMeshyV5RemeshInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiMeshyV5RemeshResponse = zSchemaQueueStatus
+
+export const zGetFalAiMeshyV5RemeshRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiMeshyV5RemeshRequestsByRequestIdResponse =
+  zSchemaMeshyV5RemeshOutput
+
+export const zGetFalAiHunyuanPartRequestsByRequestIdStatusData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(
+    z.object({
+      logs: z.optional(
+        z.number().register(z.globalRegistry, {
+          description:
+            'Whether to include logs (`1`) in the response or not (`0`).',
+        }),
+      ),
+    }),
+  ),
+})
+
+/**
+ * The request status.
+ */
+export const zGetFalAiHunyuanPartRequestsByRequestIdStatusResponse =
+  zSchemaQueueStatus
+
+export const zPutFalAiHunyuanPartRequestsByRequestIdCancelData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiHunyuanPartRequestsByRequestIdCancelResponse = z
+  .object({
+    success: z.optional(
+      z.boolean().register(z.globalRegistry, {
+        description: 'Whether the request was cancelled successfully.',
+      }),
+    ),
+  })
+  .register(z.globalRegistry, {
+    description: 'The request was cancelled.',
+  })
+
+export const zPostFalAiHunyuanPartData = z.object({
+  body: zSchemaHunyuanPartInput,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * The request status.
+ */
+export const zPostFalAiHunyuanPartResponse = zSchemaQueueStatus
+
+export const zGetFalAiHunyuanPartRequestsByRequestIdData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    request_id: z.string().register(z.globalRegistry, {
+      description: 'Request ID',
+    }),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiHunyuanPartRequestsByRequestIdResponse =
+  zSchemaHunyuanPartOutput
