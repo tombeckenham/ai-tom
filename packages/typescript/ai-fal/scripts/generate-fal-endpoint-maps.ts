@@ -166,10 +166,14 @@ function generateOutputTypeUnions(
     lines.push(``)
 
     // Generate Input type
-    lines.push(`/** Get the input type for a specific ${outputType} model */`)
+    lines.push(`/**`)
+    lines.push(` * Get the input type for a specific ${outputType} model.`)
+    lines.push(` * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.`)
+    lines.push(` */`)
     lines.push(
       `export type Fal${outputTypePascal}Input<T extends Fal${outputTypePascal}Model> =`,
     )
+    lines.push(`  T extends keyof EndpointTypeMap ? EndpointTypeMap[T]['input'] :`)
     for (let i = 0; i < availableCategories.length; i++) {
       const category = availableCategories[i]!
       const typeName = toPascalCase(category)
@@ -182,10 +186,14 @@ function generateOutputTypeUnions(
     lines.push(``)
 
     // Generate Output type
-    lines.push(`/** Get the output type for a specific ${outputType} model */`)
+    lines.push(`/**`)
+    lines.push(` * Get the output type for a specific ${outputType} model.`)
+    lines.push(` * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.`)
+    lines.push(` */`)
     lines.push(
       `export type Fal${outputTypePascal}Output<T extends Fal${outputTypePascal}Model> =`,
     )
+    lines.push(`  T extends keyof EndpointTypeMap ? EndpointTypeMap[T]['output'] :`)
     for (let i = 0; i < availableCategories.length; i++) {
       const category = availableCategories[i]!
       const typeName = toPascalCase(category)
@@ -440,6 +448,11 @@ async function main() {
 
   // Import external zod type after local imports
   indexLines.push(`import type { z } from 'zod'`)
+  indexLines.push(``)
+
+  // Import fal.ai EndpointTypeMap for type checking
+  indexLines.push(`// Import official fal.ai endpoint types`)
+  indexLines.push(`import type { EndpointTypeMap } from '@fal-ai/client/endpoints'`)
   indexLines.push(``)
 
   // Now add the re-exports

@@ -5,18 +5,18 @@ import {
   getFalApiKeyFromEnv,
   generateId as utilGenerateId,
 } from '../utils'
+import { FalVideoSchemaMap } from '../generated'
 import type { FalClientConfig } from '../utils'
+import type { FalVideoInput, FalVideoModel, FalVideoOutput } from '../generated'
 import type {
   VideoGenerationOptions,
   VideoJobResult,
   VideoStatusResult,
   VideoUrlResult,
 } from '@tanstack/ai'
-import type {
-  FalModel,
-  FalModelInput,
-  FalVideoProviderOptions,
-} from '../model-meta'
+import type { FalVideoProviderOptions } from '../model-meta'
+
+import type { z } from 'zod'
 
 export interface FalVideoConfig extends Omit<FalClientConfig, 'apiKey'> {}
 
@@ -60,15 +60,27 @@ function mapFalStatusToVideoStatus(
  *
  * @experimental Video generation is an experimental feature and may change.
  */
-export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
-  TModel,
-  FalVideoProviderOptions<TModel>
-> {
+export class FalVideoAdapter<
+  TModel extends FalVideoModel,
+> extends BaseVideoAdapter<TModel, FalVideoProviderOptions<TModel>> {
   readonly kind = 'video' as const
   readonly name = 'fal' as const
+  readonly model: TModel
+  readonly inputSchema: z.ZodSchema<FalVideoInput<TModel>>
+  readonly outputSchema: z.ZodSchema<FalVideoOutput<TModel>>
 
   constructor(apiKey: string, model: TModel, config?: FalVideoConfig) {
     super({}, model)
+    this.model = model
+    // The only reason we need to cast here, is because the number of video models is so large,
+    // that typescript has a hard time inferring the type of the input and output schemas.
+    // I had to type it as generic zod schemas.
+    this.inputSchema = FalVideoSchemaMap[model].input as z.ZodSchema<
+      FalVideoInput<TModel>
+    >
+    this.outputSchema = FalVideoSchemaMap[model].output as z.ZodSchema<
+      FalVideoOutput<TModel>
+    >
     configureFalClient({ apiKey, proxyUrl: config?.proxyUrl })
   }
 
@@ -78,12 +90,12 @@ export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
     const { model, prompt, size, duration, modelOptions } = options
 
     // Build the input object for fal.ai
-    const input = {
+    const input = this.inputSchema.parse({
       ...modelOptions,
       prompt,
       ...(duration ? { duration } : {}),
       ...(size ? { aspect_ratio: this.sizeToAspectRatio(size) } : {}),
-    } as FalModelInput<TModel>
+    })
 
     // Submit to queue and get request ID
     const { request_id } = await fal.queue.submit(model, {
@@ -157,7 +169,7 @@ export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
  *
  * @experimental Video generation is an experimental feature and may change.
  */
-export function createFalVideo<TModel extends FalModel>(
+export function createFalVideo<TModel extends FalVideoModel>(
   model: TModel,
   apiKey: string,
   config?: FalVideoConfig,
@@ -170,7 +182,7 @@ export function createFalVideo<TModel extends FalModel>(
  *
  * @experimental Video generation is an experimental feature and may change.
  */
-export function falVideo<TModel extends FalModel>(
+export function falVideo<TModel extends FalVideoModel>(
   model: TModel,
   config?: FalVideoConfig,
 ): FalVideoAdapter<TModel> {

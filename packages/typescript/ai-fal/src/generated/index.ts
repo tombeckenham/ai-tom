@@ -99,6 +99,9 @@ import type {
 
 import type { z } from 'zod'
 
+// Import official fal.ai endpoint types
+import type { EndpointTypeMap } from '@fal-ai/client/endpoints'
+
 // Re-export all category endpoint maps
 export * from './3d-to-3d/endpoint-map'
 export * from './audio-to-audio/endpoint-map'
@@ -162,19 +165,31 @@ export type FalModel =
 /** Union of all image generation models */
 export type FalImageModel = TextToImageModel | ImageToImageModel
 
-/** Get the input type for a specific image model */
-export type FalImageInput<T extends FalImageModel> = T extends TextToImageModel
-  ? TextToImageModelInput<T>
-  : T extends ImageToImageModel
-    ? ImageToImageModelInput<T>
-    : never
+/**
+ * Get the input type for a specific image model.
+ * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.
+ */
+export type FalImageInput<T extends FalImageModel> =
+  T extends keyof EndpointTypeMap
+    ? EndpointTypeMap[T]['input']
+    : T extends TextToImageModel
+      ? TextToImageModelInput<T>
+      : T extends ImageToImageModel
+        ? ImageToImageModelInput<T>
+        : never
 
-/** Get the output type for a specific image model */
-export type FalImageOutput<T extends FalImageModel> = T extends TextToImageModel
-  ? TextToImageModelOutput<T>
-  : T extends ImageToImageModel
-    ? ImageToImageModelOutput<T>
-    : never
+/**
+ * Get the output type for a specific image model.
+ * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.
+ */
+export type FalImageOutput<T extends FalImageModel> =
+  T extends keyof EndpointTypeMap
+    ? EndpointTypeMap[T]['output']
+    : T extends TextToImageModel
+      ? TextToImageModelOutput<T>
+      : T extends ImageToImageModel
+        ? ImageToImageModelOutput<T>
+        : never
 
 /** Combined schema map for all image models */
 export const FalImageSchemaMap: Record<
@@ -192,27 +207,39 @@ export type FalVideoModel =
   | VideoToVideoModel
   | AudioToVideoModel
 
-/** Get the input type for a specific video model */
-export type FalVideoInput<T extends FalVideoModel> = T extends TextToVideoModel
-  ? TextToVideoModelInput<T>
-  : T extends ImageToVideoModel
-    ? ImageToVideoModelInput<T>
-    : T extends VideoToVideoModel
-      ? VideoToVideoModelInput<T>
-      : T extends AudioToVideoModel
-        ? AudioToVideoModelInput<T>
-        : never
+/**
+ * Get the input type for a specific video model.
+ * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.
+ */
+export type FalVideoInput<T extends FalVideoModel> =
+  T extends keyof EndpointTypeMap
+    ? EndpointTypeMap[T]['input']
+    : T extends TextToVideoModel
+      ? TextToVideoModelInput<T>
+      : T extends ImageToVideoModel
+        ? ImageToVideoModelInput<T>
+        : T extends VideoToVideoModel
+          ? VideoToVideoModelInput<T>
+          : T extends AudioToVideoModel
+            ? AudioToVideoModelInput<T>
+            : never
 
-/** Get the output type for a specific video model */
-export type FalVideoOutput<T extends FalVideoModel> = T extends TextToVideoModel
-  ? TextToVideoModelOutput<T>
-  : T extends ImageToVideoModel
-    ? ImageToVideoModelOutput<T>
-    : T extends VideoToVideoModel
-      ? VideoToVideoModelOutput<T>
-      : T extends AudioToVideoModel
-        ? AudioToVideoModelOutput<T>
-        : never
+/**
+ * Get the output type for a specific video model.
+ * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.
+ */
+export type FalVideoOutput<T extends FalVideoModel> =
+  T extends keyof EndpointTypeMap
+    ? EndpointTypeMap[T]['output']
+    : T extends TextToVideoModel
+      ? TextToVideoModelOutput<T>
+      : T extends ImageToVideoModel
+        ? ImageToVideoModelOutput<T>
+        : T extends VideoToVideoModel
+          ? VideoToVideoModelOutput<T>
+          : T extends AudioToVideoModel
+            ? AudioToVideoModelOutput<T>
+            : never
 
 /** Combined schema map for all video models */
 export const FalVideoSchemaMap: Record<
@@ -232,27 +259,39 @@ export type FalAudioModel =
   | SpeechToSpeechModel
   | TextToSpeechModel
 
-/** Get the input type for a specific audio model */
-export type FalAudioInput<T extends FalAudioModel> = T extends TextToAudioModel
-  ? TextToAudioModelInput<T>
-  : T extends AudioToAudioModel
-    ? AudioToAudioModelInput<T>
-    : T extends SpeechToSpeechModel
-      ? SpeechToSpeechModelInput<T>
-      : T extends TextToSpeechModel
-        ? TextToSpeechModelInput<T>
-        : never
+/**
+ * Get the input type for a specific audio model.
+ * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.
+ */
+export type FalAudioInput<T extends FalAudioModel> =
+  T extends keyof EndpointTypeMap
+    ? EndpointTypeMap[T]['input']
+    : T extends TextToAudioModel
+      ? TextToAudioModelInput<T>
+      : T extends AudioToAudioModel
+        ? AudioToAudioModelInput<T>
+        : T extends SpeechToSpeechModel
+          ? SpeechToSpeechModelInput<T>
+          : T extends TextToSpeechModel
+            ? TextToSpeechModelInput<T>
+            : never
 
-/** Get the output type for a specific audio model */
-export type FalAudioOutput<T extends FalAudioModel> = T extends TextToAudioModel
-  ? TextToAudioModelOutput<T>
-  : T extends AudioToAudioModel
-    ? AudioToAudioModelOutput<T>
-    : T extends SpeechToSpeechModel
-      ? SpeechToSpeechModelOutput<T>
-      : T extends TextToSpeechModel
-        ? TextToSpeechModelOutput<T>
-        : never
+/**
+ * Get the output type for a specific audio model.
+ * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.
+ */
+export type FalAudioOutput<T extends FalAudioModel> =
+  T extends keyof EndpointTypeMap
+    ? EndpointTypeMap[T]['output']
+    : T extends TextToAudioModel
+      ? TextToAudioModelOutput<T>
+      : T extends AudioToAudioModel
+        ? AudioToAudioModelOutput<T>
+        : T extends SpeechToSpeechModel
+          ? SpeechToSpeechModelOutput<T>
+          : T extends TextToSpeechModel
+            ? TextToSpeechModelOutput<T>
+            : never
 
 /** Combined schema map for all audio models */
 export const FalAudioSchemaMap: Record<
@@ -273,31 +312,43 @@ export type FalTextModel =
   | VisionModel
   | SpeechToTextModel
 
-/** Get the input type for a specific text model */
-export type FalTextInput<T extends FalTextModel> = T extends TextToTextModel
-  ? TextToTextModelInput<T>
-  : T extends AudioToTextModel
-    ? AudioToTextModelInput<T>
-    : T extends VideoToTextModel
-      ? VideoToTextModelInput<T>
-      : T extends VisionModel
-        ? VisionModelInput<T>
-        : T extends SpeechToTextModel
-          ? SpeechToTextModelInput<T>
-          : never
+/**
+ * Get the input type for a specific text model.
+ * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.
+ */
+export type FalTextInput<T extends FalTextModel> =
+  T extends keyof EndpointTypeMap
+    ? EndpointTypeMap[T]['input']
+    : T extends TextToTextModel
+      ? TextToTextModelInput<T>
+      : T extends AudioToTextModel
+        ? AudioToTextModelInput<T>
+        : T extends VideoToTextModel
+          ? VideoToTextModelInput<T>
+          : T extends VisionModel
+            ? VisionModelInput<T>
+            : T extends SpeechToTextModel
+              ? SpeechToTextModelInput<T>
+              : never
 
-/** Get the output type for a specific text model */
-export type FalTextOutput<T extends FalTextModel> = T extends TextToTextModel
-  ? TextToTextModelOutput<T>
-  : T extends AudioToTextModel
-    ? AudioToTextModelOutput<T>
-    : T extends VideoToTextModel
-      ? VideoToTextModelOutput<T>
-      : T extends VisionModel
-        ? VisionModelOutput<T>
-        : T extends SpeechToTextModel
-          ? SpeechToTextModelOutput<T>
-          : never
+/**
+ * Get the output type for a specific text model.
+ * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.
+ */
+export type FalTextOutput<T extends FalTextModel> =
+  T extends keyof EndpointTypeMap
+    ? EndpointTypeMap[T]['output']
+    : T extends TextToTextModel
+      ? TextToTextModelOutput<T>
+      : T extends AudioToTextModel
+        ? AudioToTextModelOutput<T>
+        : T extends VideoToTextModel
+          ? VideoToTextModelOutput<T>
+          : T extends VisionModel
+            ? VisionModelOutput<T>
+            : T extends SpeechToTextModel
+              ? SpeechToTextModelOutput<T>
+              : never
 
 /** Combined schema map for all text models */
 export const FalTextSchemaMap: Record<
@@ -314,23 +365,33 @@ export const FalTextSchemaMap: Record<
 /** Union of all 3d generation models */
 export type Fal3dModel = TextTo3dModel | ImageTo3dModel | Gen3dTo3dModel
 
-/** Get the input type for a specific 3d model */
-export type Fal3dInput<T extends Fal3dModel> = T extends TextTo3dModel
-  ? TextTo3dModelInput<T>
-  : T extends ImageTo3dModel
-    ? ImageTo3dModelInput<T>
-    : T extends Gen3dTo3dModel
-      ? Gen3dTo3dModelInput<T>
-      : never
+/**
+ * Get the input type for a specific 3d model.
+ * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.
+ */
+export type Fal3dInput<T extends Fal3dModel> = T extends keyof EndpointTypeMap
+  ? EndpointTypeMap[T]['input']
+  : T extends TextTo3dModel
+    ? TextTo3dModelInput<T>
+    : T extends ImageTo3dModel
+      ? ImageTo3dModelInput<T>
+      : T extends Gen3dTo3dModel
+        ? Gen3dTo3dModelInput<T>
+        : never
 
-/** Get the output type for a specific 3d model */
-export type Fal3dOutput<T extends Fal3dModel> = T extends TextTo3dModel
-  ? TextTo3dModelOutput<T>
-  : T extends ImageTo3dModel
-    ? ImageTo3dModelOutput<T>
-    : T extends Gen3dTo3dModel
-      ? Gen3dTo3dModelOutput<T>
-      : never
+/**
+ * Get the output type for a specific 3d model.
+ * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.
+ */
+export type Fal3dOutput<T extends Fal3dModel> = T extends keyof EndpointTypeMap
+  ? EndpointTypeMap[T]['output']
+  : T extends TextTo3dModel
+    ? TextTo3dModelOutput<T>
+    : T extends ImageTo3dModel
+      ? ImageTo3dModelOutput<T>
+      : T extends Gen3dTo3dModel
+        ? Gen3dTo3dModelOutput<T>
+        : never
 
 /** Combined schema map for all 3d models */
 export const Fal3dSchemaMap: Record<
@@ -345,23 +406,35 @@ export const Fal3dSchemaMap: Record<
 /** Union of all json generation models */
 export type FalJsonModel = TextToJsonModel | ImageToJsonModel | JsonModel
 
-/** Get the input type for a specific json model */
-export type FalJsonInput<T extends FalJsonModel> = T extends TextToJsonModel
-  ? TextToJsonModelInput<T>
-  : T extends ImageToJsonModel
-    ? ImageToJsonModelInput<T>
-    : T extends JsonModel
-      ? JsonModelInput<T>
-      : never
+/**
+ * Get the input type for a specific json model.
+ * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.
+ */
+export type FalJsonInput<T extends FalJsonModel> =
+  T extends keyof EndpointTypeMap
+    ? EndpointTypeMap[T]['input']
+    : T extends TextToJsonModel
+      ? TextToJsonModelInput<T>
+      : T extends ImageToJsonModel
+        ? ImageToJsonModelInput<T>
+        : T extends JsonModel
+          ? JsonModelInput<T>
+          : never
 
-/** Get the output type for a specific json model */
-export type FalJsonOutput<T extends FalJsonModel> = T extends TextToJsonModel
-  ? TextToJsonModelOutput<T>
-  : T extends ImageToJsonModel
-    ? ImageToJsonModelOutput<T>
-    : T extends JsonModel
-      ? JsonModelOutput<T>
-      : never
+/**
+ * Get the output type for a specific json model.
+ * Checks official fal.ai EndpointTypeMap first, then falls back to category-specific types.
+ */
+export type FalJsonOutput<T extends FalJsonModel> =
+  T extends keyof EndpointTypeMap
+    ? EndpointTypeMap[T]['output']
+    : T extends TextToJsonModel
+      ? TextToJsonModelOutput<T>
+      : T extends ImageToJsonModel
+        ? ImageToJsonModelOutput<T>
+        : T extends JsonModel
+          ? JsonModelOutput<T>
+          : never
 
 /** Combined schema map for all json models */
 export const FalJsonSchemaMap: Record<
