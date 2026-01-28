@@ -134,28 +134,49 @@ function main() {
   const openapiDir = join(__dirname, 'openapi')
   mkdirSync(openapiDir, { recursive: true })
 
-  // Helper function to extract all $ref schema names from a schema
-  function extractRefNames(
+  // Helper function to collect all schema names referenced in a schema (recursively)
+  // Returns { found: Set<string>, missing: Set<string> }
+  function collectDependencies(
     schema: any,
-    refs: Set<string> = new Set(),
-  ): Set<string> {
-    if (!schema || typeof schema !== 'object') return refs
+    allSchemas: Record<string, any>,
+    collected: { found: Set<string>; missing: Set<string> } = {
+      found: new Set(),
+      missing: new Set(),
+    },
+  ): { found: Set<string>; missing: Set<string> } {
+    if (!schema || typeof schema !== 'object') return collected
 
+    // Check for $ref
     if (schema.$ref && typeof schema.$ref === 'string') {
       const match = schema.$ref.match(/#\/components\/schemas\/(.+)/)
       if (match) {
-        refs.add(match[1])
+        const refName = match[1]!
+        if (!collected.found.has(refName) && !collected.missing.has(refName)) {
+          if (allSchemas[refName]) {
+            collected.found.add(refName)
+            // Recursively collect dependencies of this schema
+            collectDependencies(allSchemas[refName], allSchemas, collected)
+          } else {
+            collected.missing.add(refName)
+          }
+        }
       }
     }
 
     // Recursively check all properties
-    for (const value of Object.values(schema)) {
-      if (typeof value === 'object' && value !== null) {
-        extractRefNames(value, refs)
+    if (Array.isArray(schema)) {
+      for (const item of schema) {
+        collectDependencies(item, allSchemas, collected)
+      }
+    } else {
+      for (const value of Object.values(schema)) {
+        if (typeof value === 'object' && value !== null) {
+          collectDependencies(value, allSchemas, collected)
+        }
       }
     }
 
-    return refs
+    return collected
   }
 
   // Helper function to update all $ref pointers in a schema
@@ -195,6 +216,7 @@ function main() {
     // Process each model in this category
     for (const model of models) {
       const endpointId = model.endpoint_id
+
       const schemas = model.openapi.components.schemas
 
       // Find Input and Output schemas
@@ -209,51 +231,40 @@ function main() {
         }
       }
 
-      // Add Input/Output schemas and all their dependencies
-      const schemasToAdd = new Set<string>()
-      if (inputSchemaName) schemasToAdd.add(inputSchemaName)
-      if (outputSchemaName) schemasToAdd.add(outputSchemaName)
-
-      // Phase 1: Collect all schemas and build name mapping
-      const visited = new Set<string>()
-      const queue = Array.from(schemasToAdd)
+      // Collect all schemas needed (Input/Output + their dependencies)
+      const schemasToInclude = new Set<string>()
       const missingRefs = new Set<string>()
-      const schemasToProcess: Array<{ oldName: string; schema: any }> = []
 
-      while (queue.length > 0) {
-        const schemaName = queue.shift()!
-        if (visited.has(schemaName)) continue
-        visited.add(schemaName)
-
-        const schema = schemas[schemaName]
-        if (!schema) {
-          missingRefs.add(schemaName)
-          continue
+      if (inputSchemaName) {
+        schemasToInclude.add(inputSchemaName)
+        const deps = collectDependencies(schemas[inputSchemaName], schemas)
+        for (const dep of deps.found) {
+          schemasToInclude.add(dep)
         }
-
-        schemasToProcess.push({ oldName: schemaName, schema })
-
-        // Extract all $ref names from this schema
-        const refs = extractRefNames(schema)
-        for (const ref of refs) {
-          if (!visited.has(ref)) {
-            if (schemas[ref]) {
-              queue.push(ref)
-            } else {
-              missingRefs.add(ref)
-            }
-          }
+        for (const dep of deps.missing) {
+          missingRefs.add(dep)
+        }
+      }
+      if (outputSchemaName) {
+        schemasToInclude.add(outputSchemaName)
+        const deps = collectDependencies(schemas[outputSchemaName], schemas)
+        for (const dep of deps.found) {
+          schemasToInclude.add(dep)
+        }
+        for (const dep of deps.missing) {
+          missingRefs.add(dep)
         }
       }
 
-      // Phase 2: Build name mapping (old name -> sanitized name)
+      // Build name mapping for schemas we're including (+ missing refs)
       const nameMap = new Map<string, string>()
       const usedNames = new Set<string>(Object.keys(categorySchemas))
 
-      for (const { oldName } of schemasToProcess) {
+      // Add mappings for existing schemas
+      for (const oldName of schemasToInclude) {
         const sanitizedName = sanitizeSchemaName(oldName)
-
         let finalName = sanitizedName
+
         // Check if this sanitized name is already used by a different schema
         if (usedNames.has(sanitizedName)) {
           const existingMapping = Array.from(nameMap.entries()).find(
@@ -274,20 +285,24 @@ function main() {
         usedNames.add(finalName)
       }
 
-      // Add mappings for missing refs
+      // Add mappings for missing refs (so updateRefs can find them)
       for (const missingRef of missingRefs) {
         if (!nameMap.has(missingRef)) {
-          nameMap.set(missingRef, sanitizeSchemaName(missingRef))
+          const sanitizedName = sanitizeSchemaName(missingRef)
+          nameMap.set(missingRef, sanitizedName)
         }
       }
 
-      // Phase 3: Update all $ref pointers and add schemas to category
-      for (const { oldName, schema } of schemasToProcess) {
+      // Update refs and add schemas to category
+      for (const oldName of schemasToInclude) {
+        const schema = schemas[oldName]
+        if (!schema) continue
+
         const finalName = nameMap.get(oldName)!
         const updatedSchema = updateRefs(schema, nameMap)
         categorySchemas[finalName] = updatedSchema
 
-        // Update input/output names
+        // Track Input/Output for endpoint mapping
         if (oldName === inputSchemaName) inputSchemaName = finalName
         if (oldName === outputSchemaName) outputSchemaName = finalName
       }
@@ -366,29 +381,10 @@ function main() {
     `\n✓ Written endpoint mapping to fal-endpoint-mapping.json (${Object.keys(endpointMapping).length} endpoints)`,
   )
 
-  // Generate openapi-ts.config.ts with all jobs
-  const allCategories = Array.from(categoriesMap.keys())
-  const configPath = join(__dirname, '..', 'openapi-ts.config.ts')
-  const configContent = `// This file is auto-generated by generate-fal-openapi.ts
-export default [
-${allCategories
-  .map(
-    (category) => `  {
-    input: './scripts/openapi/${category}.json',
-    output: './src/generated/${category}',
-    plugins: ['@hey-api/typescript', 'zod'],
-    postProcess: ['prettier'],
-  },`,
-  )
-  .join('\n')}
-]
-`
-  writeFileSync(configPath, configContent)
-  console.log(
-    `✓ Generated openapi-ts.config.ts with ${allCategories.length} jobs`,
-  )
-
   console.log('\nDone! OpenAPI specs generated in scripts/openapi/')
+  console.log(
+    'Note: openapi-ts.config.ts is manually maintained - update it if new categories are added',
+  )
 }
 
 main()
