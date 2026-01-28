@@ -64,7 +64,10 @@ function findAllRefs(obj: any, refs: Set<string> = new Set()): Set<string> {
  *
  * This runs during config evaluation, before @hey-api/openapi-ts parses the specs.
  */
-function resolveMissingRefs(spec: any): { fixed: number; unknown: string[] } {
+function resolveMissingRefs(spec: any): {
+  fixed: number
+  unknown: Array<string>
+} {
   if (!spec.components?.schemas) return { fixed: 0, unknown: [] }
 
   const allRefs = findAllRefs(spec)
@@ -72,7 +75,7 @@ function resolveMissingRefs(spec: any): { fixed: number; unknown: string[] } {
   const missingRefs = [...allRefs].filter((ref) => !existingSchemas.has(ref))
 
   let fixed = 0
-  const unknown: string[] = []
+  const unknown: Array<string> = []
 
   for (const missingRef of missingRefs) {
     if (!spec.components.schemas) spec.components.schemas = {}
