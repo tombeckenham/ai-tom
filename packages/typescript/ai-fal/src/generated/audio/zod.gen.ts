@@ -28,10 +28,7 @@ export const zSchemaSfxV1VideoToAudioOutput = z.object({
  */
 export const zSchemaSfxV1VideoToAudioInput = z.object({
   num_samples: z.optional(z.union([z.int().gte(2).lte(8), z.unknown()])),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   duration: z.optional(z.union([z.number().gte(1).lte(10), z.unknown()])),
   seed: z.optional(z.union([z.int().gte(1), z.unknown()])),
   text_prompt: z.optional(z.union([z.string(), z.unknown()])),
@@ -61,11 +58,9 @@ export const zSchemaFile = z.object({
     description: 'The URL where the file can be downloaded from.',
   }),
   file_data: z.optional(
-    z
-      .union([z.instanceof(Blob), z.instanceof(File)])
-      .register(z.globalRegistry, {
-        description: 'File data',
-      }),
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
   ),
 })
 
@@ -81,10 +76,7 @@ export const zSchemaKlingVideoVideoToAudioOutput = z.object({
  * VideoToAudioInput
  */
 export const zSchemaKlingVideoVideoToAudioInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   asmr_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -137,10 +129,7 @@ export const zSchemaSfxV15VideoToAudioInput = z.object({
   num_samples: z.optional(z.union([z.int().gte(2).lte(8), z.unknown()])),
   duration: z.optional(z.union([z.number().gte(1).lte(10), z.unknown()])),
   start_offset: z.optional(z.union([z.number().gte(0), z.unknown()])),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   seed: z.optional(z.union([z.int().gte(1), z.unknown()])),
   text_prompt: z.optional(z.union([z.string(), z.unknown()])),
 })
@@ -184,18 +173,13 @@ export const zSchemaSamAudioVisualSeparateInput = z
         }),
       )
       .default(''),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     acceleration: z.optional(
       z.enum(['fast', 'balanced', 'quality']).register(z.globalRegistry, {
         description: 'The acceleration level to use.',
       }),
     ),
-    mask_video_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    mask_video_url: z.optional(z.union([z.string(), z.string()])),
     output_format: z.optional(
       z.enum(['wav', 'mp3']).register(z.globalRegistry, {
         description: 'Output audio format.',
@@ -295,10 +279,7 @@ export const zSchemaF5TtsInput = z.object({
   model_type: z.enum(['F5-TTS', 'E2-TTS']).register(z.globalRegistry, {
     description: 'The name of the model to be used for TTS.',
   }),
-  ref_audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  ref_audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -316,10 +297,7 @@ export const zSchemaMinimaxMusicInput = z.object({
     description:
       'Lyrics with optional formatting. You can use a newline to separate each line of lyrics. You can use two newlines to add a pause between lines. You can use double hash marks (##) at the beginning and end of the lyrics to add accompaniment. Maximum 600 characters.',
   }),
-  reference_audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  reference_audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -437,10 +415,7 @@ export const zSchemaZonosInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The content generated using cloned voice.',
   }),
-  reference_audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  reference_audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -772,9 +747,7 @@ export const zSchemaDiffrhythmInput = z.object({
       }),
     )
     .default(4),
-  reference_audio_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  reference_audio_url: z.optional(z.union([z.string(), z.string()])),
   music_duration: z.optional(
     z.enum(['95s', '285s']).register(z.globalRegistry, {
       description: 'The duration of the music to generate.',
@@ -823,10 +796,7 @@ export const zSchemaTurn = z.object({
  * Output
  */
 export const zSchemaCsm1bOutput = z.object({
-  audio: z.union([
-    zSchemaFile,
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio: z.union([zSchemaFile, z.string()]),
 })
 
 /**
@@ -1371,10 +1341,7 @@ export const zSchemaV2InpaintInput = z.object({
       }),
     )
     .default(0.7),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.union([
       z.int().gte(-9223372036854776000).lte(9223372036854776000),
@@ -1914,10 +1881,7 @@ export const zSchemaDiaTtsVoiceCloneInput = z.object({
   ref_text: z.string().register(z.globalRegistry, {
     description: 'The reference text to be used for TTS.',
   }),
-  ref_audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  ref_audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -2026,10 +1990,7 @@ export const zSchemaAceStepAudioToAudioInput = z.object({
       }),
     )
     .default(0),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -2182,10 +2143,7 @@ export const zSchemaAceStepAudioInpaintInput = z.object({
         'Whether the start time is relative to the start or end of the audio.',
     }),
   ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -2310,10 +2268,7 @@ export const zSchemaAceStepAudioOutpaintInput = z.object({
       }),
     )
     .default(0),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -2397,10 +2352,7 @@ export const zSchemaV2ExtendInput = z.object({
       }),
     )
     .default(0),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.union([
       z.int().gte(-9223372036854776000).lte(9223372036854776000),
@@ -2450,10 +2402,7 @@ export const zSchemaStableAudio25InpaintInput = z.object({
       }),
     )
     .default(false),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   seed: z.optional(z.int()),
   seconds_total: z
     .optional(
@@ -2512,10 +2461,7 @@ export const zSchemaStableAudio25AudioToAudioInput = z.object({
       }),
     )
     .default(false),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   num_inference_steps: z
     .optional(
       z.int().gte(4).lte(8).register(z.globalRegistry, {
@@ -2563,10 +2509,7 @@ export const zSchemaAudioUnderstandingInput = z.object({
       }),
     )
     .default(false),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -2621,10 +2564,7 @@ export const zSchemaDemucsInput = z.object({
         description: 'Demucs model to use for separation',
       }),
   ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   shifts: z
     .optional(
       z.int().gte(1).lte(10).register(z.globalRegistry, {
@@ -2657,10 +2597,7 @@ export const zSchemaKlingVideoCreateVoiceOutput = z
  */
 export const zSchemaKlingVideoCreateVoiceInput = z
   .object({
-    voice_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    voice_url: z.union([z.string(), z.string()]),
   })
   .register(z.globalRegistry, {
     description: 'Request model for creating a custom voice.',
@@ -2677,14 +2614,10 @@ export const zSchemaFfmpegApiMergeAudiosOutput = z.object({
  * MergeAudiosInput
  */
 export const zSchemaFfmpegApiMergeAudiosInput = z.object({
-  audio_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .min(2)
-    .max(5)
-    .register(z.globalRegistry, {
-      description:
-        'List of audio URLs to merge in order. The 0th stream of the audio will be considered as the merge candidate.',
-    }),
+  audio_urls: z.array(z.string()).min(2).max(5).register(z.globalRegistry, {
+    description:
+      'List of audio URLs to merge in order. The 0th stream of the audio will be considered as the merge candidate.',
+  }),
   output_format: z.optional(
     z.union([
       z.enum([
@@ -2798,10 +2731,7 @@ export const zSchemaSamAudioSpanSeparateInput = z
         }),
       )
       .default(false),
-    audio_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    audio_url: z.union([z.string(), z.string()]),
     reranking_candidates: z
       .optional(
         z.int().gte(1).lte(4).register(z.globalRegistry, {
@@ -2854,10 +2784,7 @@ export const zSchemaSamAudioSeparateInput = z
         description: 'The acceleration level to use.',
       }),
     ),
-    audio_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    audio_url: z.union([z.string(), z.string()]),
     predict_spans: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -2926,10 +2853,7 @@ export const zSchemaDeepfilternet3Input = z.object({
         description: 'The format for the output audio.',
       }),
   ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   bitrate: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -2981,10 +2905,7 @@ export const zSchemaNovaSrInput = z.object({
       }),
     )
     .default('192k'),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   audio_format: z.optional(
     z
       .enum(['mp3', 'aac', 'm4a', 'ogg', 'opus', 'flac', 'wav'])
@@ -3015,10 +2936,7 @@ export const zSchemaElevenlabsVoiceChangerInput = z.object({
       }),
     )
     .default('Rachel'),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'Random seed for reproducibility.',

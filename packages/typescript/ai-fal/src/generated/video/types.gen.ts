@@ -1531,7 +1531,7 @@ export type SchemaVideo = {
    *
    * File data
    */
-  file_data?: Blob | File | unknown
+  file_data?: string | unknown
 }
 
 /**
@@ -7815,7 +7815,7 @@ export type SchemaImageFile = {
    *
    * File data
    */
-  file_data?: Blob | File
+  file_data?: string
 }
 
 /**

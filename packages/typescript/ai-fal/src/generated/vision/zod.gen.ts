@@ -46,10 +46,7 @@ export const zSchemaLlavaNextInput = z.object({
       }),
     )
     .default(0.2),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -145,10 +142,7 @@ export const zSchemaImageutilsNsfwOutput = z.object({
  * NSFWImageDetectionInput
  */
 export const zSchemaImageutilsNsfwInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -164,10 +158,7 @@ export const zSchemaFlorence2LargeDetailedCaptionOutput = z.object({
  * ImageInput
  */
 export const zSchemaFlorence2LargeDetailedCaptionInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -183,10 +174,7 @@ export const zSchemaFlorence2LargeCaptionOutput = z.object({
  * ImageInput
  */
 export const zSchemaFlorence2LargeCaptionInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -221,10 +209,7 @@ export const zSchemaRegion = z.object({
  */
 export const zSchemaFlorence2LargeRegionToCategoryInput = z.object({
   region: zSchemaRegion,
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -240,10 +225,7 @@ export const zSchemaFlorence2LargeMoreDetailedCaptionOutput = z.object({
  * ImageInput
  */
 export const zSchemaFlorence2LargeMoreDetailedCaptionInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -259,10 +241,7 @@ export const zSchemaFlorence2LargeOcrOutput = z.object({
  * ImageInput
  */
 export const zSchemaFlorence2LargeOcrInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -279,10 +258,7 @@ export const zSchemaFlorence2LargeRegionToDescriptionOutput = z.object({
  */
 export const zSchemaFlorence2LargeRegionToDescriptionInput = z.object({
   region: zSchemaRegion,
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -313,10 +289,7 @@ export const zSchemaMoondreamNextInput = z.object({
       }),
     )
     .default(64),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -356,11 +329,9 @@ export const zSchemaImage = z
       }),
     ),
     file_data: z.optional(
-      z
-        .union([z.instanceof(Blob), z.instanceof(File)])
-        .register(z.globalRegistry, {
-          description: 'File data',
-        }),
+      z.string().register(z.globalRegistry, {
+        description: 'File data',
+      }),
     ),
   })
   .register(z.globalRegistry, {
@@ -386,10 +357,7 @@ export const zSchemaSa2Va8bImageInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'Prompt to be used for the chat completion',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -411,10 +379,7 @@ export const zSchemaSa2Va4bImageInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'Prompt to be used for the chat completion',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -441,11 +406,9 @@ export const zSchemaFile = z.object({
     description: 'The URL where the file can be downloaded from.',
   }),
   file_data: z.optional(
-    z
-      .union([z.instanceof(Blob), z.instanceof(File)])
-      .register(z.globalRegistry, {
-        description: 'File data',
-      }),
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
   ),
 })
 
@@ -468,10 +431,7 @@ export const zSchemaSa2Va8bVideoInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'Prompt to be used for the chat completion',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   num_frames_to_sample: z.optional(
     z.int().gte(1).lte(100).register(z.globalRegistry, {
       description:
@@ -499,10 +459,7 @@ export const zSchemaSa2Va4bVideoInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'Prompt to be used for the chat completion',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   num_frames_to_sample: z.optional(
     z.int().gte(1).lte(100).register(z.globalRegistry, {
       description:
@@ -528,10 +485,7 @@ export const zSchemaMoondreamNextBatchInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'Single prompt to apply to all images',
   }),
-  images_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  images_data_url: z.union([z.string(), z.string()]),
   max_tokens: z
     .optional(
       z.int().gte(1).lte(512).register(z.globalRegistry, {
@@ -570,11 +524,9 @@ export const zSchemaGotOcrV2Input = z.object({
     .default(false),
   input_image_urls: z
     .optional(
-      z
-        .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-        .register(z.globalRegistry, {
-          description: 'URL of images.',
-        }),
+      z.array(z.string()).register(z.globalRegistry, {
+        description: 'URL of images.',
+      }),
     )
     .default([]),
 })
@@ -598,10 +550,7 @@ export const zSchemaMoondream2ObjectDetectionInput = z.object({
   object: z.string().register(z.globalRegistry, {
     description: 'Object to be detected in the image',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -623,10 +572,7 @@ export const zSchemaMoondream2PointObjectDetectionInput = z.object({
   object: z.string().register(z.globalRegistry, {
     description: 'Object to be detected in the image',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -642,10 +588,7 @@ export const zSchemaMoondream2Output = z.object({
  * MoondreamInput
  */
 export const zSchemaMoondream2Input = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -664,10 +607,7 @@ export const zSchemaMoondream2VisualQueryInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'Query to be asked in the image',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -690,10 +630,7 @@ export const zSchemaVideoUnderstandingInput = z.object({
       }),
     )
     .default(false),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   prompt: z.string().min(1).max(5000).register(z.globalRegistry, {
     description: 'The question or prompt about the video content.',
   }),
@@ -712,12 +649,10 @@ export const zSchemaXAilabNsfwOutput = z.object({
  * NSFWInput
  */
 export const zSchemaXAilabNsfwInput = z.object({
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'List of image URLs to check. If more than 10 images are provided, only the first 10 will be checked.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'List of image URLs to check. If more than 10 images are provided, only the first 10 will be checked.',
+  }),
 })
 
 /**
@@ -766,10 +701,7 @@ export const zSchemaIsaac01Input = z.object({
         '\nResponse style to be used for the image.\n\n- text: Model will output text. Good for descriptions and captioning.\n- box: Model will output a combination of text and bounding boxes. Good for\nlocalization.\n- point: Model will output a combination of text and points. Good for counting many\nobjects.\n- polygon: Model will output a combination of text and polygons. Good for granular\nsegmentation.\n',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -838,10 +770,7 @@ export const zSchemaMoondream3PreviewCaptionInput = z.object({
         'Sampling temperature to use, between 0 and 1. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. If not set, defaults to 0.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -887,10 +816,7 @@ export const zSchemaMoondream3PreviewQueryInput = z.object({
       }),
     )
     .default(true),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -939,11 +865,9 @@ export const zSchemaImageFile = z.object({
     }),
   ),
   file_data: z.optional(
-    z
-      .union([z.instanceof(Blob), z.instanceof(File)])
-      .register(z.globalRegistry, {
-        description: 'File data',
-      }),
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
   ),
 })
 
@@ -975,10 +899,7 @@ export const zSchemaMoondream3PreviewPointInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -1029,10 +950,7 @@ export const zSchemaMoondream3PreviewDetectInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -1083,11 +1001,9 @@ export const zSchemaRouterVisionInput = z.object({
       }),
     )
     .default(1),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'List of image URLs to be processed',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'List of image URLs to be processed',
+  }),
 })
 
 /**
@@ -1103,10 +1019,7 @@ export const zSchemaSam3ImageEmbedOutput = z.object({
  * SAM3EmbeddingInput
  */
 export const zSchemaSam3ImageEmbedInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -1123,10 +1036,7 @@ export const zSchemaAiDetectorDetectImageOutput = z.object({
  * ImageDetectionInput
  */
 export const zSchemaAiDetectorDetectImageInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**

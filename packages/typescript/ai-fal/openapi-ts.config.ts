@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
+import type { IR } from '@hey-api/openapi-ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -149,7 +150,7 @@ function transformPropertiesRecursively(obj: object): void {
 
   // Recurse into items
   if (schema.items && typeof schema.items === 'object') {
-    transformPropertiesRecursively(schema.items as object)
+    transformPropertiesRecursively(schema.items)
   }
 
   // Recurse into additionalProperties
@@ -157,7 +158,7 @@ function transformPropertiesRecursively(obj: object): void {
     schema.additionalProperties &&
     typeof schema.additionalProperties === 'object'
   ) {
-    transformPropertiesRecursively(schema.additionalProperties as object)
+    transformPropertiesRecursively(schema.additionalProperties)
   }
 }
 
@@ -317,7 +318,13 @@ export default [
         transformers: [],
         typeTransformers: [
           // Transform x-fal-file-input fields to string | Blob | File in TypeScript
-          (context: { schema: { 'x-fal-file-input'?: boolean } }) => {
+          (context: { schema: IR.SchemaObject }) => {
+            if (
+              context.schema.format === 'binary' &&
+              !context.schema['x-fal-file-input']
+            ) {
+              return ts.factory.createTypeReferenceNode('string')
+            }
             if (!context.schema['x-fal-file-input']) {
               return undefined
             }
@@ -337,35 +344,34 @@ export default [
           // Transform file fields to proper Zod types:
           // - x-fal-file-input (Input schemas): string | Blob | File (fal SDK auto-uploads)
           // - format: binary (Output schemas): Blob | File (matches TypeScript plugin output)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           string(ctx: any) {
             const { $, schema, symbols } = ctx
             const { z } = symbols
 
             // Input schemas: x-fal-file-input → string | Blob | File
-            if (schema['x-fal-file-input']) {
-              return $(z)
-                .attr('union')
-                .call(
-                  $.array(
-                    $(z).attr('string').call(),
-                    $(z).attr('instanceof').call($.id('Blob')),
-                    $(z).attr('instanceof').call($.id('File')),
-                  ),
-                )
-            }
+            // if (schema['x-fal-file-input']) {
+            //   return $(z)
+            //     .attr('union')
+            //     .call(
+            //       $.array(
+            //         $(z).attr('string').call(),
+            //         $(z).attr('instanceof').call($.id('Blob')),
+            //         $(z).attr('instanceof').call($.id('File')),
+            //       ),
+            //     )
+            // }
 
             // Output schemas: format: binary → Blob | File (matches TypeScript plugin)
-            if (schema.format === 'binary') {
-              return $(z)
-                .attr('union')
-                .call(
-                  $.array(
-                    $(z).attr('instanceof').call($.id('Blob')),
-                    $(z).attr('instanceof').call($.id('File')),
-                  ),
-                )
-            }
+            // if (schema.format === 'binary') {
+            //   return $(z)
+            //     .attr('union')
+            //     .call(
+            //       $.array(
+            //         $(z).attr('instanceof').call($.id('Blob')),
+            //         $(z).attr('instanceof').call($.id('File')),
+            //       ),
+            //     )
+            // }
 
             return undefined
           },

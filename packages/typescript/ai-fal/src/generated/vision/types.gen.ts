@@ -467,7 +467,7 @@ export type SchemaImage = {
    *
    * File data
    */
-  file_data?: Blob | File
+  file_data?: string
 }
 
 /**
@@ -575,7 +575,7 @@ export type SchemaFile = {
    *
    * File data
    */
-  file_data?: Blob | File
+  file_data?: string
 }
 
 /**
@@ -1250,7 +1250,7 @@ export type SchemaImageFile = {
    *
    * File data
    */
-  file_data?: Blob | File
+  file_data?: string
 }
 
 /**

@@ -33,10 +33,7 @@ export const zSchemaHunyuanVideoLoraTrainingInput = z.object({
       }),
     )
     .default(''),
-  images_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  images_data_url: z.union([z.string(), z.string()]),
   steps: z.int().gte(1).lte(5000).register(z.globalRegistry, {
     description: 'Number of steps to train the LoRA on.',
   }),
@@ -76,10 +73,7 @@ export const zSchemaWanTrainerInput = z.object({
       }),
     )
     .default(400),
-  training_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  training_data_url: z.union([z.string(), z.string()]),
   trigger_phrase: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -118,10 +112,7 @@ export const zSchemaTurboFluxTrainerOutput = z.object({
  * Input
  */
 export const zSchemaTurboFluxTrainerInput = z.object({
-  images_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  images_data_url: z.union([z.string(), z.string()]),
   trigger_phrase: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -173,10 +164,7 @@ export const zSchemaRecraftV3CreateStyleOutput = z.object({
  * StyleReferenceInput
  */
 export const zSchemaRecraftV3CreateStyleInput = z.object({
-  images_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  images_data_url: z.union([z.string(), z.string()]),
   base_style: z.optional(
     z
       .enum([
@@ -342,10 +330,7 @@ export const zSchemaLtxVideoTrainerInput = z.object({
       }),
     )
     .default(false),
-  training_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  training_data_url: z.union([z.string(), z.string()]),
   split_input_duration_threshold: z
     .optional(
       z.number().gte(1).lte(60).register(z.globalRegistry, {
@@ -448,10 +433,7 @@ export const zSchemaWanTrainerFlf2V720pInput = z.object({
       }),
     )
     .default(400),
-  training_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  training_data_url: z.union([z.string(), z.string()]),
   trigger_phrase: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -497,10 +479,7 @@ export const zSchemaWanTrainerI2V720pInput = z.object({
       }),
     )
     .default(400),
-  training_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  training_data_url: z.union([z.string(), z.string()]),
   trigger_phrase: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -546,10 +525,7 @@ export const zSchemaWanTrainerT2V14bInput = z.object({
       }),
     )
     .default(400),
-  training_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  training_data_url: z.union([z.string(), z.string()]),
   trigger_phrase: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -595,10 +571,7 @@ export const zSchemaWanTrainerT2vInput = z.object({
       }),
     )
     .default(400),
-  training_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  training_data_url: z.union([z.string(), z.string()]),
   trigger_phrase: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -663,10 +636,7 @@ export const zSchemaWan22ImageTrainerInput = z.object({
       }),
     )
     .default(false),
-  training_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  training_data_url: z.union([z.string(), z.string()]),
   steps: z
     .optional(
       z.int().gte(10).lte(6000).register(z.globalRegistry, {
@@ -719,10 +689,7 @@ export const zSchemaQwenImageTrainerInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().gte(0.000001).lte(0.01).register(z.globalRegistry, {
@@ -759,10 +726,7 @@ export const zSchemaQwenImageEditTrainerInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -792,10 +756,7 @@ export const zSchemaQwenImageEditPlusTrainerInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -825,10 +786,7 @@ export const zSchemaFlux2TrainerInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -863,10 +821,7 @@ export const zSchemaFlux2TrainerEditInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -901,10 +856,7 @@ export const zSchemaZImageTrainerInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   training_type: z.optional(
     z.enum(['content', 'style', 'balanced']).register(z.globalRegistry, {
       description:
@@ -940,10 +892,7 @@ export const zSchemaQwenImageEdit2509TrainerInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -973,10 +922,7 @@ export const zSchemaQwenImageLayeredTrainerInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -1006,10 +952,7 @@ export const zSchemaQwenImageEdit2511TrainerInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -1039,10 +982,7 @@ export const zSchemaQwenImage2512TrainerInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -1130,10 +1070,7 @@ export const zSchemaLtx2VideoTrainerInput = z
         }),
       )
       .default(89),
-    training_data_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    training_data_url: z.union([z.string(), z.string()]),
     split_input_duration_threshold: z
       .optional(
         z.number().gte(1).lte(60).register(z.globalRegistry, {
@@ -1333,10 +1270,7 @@ export const zSchemaLtx2V2vTrainerInput = z
         }),
       )
       .default(89),
-    training_data_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    training_data_url: z.union([z.string(), z.string()]),
     split_input_duration_threshold: z
       .optional(
         z.number().gte(1).lte(60).register(z.globalRegistry, {
@@ -1471,10 +1405,7 @@ export const zSchemaFlux2TrainerV2Input = z
         }),
       )
       .default(1000),
-    image_data_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_data_url: z.union([z.string(), z.string()]),
     learning_rate: z
       .optional(
         z.number().register(z.globalRegistry, {
@@ -1512,10 +1443,7 @@ export const zSchemaFlux2TrainerV2EditInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -1550,10 +1478,7 @@ export const zSchemaQwenImage2512TrainerV2Input = z.object({
       }),
     )
     .default(2000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -1583,10 +1508,7 @@ export const zSchemaFlux2Klein4bBaseTrainerEditInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -1624,10 +1546,7 @@ export const zSchemaFlux2Klein4bBaseTrainerInput = z
         }),
       )
       .default(1000),
-    image_data_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_data_url: z.union([z.string(), z.string()]),
     learning_rate: z
       .optional(
         z.number().register(z.globalRegistry, {
@@ -1668,10 +1587,7 @@ export const zSchemaFlux2Klein9bBaseTrainerInput = z
         }),
       )
       .default(1000),
-    image_data_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_data_url: z.union([z.string(), z.string()]),
     learning_rate: z
       .optional(
         z.number().register(z.globalRegistry, {
@@ -1709,10 +1625,7 @@ export const zSchemaFlux2Klein9bBaseTrainerEditInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -1747,10 +1660,7 @@ export const zSchemaZImageTurboTrainerV2Input = z.object({
       }),
     )
     .default(2000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -1780,10 +1690,7 @@ export const zSchemaZImageBaseTrainerInput = z.object({
       }),
     )
     .default(2000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -1806,10 +1713,7 @@ export const zSchemaFluxLoraPortraitTrainerOutput = z.object({
  * PublicInput
  */
 export const zSchemaFluxLoraPortraitTrainerInput = z.object({
-  images_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  images_data_url: z.union([z.string(), z.string()]),
   trigger_phrase: z.optional(z.union([z.string(), z.null()])),
   resume_from_checkpoint: z
     .optional(
@@ -1869,10 +1773,7 @@ export const zSchemaFluxLoraFastTrainingOutput = z.object({
  * PublicInput
  */
 export const zSchemaFluxLoraFastTrainingInput = z.object({
-  images_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  images_data_url: z.union([z.string(), z.string()]),
   is_input_format_already_preprocessed: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -1925,10 +1826,7 @@ export const zSchemaFluxKontextTrainerInput = z.object({
       }),
     )
     .default(1000),
-  image_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_data_url: z.union([z.string(), z.string()]),
   learning_rate: z.optional(z.number()).default(0.0001),
   default_caption: z.optional(
     z.string().register(z.globalRegistry, {
@@ -1956,10 +1854,7 @@ export const zSchemaFluxKreaTrainerOutput = z.object({
  * PublicInput
  */
 export const zSchemaFluxKreaTrainerInput = z.object({
-  images_data_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  images_data_url: z.union([z.string(), z.string()]),
   is_input_format_already_preprocessed: z
     .optional(
       z.boolean().register(z.globalRegistry, {

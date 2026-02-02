@@ -26,11 +26,9 @@ export const zSchemaFile = z.object({
     description: 'The URL where the file can be downloaded from.',
   }),
   file_data: z.optional(
-    z
-      .union([z.instanceof(Blob), z.instanceof(File)])
-      .register(z.globalRegistry, {
-        description: 'File data',
-      }),
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
   ),
 })
 
@@ -71,11 +69,9 @@ export const zSchemaImage = z
       }),
     ),
     file_data: z.optional(
-      z
-        .union([z.instanceof(Blob), z.instanceof(File)])
-        .register(z.globalRegistry, {
-          description: 'File data',
-        }),
+      z.string().register(z.globalRegistry, {
+        description: 'File data',
+      }),
     ),
   })
   .register(z.globalRegistry, {
@@ -351,9 +347,7 @@ export const zSchemaLoraInput = z.object({
       }),
     )
     .default([]),
-  ic_light_model_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  ic_light_model_url: z.optional(z.union([z.string(), z.string()])),
   image_encoder_weight_name: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -463,7 +457,7 @@ export const zSchemaLoraInput = z.object({
     }),
   ),
   ic_light_model_background_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
+    z.union([z.string(), z.string()]),
   ),
   rescale_betas_snr_zero: z
     .optional(
@@ -535,9 +529,7 @@ export const zSchemaLoraInput = z.object({
       }),
     )
     .default(false),
-  ic_light_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  ic_light_image_url: z.optional(z.union([z.string(), z.string()])),
   unet_name: z.optional(
     z.string().register(z.globalRegistry, {
       description:
@@ -908,13 +900,7 @@ export const zSchemaFooocusInput = z.object({
         description: 'The type of image control',
       }),
   ),
-  mask_image_url: z.optional(
-    z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-      z.null(),
-    ]),
-  ),
+  mask_image_url: z.optional(z.union([z.string(), z.string(), z.null()])),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -959,13 +945,7 @@ export const zSchemaFooocusInput = z.object({
       }),
     )
     .default(''),
-  inpaint_image_url: z.optional(
-    z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-      z.null(),
-    ]),
-  ),
+  inpaint_image_url: z.optional(z.union([z.string(), z.string(), z.null()])),
   mixing_image_prompt_and_inpaint: z.optional(z.boolean()).default(false),
   aspect_ratio: z
     .optional(
@@ -1003,13 +983,7 @@ export const zSchemaFooocusInput = z.object({
       }),
     )
     .default(false),
-  control_image_url: z.optional(
-    z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-      z.null(),
-    ]),
-  ),
+  control_image_url: z.optional(z.union([z.string(), z.string(), z.null()])),
   seed: z.optional(z.union([z.int(), z.null()])),
   refiner_switch: z
     .optional(
@@ -1048,10 +1022,7 @@ export const zSchemaDiffusionEdgeOutput = z.object({
  * DiffusionEdgeInput
  */
 export const zSchemaDiffusionEdgeInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -1130,9 +1101,7 @@ export const zSchemaLcmInput = z.object({
       description: 'The model to use for generating the image.',
     }),
   ),
-  lora_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  lora_url: z.optional(z.union([z.string(), z.string()])),
   guidance_scale: z
     .optional(
       z.number().gte(0).lte(8).register(z.globalRegistry, {
@@ -1173,9 +1142,7 @@ export const zSchemaLcmInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.optional(z.union([z.string(), z.string()])),
   strength: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -1206,9 +1173,7 @@ export const zSchemaLcmInput = z.object({
         '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
     }),
   ),
-  mask_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_url: z.optional(z.union([z.string(), z.string()])),
   num_inference_steps: z
     .optional(
       z.int().gte(1).lte(12).register(z.globalRegistry, {
@@ -1599,10 +1564,7 @@ export const zSchemaFooocusInpaintInput = z.object({
         }),
     )
     .default([]),
-  inpaint_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  inpaint_image_url: z.union([z.string(), z.string()]),
   refiner_model: z.optional(
     z
       .enum(['None', 'realisticVisionV60B1_v51VAE.safetensors'])
@@ -1660,9 +1622,7 @@ export const zSchemaFooocusInpaintInput = z.object({
       }),
     )
     .default(false),
-  mask_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_image_url: z.optional(z.union([z.string(), z.string()])),
   invert_mask: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -1767,9 +1727,7 @@ export const zSchemaFooocusImagePromptInput = z.object({
       }),
     )
     .default(''),
-  uov_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  uov_image_url: z.optional(z.union([z.string(), z.string()])),
   performance: z.optional(
     z
       .enum(['Speed', 'Quality', 'Extreme Speed', 'Lightning'])
@@ -2113,9 +2071,7 @@ export const zSchemaFooocusImagePromptInput = z.object({
         }),
     )
     .default([]),
-  inpaint_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  inpaint_image_url: z.optional(z.union([z.string(), z.string()])),
   output_format: z.optional(
     z.enum(['png', 'jpeg', 'webp']).register(z.globalRegistry, {
       description: 'The format of the generated image.',
@@ -2178,9 +2134,7 @@ export const zSchemaFooocusImagePromptInput = z.object({
       }),
     )
     .default(false),
-  mask_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_image_url: z.optional(z.union([z.string(), z.string()])),
   image_prompt_1: zSchemaImagePrompt,
   enable_safety_checker: z
     .optional(
@@ -2261,10 +2215,7 @@ export const zSchemaIllusionDiffusionInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   scheduler: z.optional(
     z.enum(['DPM++ Karras SDE', 'Euler']).register(z.globalRegistry, {
       description:
@@ -2669,10 +2620,7 @@ export const zSchemaFastSdxlControlnetCannyInput = z.object({
       }),
     )
     .default(false),
-  control_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  control_image_url: z.union([z.string(), z.string()]),
   num_inference_steps: z
     .optional(
       z.int().gte(1).lte(50).register(z.globalRegistry, {
@@ -2803,10 +2751,7 @@ export const zSchemaFastFooocusSdxlImageToImageInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.05).lte(1).register(z.globalRegistry, {
@@ -4256,9 +4201,7 @@ export const zSchemaSdxlControlnetUnionInput = z.object({
       z.null(),
     ]),
   ),
-  normal_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  normal_image_url: z.optional(z.union([z.string(), z.string()])),
   embeddings: z
     .optional(
       z.array(zSchemaEmbedding).register(z.globalRegistry, {
@@ -4266,9 +4209,7 @@ export const zSchemaSdxlControlnetUnionInput = z.object({
       }),
     )
     .default([]),
-  teed_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  teed_image_url: z.optional(z.union([z.string(), z.string()])),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -4284,9 +4225,7 @@ export const zSchemaSdxlControlnetUnionInput = z.object({
       }),
     )
     .default(7.5),
-  canny_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  canny_image_url: z.optional(z.union([z.string(), z.string()])),
   segmentation_preprocess: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -4321,12 +4260,8 @@ export const zSchemaSdxlControlnetUnionInput = z.object({
         '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
     }),
   ),
-  segmentation_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
-  openpose_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  segmentation_image_url: z.optional(z.union([z.string(), z.string()])),
+  openpose_image_url: z.optional(z.union([z.string(), z.string()])),
   canny_preprocess: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -4342,9 +4277,7 @@ export const zSchemaSdxlControlnetUnionInput = z.object({
       }),
     )
     .default(false),
-  depth_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  depth_image_url: z.optional(z.union([z.string(), z.string()])),
   normal_preprocess: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -4582,10 +4515,7 @@ export const zSchemaFluxSubjectInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -5048,10 +4978,7 @@ export const zSchemaFooocusUpscaleOrVaryInput = z.object({
         }),
     )
     .default(['Fooocus Enhance', 'Fooocus V2', 'Fooocus Sharp']),
-  uov_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  uov_image_url: z.union([z.string(), z.string()]),
   performance: z.optional(
     z
       .enum(['Speed', 'Quality', 'Extreme Speed', 'Lightning'])
@@ -5339,10 +5266,7 @@ export const zSchemaFluxLoraInpaintingInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -5382,10 +5306,7 @@ export const zSchemaFluxLoraInpaintingInput = z.object({
       }),
     )
     .default(28),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -5647,12 +5568,10 @@ export const zSchemaOmnigenV1Input = z.object({
     .default(1.6),
   input_image_urls: z
     .optional(
-      z
-        .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-        .register(z.globalRegistry, {
-          description:
-            'URL of images to use while generating the image, Use <img><|image_1|></img> for the first image and so on.',
-        }),
+      z.array(z.string()).register(z.globalRegistry, {
+        description:
+          'URL of images to use while generating the image, Use <img><|image_1|></img> for the first image and so on.',
+      }),
     )
     .default([]),
   output_format: z.optional(
@@ -6008,10 +5927,7 @@ export const zSchemaGuidanceInput = z.object({
           'Which guidance type you would like to include in the generation. Up to 4 guidance methods can be combined during a single inference. This parameter is optional.',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -6727,9 +6643,7 @@ export const zSchemaFluxProV11UltraFinetunedInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.optional(z.union([z.string(), z.string()])),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -7128,10 +7042,7 @@ export const zSchemaFluxControlLoraDepthInput = z.object({
       }),
     )
     .default(3.5),
-  control_lora_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  control_lora_image_url: z.union([z.string(), z.string()]),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -7251,9 +7162,7 @@ export const zSchemaFluxControlLoraCannyInput = z.object({
       }),
     )
     .default(true),
-  control_lora_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  control_lora_image_url: z.optional(z.union([z.string(), z.string()])),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -8327,11 +8236,9 @@ export const zSchemaImageFile = z.object({
     }),
   ),
   file_data: z.optional(
-    z
-      .union([z.instanceof(Blob), z.instanceof(File)])
-      .register(z.globalRegistry, {
-        description: 'File data',
-      }),
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
   ),
 })
 
@@ -9008,9 +8915,7 @@ export const zSchemaDreamoInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The prompt to generate an image from.',
   }),
-  first_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  first_image_url: z.optional(z.union([z.string(), z.string()])),
   image_size: z.optional(
     z.union([
       zSchemaImageSize,
@@ -9024,9 +8929,7 @@ export const zSchemaDreamoInput = z.object({
       ]),
     ]),
   ),
-  second_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  second_image_url: z.optional(z.union([z.string(), z.string()])),
   second_reference_task: z.optional(
     z.enum(['ip', 'id', 'style']).register(z.globalRegistry, {
       description: 'Task for second reference image (ip/id/style).',
@@ -9713,12 +9616,10 @@ export const zSchemaOmnigenV2Input = z.object({
     .default(2),
   input_image_urls: z
     .optional(
-      z
-        .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-        .register(z.globalRegistry, {
-          description:
-            'URLs of input images to use for image editing or multi-image generation. Support up to 3 images.',
-        }),
+      z.array(z.string()).register(z.globalRegistry, {
+        description:
+          'URLs of input images to use for image editing or multi-image generation. Support up to 3 images.',
+      }),
     )
     .default([]),
   output_format: z.optional(
@@ -13781,9 +13682,7 @@ export const zSchemaV26TextToImageInput = z
         }),
       )
       .default(1),
-    image_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    image_url: z.optional(z.union([z.string(), z.string()])),
     enable_safety_checker: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -15116,17 +15015,8 @@ export const zSchemaControlNetUnionInput = z.object({
       }),
     )
     .default(1),
-  mask_image_url: z.optional(
-    z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-      z.null(),
-    ]),
-  ),
-  control_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_image_url: z.optional(z.union([z.string(), z.string(), z.null()])),
+  control_image_url: z.union([z.string(), z.string()]),
   control_mode: z
     .enum(['canny', 'tile', 'depth', 'blur', 'pose', 'gray', 'low-quality'])
     .register(z.globalRegistry, {
@@ -15348,9 +15238,7 @@ export const zSchemaFluxGeneralInput = z.object({
       }),
     )
     .default(3),
-  reference_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  reference_image_url: z.optional(z.union([z.string(), z.string()])),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -16594,9 +16482,7 @@ export const zSchemaFluxProV11UltraInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.optional(z.union([z.string(), z.string()])),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -16718,10 +16604,7 @@ export const zSchemaImageutilsRembgInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -16776,10 +16659,7 @@ export const zSchemaEsrganInput = z.object({
       description: 'Output image format (png or jpeg)',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -16801,10 +16681,7 @@ export const zSchemaInpaintInput = z.object({
     description:
       'The prompt to use for generating the image. Be as descriptive as possible for best results.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   model_name: z.string().register(z.globalRegistry, {
     description:
       'URL or HuggingFace ID of the base model to generate the image.',
@@ -16825,10 +16702,7 @@ export const zSchemaInpaintInput = z.object({
       }),
     )
     .default(30),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -16895,10 +16769,7 @@ export const zSchemaLcmSd15I2iInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -17053,10 +16924,7 @@ export const zSchemaFastSdxlControlnetCannyInpaintingInput = z.object({
       }),
     )
     .default(0.5),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -17073,20 +16941,14 @@ export const zSchemaFastSdxlControlnetCannyInpaintingInput = z.object({
       }),
     )
     .default(false),
-  control_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  control_image_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
         '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
     }),
   ),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   num_inference_steps: z
     .optional(
       z.int().gte(1).lte(65).register(z.globalRegistry, {
@@ -17187,10 +17049,7 @@ export const zSchemaFastSdxlControlnetCannyImageToImageInput = z.object({
       }),
     )
     .default(0.5),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -17207,10 +17066,7 @@ export const zSchemaFastSdxlControlnetCannyImageToImageInput = z.object({
       }),
     )
     .default(false),
-  control_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  control_image_url: z.union([z.string(), z.string()]),
   num_inference_steps: z
     .optional(
       z.int().gte(1).lte(65).register(z.globalRegistry, {
@@ -17362,10 +17218,7 @@ export const zSchemaImageutilsMarigoldDepthInput = z.object({
       }),
     )
     .default(0),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -17400,10 +17253,7 @@ export const zSchemaImageutilsDepthInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -17426,10 +17276,7 @@ export const zSchemaRetoucherInput = z.object({
         'Seed for reproducibility. Different seeds will make slightly different results.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -17539,10 +17386,7 @@ export const zSchemaFastLcmDiffusionImageToImageInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -17689,10 +17533,7 @@ export const zSchemaFastLcmDiffusionInpaintingInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -17730,10 +17571,7 @@ export const zSchemaFastLcmDiffusionInpaintingInput = z.object({
       }),
     )
     .default(6),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -17850,10 +17688,7 @@ export const zSchemaPlaygroundV25InpaintingInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -17882,10 +17717,7 @@ export const zSchemaPlaygroundV25InpaintingInput = z.object({
         '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
     }),
   ),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   num_inference_steps: z
     .optional(
       z.int().gte(1).lte(65).register(z.globalRegistry, {
@@ -17977,10 +17809,7 @@ export const zSchemaFastLightningSdxlInpaintingInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -18016,10 +17845,7 @@ export const zSchemaFastLightningSdxlInpaintingInput = z.object({
       description: 'The number of inference steps to perform.',
     }),
   ),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -18126,10 +17952,7 @@ export const zSchemaFastLightningSdxlImageToImageInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.05).lte(1).register(z.globalRegistry, {
@@ -18287,10 +18110,7 @@ export const zSchemaPlaygroundV25ImageToImageInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.05).lte(1).register(z.globalRegistry, {
@@ -18351,10 +18171,7 @@ export const zSchemaBirefnetInput = z.object({
       description: 'The format of the output image',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   model: z.optional(
     z
       .enum(['General Use (Light)', 'General Use (Heavy)', 'Portrait'])
@@ -18411,9 +18228,7 @@ export const zSchemaCreativeUpscalerInput = z.object({
     )
     .default(0.25),
   prompt: z.optional(z.union([z.string(), z.null()])),
-  additional_embedding_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  additional_embedding_url: z.optional(z.union([z.string(), z.string()])),
   enable_safety_checks: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -18422,9 +18237,7 @@ export const zSchemaCreativeUpscalerInput = z.object({
       }),
     )
     .default(true),
-  additional_lora_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  additional_lora_url: z.optional(z.union([z.string(), z.string()])),
   guidance_scale: z
     .optional(
       z.number().gte(0).lte(16).register(z.globalRegistry, {
@@ -18474,13 +18287,8 @@ export const zSchemaCreativeUpscalerInput = z.object({
       }),
     )
     .default(1),
-  base_model_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  base_model_url: z.optional(z.union([z.string(), z.string()])),
+  image_url: z.union([z.string(), z.string()]),
   creativity: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -18580,13 +18388,8 @@ export const zSchemaPhotomakerInput = z.object({
         '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
     }),
   ),
-  image_archive_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  initial_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_archive_url: z.union([z.string(), z.string()]),
+  initial_image_url: z.optional(z.union([z.string(), z.string()])),
   num_inference_steps: z
     .optional(
       z.int().gte(20).lte(100).register(z.globalRegistry, {
@@ -18673,10 +18476,7 @@ export const zSchemaFaceToStickerInput = z.object({
       }),
     )
     .default(0.2),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   upscale_steps: z
     .optional(
       z.int().gte(1).lte(20).register(z.globalRegistry, {
@@ -18836,10 +18636,7 @@ export const zSchemaFastSdxlInpaintingInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -18877,10 +18674,7 @@ export const zSchemaFastSdxlInpaintingInput = z.object({
       }),
     )
     .default(25),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -19003,10 +18797,7 @@ export const zSchemaFastSdxlImageToImageInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.05).lte(1).register(z.globalRegistry, {
@@ -19102,9 +18893,7 @@ export const zSchemaLoraImageToImageInput = z.object({
       }),
     )
     .default([]),
-  ic_light_model_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  ic_light_model_url: z.optional(z.union([z.string(), z.string()])),
   image_encoder_weight_name: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -19193,9 +18982,7 @@ export const zSchemaLoraImageToImageInput = z.object({
         "The variant of the model to use for huggingface models, e.g. 'fp16'.",
     }),
   ),
-  image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.optional(z.union([z.string(), z.string()])),
   controlnet_guess_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -19217,7 +19004,7 @@ export const zSchemaLoraImageToImageInput = z.object({
     }),
   ),
   ic_light_model_background_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
+    z.union([z.string(), z.string()]),
   ),
   rescale_betas_snr_zero: z
     .optional(
@@ -19289,9 +19076,7 @@ export const zSchemaLoraImageToImageInput = z.object({
       }),
     )
     .default(false),
-  ic_light_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  ic_light_image_url: z.optional(z.union([z.string(), z.string()])),
   unet_name: z.optional(
     z.string().register(z.globalRegistry, {
       description:
@@ -19382,9 +19167,7 @@ export const zSchemaLoraInpaintInput = z.object({
       }),
     )
     .default([]),
-  ic_light_model_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  ic_light_model_url: z.optional(z.union([z.string(), z.string()])),
   image_encoder_weight_name: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -19473,18 +19256,14 @@ export const zSchemaLoraInpaintInput = z.object({
         "The variant of the model to use for huggingface models, e.g. 'fp16'.",
     }),
   ),
-  image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.optional(z.union([z.string(), z.string()])),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
         '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
     }),
   ),
-  mask_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_url: z.optional(z.union([z.string(), z.string()])),
   image_encoder_subfolder: z.optional(
     z.string().register(z.globalRegistry, {
       description:
@@ -19492,7 +19271,7 @@ export const zSchemaLoraInpaintInput = z.object({
     }),
   ),
   ic_light_model_background_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
+    z.union([z.string(), z.string()]),
   ),
   rescale_betas_snr_zero: z
     .optional(
@@ -19572,9 +19351,7 @@ export const zSchemaLoraInpaintInput = z.object({
       }),
     )
     .default(false),
-  ic_light_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  ic_light_image_url: z.optional(z.union([z.string(), z.string()])),
   unet_name: z.optional(
     z.string().register(z.globalRegistry, {
       description:
@@ -19634,9 +19411,7 @@ export const zSchemaIpAdapterFaceIdInput = z.object({
     description:
       'The prompt to use for generating the image. Be as descriptive as possible for best results.',
   }),
-  face_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  face_image_url: z.optional(z.union([z.string(), z.string()])),
   width: z
     .optional(
       z.int().gte(512).lte(1024).register(z.globalRegistry, {
@@ -19726,9 +19501,7 @@ export const zSchemaIpAdapterFaceIdInput = z.object({
           'The model type to use. 1_5 is the default and is recommended for most use cases.',
       }),
   ),
-  face_images_data_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  face_images_data_url: z.optional(z.union([z.string(), z.string()])),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -19751,10 +19524,7 @@ export const zSchemaOmniZeroInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'Prompt to guide the image generation.',
   }),
-  identity_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  identity_image_url: z.union([z.string(), z.string()]),
   identity_strength: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -19790,10 +19560,7 @@ export const zSchemaOmniZeroInput = z.object({
       }),
     )
     .default(''),
-  composition_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  composition_image_url: z.union([z.string(), z.string()]),
   depth_strength: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -19808,14 +19575,8 @@ export const zSchemaOmniZeroInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  style_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
+  style_image_url: z.union([z.string(), z.string()]),
   face_strength: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -19886,10 +19647,7 @@ export const zSchemaCcsrInput = z.object({
       }),
     )
     .default(0.3333),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   tile_diffusion_stride: z
     .optional(
       z.int().gte(128).lte(1024).register(z.globalRegistry, {
@@ -20044,10 +19802,7 @@ export const zSchemaSd15DepthControlnetInput = z.object({
       }),
     )
     .default(false),
-  control_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  control_image_url: z.union([z.string(), z.string()]),
   num_inference_steps: z
     .optional(
       z.int().gte(1).lte(70).register(z.globalRegistry, {
@@ -20098,10 +19853,7 @@ export const zSchemaDwposeInput = z.object({
           "Mode of drawing the pose on the image. Options are: 'full-pose', 'body-pose', 'face-pose', 'hand-pose', 'face-hand-mask', 'face-mask', 'hand-mask'.",
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20163,10 +19915,7 @@ export const zSchemaStableDiffusionV3MediumImageToImageInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The prompt to generate an image from.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -20271,10 +20020,7 @@ export const zSchemaFlorence2LargeRegionToSegmentationOutput = z.object({
  */
 export const zSchemaFlorence2LargeRegionToSegmentationInput = z.object({
   region: zSchemaRegion,
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20319,10 +20065,7 @@ export const zSchemaFlorence2LargeOcrWithRegionOutput = z.object({
  * ImageInput
  */
 export const zSchemaFlorence2LargeOcrWithRegionInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20367,10 +20110,7 @@ export const zSchemaFlorence2LargeRegionProposalOutput = z.object({
  * ImageInput
  */
 export const zSchemaFlorence2LargeRegionProposalInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20388,10 +20128,7 @@ export const zSchemaFlorence2LargeCaptionToPhraseGroundingInput = z.object({
   text_input: z.string().register(z.globalRegistry, {
     description: 'Text input for the task',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20409,10 +20146,7 @@ export const zSchemaFlorence2LargeOpenVocabularyDetectionInput = z.object({
   text_input: z.string().register(z.globalRegistry, {
     description: 'Text input for the task',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20427,10 +20161,7 @@ export const zSchemaFlorence2LargeObjectDetectionOutput = z.object({
  * ImageInput
  */
 export const zSchemaFlorence2LargeObjectDetectionInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20450,10 +20181,7 @@ export const zSchemaFlorence2LargeReferringExpressionSegmentationInput =
     text_input: z.string().register(z.globalRegistry, {
       description: 'Text input for the task',
     }),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
   })
 
 /**
@@ -20468,10 +20196,7 @@ export const zSchemaFlorence2LargeDenseRegionCaptionOutput = z.object({
  * ImageInput
  */
 export const zSchemaFlorence2LargeDenseRegionCaptionInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20529,10 +20254,7 @@ export const zSchemaEra3dInput = z.object({
       }),
     )
     .default(-1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20584,9 +20306,7 @@ export const zSchemaSdxlControlnetUnionImageToImageInput = z.object({
       z.null(),
     ]),
   ),
-  normal_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  normal_image_url: z.optional(z.union([z.string(), z.string()])),
   embeddings: z
     .optional(
       z.array(zSchemaEmbedding).register(z.globalRegistry, {
@@ -20594,9 +20314,7 @@ export const zSchemaSdxlControlnetUnionImageToImageInput = z.object({
       }),
     )
     .default([]),
-  teed_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  teed_image_url: z.optional(z.union([z.string(), z.string()])),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -20612,9 +20330,7 @@ export const zSchemaSdxlControlnetUnionImageToImageInput = z.object({
       }),
     )
     .default(7.5),
-  canny_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  canny_image_url: z.optional(z.union([z.string(), z.string()])),
   segmentation_preprocess: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -20627,10 +20343,7 @@ export const zSchemaSdxlControlnetUnionImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -20653,12 +20366,8 @@ export const zSchemaSdxlControlnetUnionImageToImageInput = z.object({
         '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
     }),
   ),
-  segmentation_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
-  openpose_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  segmentation_image_url: z.optional(z.union([z.string(), z.string()])),
+  openpose_image_url: z.optional(z.union([z.string(), z.string()])),
   canny_preprocess: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -20674,9 +20383,7 @@ export const zSchemaSdxlControlnetUnionImageToImageInput = z.object({
       }),
     )
     .default(false),
-  depth_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  depth_image_url: z.optional(z.union([z.string(), z.string()])),
   normal_preprocess: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -20815,9 +20522,7 @@ export const zSchemaSdxlControlnetUnionInpaintingInput = z.object({
       z.null(),
     ]),
   ),
-  normal_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  normal_image_url: z.optional(z.union([z.string(), z.string()])),
   embeddings: z
     .optional(
       z.array(zSchemaEmbedding).register(z.globalRegistry, {
@@ -20825,9 +20530,7 @@ export const zSchemaSdxlControlnetUnionInpaintingInput = z.object({
       }),
     )
     .default([]),
-  teed_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  teed_image_url: z.optional(z.union([z.string(), z.string()])),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -20843,9 +20546,7 @@ export const zSchemaSdxlControlnetUnionInpaintingInput = z.object({
       }),
     )
     .default(7.5),
-  canny_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  canny_image_url: z.optional(z.union([z.string(), z.string()])),
   segmentation_preprocess: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -20858,10 +20559,7 @@ export const zSchemaSdxlControlnetUnionInpaintingInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -20884,16 +20582,9 @@ export const zSchemaSdxlControlnetUnionInpaintingInput = z.object({
         '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
     }),
   ),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  segmentation_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
-  openpose_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_url: z.union([z.string(), z.string()]),
+  segmentation_image_url: z.optional(z.union([z.string(), z.string()])),
+  openpose_image_url: z.optional(z.union([z.string(), z.string()])),
   canny_preprocess: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -20909,9 +20600,7 @@ export const zSchemaSdxlControlnetUnionInpaintingInput = z.object({
       }),
     )
     .default(false),
-  depth_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  depth_image_url: z.optional(z.union([z.string(), z.string()])),
   normal_preprocess: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -21038,10 +20727,7 @@ export const zSchemaFluxLoraImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -21238,10 +20924,7 @@ export const zSchemaFluxGeneralDifferentialDiffusionInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   nag_scale: z
     .optional(
       z.number().lte(10).register(z.globalRegistry, {
@@ -21250,9 +20933,7 @@ export const zSchemaFluxGeneralDifferentialDiffusionInput = z.object({
       }),
     )
     .default(3),
-  reference_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  reference_image_url: z.optional(z.union([z.string(), z.string()])),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -21284,10 +20965,7 @@ export const zSchemaFluxGeneralDifferentialDiffusionInput = z.object({
       }),
     )
     .default(2.5),
-  change_map_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  change_map_image_url: z.union([z.string(), z.string()]),
   num_images: z
     .optional(
       z.int().gte(1).lte(10).register(z.globalRegistry, {
@@ -21516,14 +21194,8 @@ export const zSchemaFluxGeneralInpaintingInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
   nag_scale: z
     .optional(
       z.number().lte(10).register(z.globalRegistry, {
@@ -21532,9 +21204,7 @@ export const zSchemaFluxGeneralInpaintingInput = z.object({
       }),
     )
     .default(3),
-  reference_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  reference_image_url: z.optional(z.union([z.string(), z.string()])),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -21794,10 +21464,7 @@ export const zSchemaFluxGeneralImageToImageInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   nag_scale: z
     .optional(
       z.number().lte(10).register(z.globalRegistry, {
@@ -21806,9 +21473,7 @@ export const zSchemaFluxGeneralImageToImageInput = z.object({
       }),
     )
     .default(3),
-  reference_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  reference_image_url: z.optional(z.union([z.string(), z.string()])),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -22044,10 +21709,7 @@ export const zSchemaSam2ImageInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22082,10 +21744,7 @@ export const zSchemaImagePreprocessorsPidiInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22099,10 +21758,7 @@ export const zSchemaImagePreprocessorsZoeOutput = z.object({
  * ZoeInput
  */
 export const zSchemaImagePreprocessorsZoeInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22123,10 +21779,7 @@ export const zSchemaImagePreprocessorsLineartInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22140,10 +21793,7 @@ export const zSchemaImagePreprocessorsTeedOutput = z.object({
  * TeeDInput
  */
 export const zSchemaImagePreprocessorsTeedInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22172,10 +21822,7 @@ export const zSchemaImagePreprocessorsMidasInput = z.object({
       }),
     )
     .default(0.1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22189,10 +21836,7 @@ export const zSchemaImagePreprocessorsSamOutput = z.object({
  * SamInput
  */
 export const zSchemaImagePreprocessorsSamInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22220,10 +21864,7 @@ export const zSchemaImagePreprocessorsMlsdInput = z.object({
       }),
     )
     .default(0.1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22249,10 +21890,7 @@ export const zSchemaImagePreprocessorsScribbleInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22266,10 +21904,7 @@ export const zSchemaImagePreprocessorsDepthAnythingV2Output = z.object({
  * DepthAnythingV2Input
  */
 export const zSchemaImagePreprocessorsDepthAnythingV2Input = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22297,10 +21932,7 @@ export const zSchemaImagePreprocessorsHedInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22460,10 +22092,7 @@ export const zSchemaFluxGeneralRfInversionInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   fill_image: z.optional(zSchemaImageFillInput),
   nag_scale: z
     .optional(
@@ -22480,9 +22109,7 @@ export const zSchemaFluxGeneralRfInversionInput = z.object({
         description: 'Scheduler for applying reverse guidance.',
       }),
   ),
-  reference_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  reference_image_url: z.optional(z.union([z.string(), z.string()])),
   reverse_guidance_end: z
     .optional(
       z.int().register(z.globalRegistry, {
@@ -22736,10 +22363,7 @@ export const zSchemaLivePortraitImageInput = z.object({
       }),
     )
     .default(0),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   flag_do_crop: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -22781,10 +22405,7 @@ export const zSchemaBirefnetV2Input = z.object({
       description: 'The format of the output image',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   model: z.optional(
     z
       .enum([
@@ -22879,10 +22500,7 @@ export const zSchemaFluxPulidInput = z.object({
       }),
     )
     .default(0),
-  reference_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  reference_image_url: z.union([z.string(), z.string()]),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -22974,10 +22592,7 @@ export const zSchemaFluxDifferentialDiffusionInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -23008,10 +22623,7 @@ export const zSchemaFluxDifferentialDiffusionInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  change_map_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  change_map_image_url: z.union([z.string(), z.string()]),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -23084,9 +22696,7 @@ export const zSchemaIclightV2Input = z.object({
       }),
     )
     .default(0.67),
-  mask_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_image_url: z.optional(z.union([z.string(), z.string()])),
   guidance_scale: z
     .optional(
       z.number().gte(0).lte(20).register(z.globalRegistry, {
@@ -23129,10 +22739,7 @@ export const zSchemaIclightV2Input = z.object({
     }),
   ),
   hr_downscale: z.optional(z.number().gte(0.01).lte(1)).default(0.5),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -23231,10 +22838,7 @@ export const zSchemaKolorsImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -23343,10 +22947,7 @@ export const zSchemaFluxProV1FillInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -23367,10 +22968,7 @@ export const zSchemaFluxProV1FillInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   enhance_prompt: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -23433,10 +23031,7 @@ export const zSchemaFluxLoraDepthInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -23551,10 +23146,7 @@ export const zSchemaFluxProV11UltraReduxInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -23653,10 +23245,7 @@ export const zSchemaFluxDevReduxInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -23748,10 +23337,7 @@ export const zSchemaFluxProV11ReduxInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -23851,10 +23437,7 @@ export const zSchemaFluxSchnellReduxInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -23931,10 +23514,7 @@ export const zSchemaIdeogramV2RemixInput = z.object({
       }),
     )
     .default(true),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -24004,10 +23584,7 @@ export const zSchemaIdeogramV2TurboRemixInput = z.object({
       }),
     )
     .default(true),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -24058,10 +23635,7 @@ export const zSchemaIdeogramV2TurboEditInput = z.object({
       }),
     )
     .default(true),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -24071,10 +23645,7 @@ export const zSchemaIdeogramV2TurboEditInput = z.object({
     )
     .default(false),
   seed: z.optional(z.union([z.int(), z.unknown()])),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24109,10 +23680,7 @@ export const zSchemaIdeogramV2EditInput = z.object({
       }),
     )
     .default(true),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -24122,10 +23690,7 @@ export const zSchemaIdeogramV2EditInput = z.object({
     )
     .default(false),
   seed: z.optional(z.union([z.int(), z.unknown()])),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24145,14 +23710,8 @@ export const zSchemaLeffaVirtualTryonOutput = z.object({
  * VTONInput
  */
 export const zSchemaLeffaVirtualTryonInput = z.object({
-  garment_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  human_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  garment_image_url: z.union([z.string(), z.string()]),
+  human_image_url: z.union([z.string(), z.string()]),
   output_format: z.optional(
     z.enum(['jpeg', 'png']).register(z.globalRegistry, {
       description: 'The format of the generated image.',
@@ -24218,10 +23777,7 @@ export const zSchemaLeffaPoseTransferOutput = z.object({
  * PoseTransferInput
  */
 export const zSchemaLeffaPoseTransferInput = z.object({
-  pose_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  pose_image_url: z.union([z.string(), z.string()]),
   output_format: z.optional(
     z.enum(['jpeg', 'png']).register(z.globalRegistry, {
       description: 'The format of the generated image.',
@@ -24263,10 +23819,7 @@ export const zSchemaLeffaPoseTransferInput = z.object({
       }),
     )
     .default(true),
-  person_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  person_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24280,10 +23833,7 @@ export const zSchemaCatVtonOutput = z.object({
  * CATVTONInput
  */
 export const zSchemaCatVtonInput = z.object({
-  garment_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  garment_image_url: z.union([z.string(), z.string()]),
   image_size: z.optional(
     z.union([
       zSchemaImageSize,
@@ -24297,10 +23847,7 @@ export const zSchemaCatVtonInput = z.object({
       ]),
     ]),
   ),
-  human_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  human_image_url: z.union([z.string(), z.string()]),
   cloth_type: z
     .enum(['upper', 'lower', 'overall', 'inner', 'outer'])
     .register(z.globalRegistry, {
@@ -24349,10 +23896,7 @@ export const zSchemaBriaBackgroundRemoveInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24368,9 +23912,7 @@ export const zSchemaBriaProductShotOutput = z.object({
  * ProductShotInput
  */
 export const zSchemaBriaProductShotInput = z.object({
-  ref_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  ref_image_url: z.optional(z.union([z.string(), z.string()])),
   manual_placement_selection: z.optional(
     z
       .enum([
@@ -24456,10 +23998,7 @@ export const zSchemaBriaProductShotInput = z.object({
         'Text description of the new scene or background for the provided product shot. Bria currently supports prompts in English only, excluding special characters.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24489,20 +24028,14 @@ export const zSchemaBriaEraserInput = z.object({
       }),
     )
     .default(false),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   mask_type: z.optional(
     z.enum(['manual', 'automatic']).register(z.globalRegistry, {
       description:
         "You can use this parameter to specify the type of the input mask from the list. 'manual' opttion should be used in cases in which the mask had been generated by a user (e.g. with a brush tool), and 'automatic' mask type should be used when mask had been generated by an algorithm like 'SAM'.",
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24533,9 +24066,7 @@ export const zSchemaBriaBackgroundReplaceInput = z.object({
       }),
     )
     .default(1),
-  ref_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  ref_image_url: z.optional(z.union([z.string(), z.string()])),
   refine_prompt: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -24543,10 +24074,7 @@ export const zSchemaBriaBackgroundReplaceInput = z.object({
       }),
     )
     .default(true),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -24674,10 +24202,7 @@ export const zSchemaFluxLoraFillInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -24694,10 +24219,7 @@ export const zSchemaFluxLoraFillInput = z.object({
       }),
     )
     .default(28),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -24729,10 +24251,7 @@ export const zSchemaBriaGenfillInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -24747,10 +24266,7 @@ export const zSchemaBriaGenfillInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -24797,10 +24313,7 @@ export const zSchemaBriaExpandInput = z.object({
         'The desired location of the original image, inside the full canvas. Provide the location of the upper left corner of the original image. The location can also be outside the canvas (the original image will be cropped). Will be ignored if aspect_ratio is provided.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -24879,10 +24392,7 @@ export const zSchemaMoondreamNextDetectionInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24933,10 +24443,7 @@ export const zSchemaFluxProV1FillFinetunedInput = z.object({
   finetune_id: z.string().register(z.globalRegistry, {
     description: 'References your specific model',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -24957,10 +24464,7 @@ export const zSchemaFluxProV1FillFinetunedInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   enhance_prompt: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -25022,10 +24526,7 @@ export const zSchemaFluxLoraCannyInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -25083,10 +24584,7 @@ export const zSchemaKlingV15KolorsVirtualTryOnOutput = z.object({
  * TryOnRequest
  */
 export const zSchemaKlingV15KolorsVirtualTryOnInput = z.object({
-  garment_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  garment_image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -25095,10 +24593,7 @@ export const zSchemaKlingV15KolorsVirtualTryOnInput = z.object({
       }),
     )
     .default(false),
-  human_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  human_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -25123,10 +24618,7 @@ export const zSchemaCodeformerInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   upscale_factor: z
     .optional(
       z.number().register(z.globalRegistry, {
@@ -25200,10 +24692,7 @@ export const zSchemaIdeogramUpscaleInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -25297,10 +24786,7 @@ export const zSchemaFluxControlLoraCannyImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -25330,9 +24816,7 @@ export const zSchemaFluxControlLoraCannyImageToImageInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  control_lora_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  control_lora_image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -25355,10 +24839,7 @@ export const zSchemaBenV2ImageInput = z.object({
       description: 'Random seed for reproducible generation.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -25443,10 +24924,7 @@ export const zSchemaFluxControlLoraDepthImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -25463,10 +24941,7 @@ export const zSchemaFluxControlLoraDepthImageToImageInput = z.object({
       }),
     )
     .default(false),
-  control_lora_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  control_lora_image_url: z.union([z.string(), z.string()]),
   num_inference_steps: z
     .optional(
       z.int().gte(1).lte(50).register(z.globalRegistry, {
@@ -25518,10 +24993,7 @@ export const zSchemaFloweditInput = z.object({
       }),
     )
     .default(23),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   source_prompt: z.string().register(z.globalRegistry, {
     description: 'Prompt of the image to be used.',
   }),
@@ -25713,9 +25185,7 @@ export const zSchemaPostProcessingInput = z.object({
       }),
     )
     .default(false),
-  dissolve_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  dissolve_image_url: z.optional(z.union([z.string(), z.string()])),
   red_shift: z
     .optional(
       z.int().gte(-20).lte(20).register(z.globalRegistry, {
@@ -25756,10 +25226,7 @@ export const zSchemaPostProcessingInput = z.object({
       description: 'Red channel shift direction',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   vertex_x: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -25984,10 +25451,7 @@ export const zSchemaNafnetDenoiseInput = z.object({
       description: 'seed to be used for generation',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26006,10 +25470,7 @@ export const zSchemaNafnetDeblurInput = z.object({
       description: 'seed to be used for generation',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26028,10 +25489,7 @@ export const zSchemaDrctSuperResolutionInput = z.object({
       description: 'Upscaling factor.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26067,10 +25525,7 @@ export const zSchemaSam2AutoSegmentInput = z.object({
       }),
     )
     .default(100),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -26111,10 +25566,7 @@ export const zSchemaDdcolorInput = z.object({
       description: 'seed to be used for generation',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26189,10 +25641,7 @@ export const zSchemaEvfSamInput = z.object({
         'Areas to exclude from segmentation (will be subtracted from prompt results)',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26246,10 +25695,7 @@ export const zSchemaIdeogramV2aTurboRemixInput = z.object({
       }),
     )
     .default(true),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -26319,10 +25765,7 @@ export const zSchemaIdeogramV2aRemixInput = z.object({
       }),
     )
     .default(true),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -26364,10 +25807,7 @@ export const zSchemaSwin2SrInput = z.object({
       description: 'seed to be used for generation',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26392,10 +25832,7 @@ export const zSchemaDocresInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26415,10 +25852,7 @@ export const zSchemaDocresDewarpInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26460,10 +25894,7 @@ export const zSchemaJuggernautFluxBaseImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -26549,10 +25980,7 @@ export const zSchemaJuggernautFluxProImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -26646,10 +26074,7 @@ export const zSchemaInvisibleWatermarkInput = z.object({
       }),
     )
     .default(0),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26669,10 +26094,7 @@ export const zSchemaGeminiFlashEditInput = z.object({
   prompt: z.string().min(3).max(5000).register(z.globalRegistry, {
     description: 'The prompt for image generation or editing',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26693,7 +26115,7 @@ export const zSchemaGeminiFlashEditMultiInput = z.object({
     description: 'The prompt for image generation or editing',
   }),
   input_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
+    .array(z.string())
     .min(1)
     .max(10)
     .register(z.globalRegistry, {
@@ -26722,10 +26144,7 @@ export const zSchemaMixDehazeNetInput = z.object({
       description: 'seed to be used for generation',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26758,10 +26177,7 @@ export const zSchemaTheraInput = z.object({
   backbone: z.enum(['edsr', 'rdn']).register(z.globalRegistry, {
     description: 'Backbone to use for upscaling',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26783,10 +26199,7 @@ export const zSchemaGhiblifyInput = z.object({
     )
     .default(true),
   seed: z.optional(z.union([z.int(), z.unknown()])),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26809,10 +26222,7 @@ export const zSchemaStarVectorInput = z.object({
       description: 'seed to be used for generation',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26842,10 +26252,7 @@ export const zSchemaFinegrainEraserInput = z.object({
       description: 'Random seed for reproducible generation',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26910,10 +26317,7 @@ export const zSchemaFinegrainEraserBboxInput = z.object({
     description:
       'List of bounding box coordinates to erase (only one box prompt is supported)',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26940,14 +26344,8 @@ export const zSchemaFinegrainEraserMaskInput = z.object({
       description: 'Random seed for reproducible generation',
     }),
   ),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26981,10 +26379,7 @@ export const zSchemaCartoonifyInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   guidance_scale: z
     .optional(
       z.number().gte(0).lte(20).register(z.globalRegistry, {
@@ -27081,10 +26476,7 @@ export const zSchemaInstantCharacterInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -27177,10 +26569,7 @@ export const zSchemaPlushifyInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   scale: z
     .optional(
       z.number().gte(0.1).lte(2).register(z.globalRegistry, {
@@ -27349,10 +26738,7 @@ export const zSchemaJuggernautFluxLoraInpaintingInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -27392,10 +26778,7 @@ export const zSchemaJuggernautFluxLoraInpaintingInput = z.object({
       }),
     )
     .default(28),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -27469,12 +26852,10 @@ export const zSchemaGptImage1EditImageInput = z.object({
       }),
     )
     .default(false),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images to use as a reference for the generation.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images to use as a reference for the generation.',
+  }),
 })
 
 /**
@@ -27529,11 +26910,9 @@ export const zSchemaUnoInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  input_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'URL of images to use while generating the image.',
-    }),
+  input_image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'URL of images to use while generating the image.',
+  }),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -27623,10 +27002,7 @@ export const zSchemaImage2SvgInput = z.object({
       }),
     )
     .default(4),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   mode: z.optional(
     z.enum(['spline', 'polygon']).register(z.globalRegistry, {
       description: 'Mode: spline (curved) or polygon (straight lines)',
@@ -27694,10 +27070,7 @@ export const zSchemaStep1xEditInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -27860,16 +27233,10 @@ export const zSchemaIdeogramV3EditInput = z.object({
     .default(false),
   color_palette: z.optional(z.union([zSchemaColorPalette, z.unknown()])),
   style_codes: z.optional(z.union([z.array(z.string()), z.unknown()])),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   seed: z.optional(z.union([z.int(), z.unknown()])),
   image_urls: z.optional(z.union([z.array(z.string()), z.unknown()])),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -27935,10 +27302,7 @@ export const zSchemaIdeogramV3RemixInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -28078,10 +27442,7 @@ export const zSchemaIdeogramV3ReplaceBackgroundInput = z.object({
     .default(false),
   color_palette: z.optional(z.union([zSchemaColorPalette, z.unknown()])),
   style_codes: z.optional(z.union([z.array(z.string()), z.unknown()])),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   seed: z.optional(z.union([z.int(), z.unknown()])),
   image_urls: z.optional(z.union([z.array(z.string()), z.unknown()])),
 })
@@ -28205,10 +27566,7 @@ export const zSchemaIdeogramV3ReframeInput = z.object({
     .default(false),
   color_palette: z.optional(z.union([zSchemaColorPalette, z.unknown()])),
   style_codes: z.optional(z.union([z.array(z.string()), z.unknown()])),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   seed: z.optional(z.union([z.int(), z.unknown()])),
   image_urls: z.optional(z.union([z.array(z.string()), z.unknown()])),
 })
@@ -28265,10 +27623,7 @@ export const zSchemaHidreamI1FullImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -28367,10 +27722,7 @@ export const zSchemaMinimaxImage01SubjectReferenceInput = z.object({
   prompt: z.string().min(1).max(1500).register(z.globalRegistry, {
     description: 'Text prompt for image generation (max 1500 characters)',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -28488,10 +27840,7 @@ export const zSchemaRecraftV3ImageToImageInput = z.object({
       description: 'The ID of the custom style reference (optional)',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -28548,10 +27897,7 @@ export const zSchemaRecraftUpscaleCrispInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -28580,10 +27926,7 @@ export const zSchemaRecraftUpscaleCreativeInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -28597,10 +27940,7 @@ export const zSchemaRembgEnhanceOutput = z.object({
  * ImageInput
  */
 export const zSchemaRembgEnhanceInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -28650,10 +27990,7 @@ export const zSchemaBagelEditInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -28723,10 +28060,7 @@ export const zSchemaFluxKontextDevInput = z.object({
       description: 'Output format',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -28797,11 +28131,9 @@ export const zSchemaFalToolkitImageImageImage = z
       }),
     ),
     file_data: z.optional(
-      z
-        .union([z.instanceof(Blob), z.instanceof(File)])
-        .register(z.globalRegistry, {
-          description: 'File data',
-        }),
+      z.string().register(z.globalRegistry, {
+        description: 'File data',
+      }),
     ),
   })
   .register(z.globalRegistry, {
@@ -28854,10 +28186,7 @@ export const zSchemaFluxProKontextMaxInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -28971,11 +28300,9 @@ export const zSchemaFluxProKontextMultiInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'Image prompt for the omni model.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'Image prompt for the omni model.',
+  }),
   enhance_prompt: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29061,11 +28388,9 @@ export const zSchemaFluxProKontextMaxMultiInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'Image prompt for the omni model.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'Image prompt for the omni model.',
+  }),
   enhance_prompt: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29106,10 +28431,7 @@ export const zSchemaImageEditingAgeProgressionInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29178,10 +28500,7 @@ export const zSchemaImageEditingBackgroundChangeInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29243,10 +28562,7 @@ export const zSchemaImageEditingCartoonifyInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29308,10 +28624,7 @@ export const zSchemaImageEditingColorCorrectionInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29380,10 +28693,7 @@ export const zSchemaImageEditingExpressionChangeInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29445,10 +28755,7 @@ export const zSchemaImageEditingFaceEnhancementInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29517,10 +28824,7 @@ export const zSchemaImageEditingHairChangeInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29589,10 +28893,7 @@ export const zSchemaImageEditingObjectRemovalInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29654,10 +28955,7 @@ export const zSchemaImageEditingProfessionalPhotoInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29726,10 +29024,7 @@ export const zSchemaImageEditingSceneCompositionInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29798,10 +29093,7 @@ export const zSchemaImageEditingStyleTransferInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29870,10 +29162,7 @@ export const zSchemaImageEditingTimeOfDayInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29942,10 +29231,7 @@ export const zSchemaImageEditingWeatherEffectInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -30020,10 +29306,7 @@ export const zSchemaImageEditingPhotoRestorationInput = z
         description: 'The format of the generated image.',
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     sync_mode: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -30101,10 +29384,7 @@ export const zSchemaImageEditingTextRemovalInput = z
         description: 'The format of the generated image.',
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     sync_mode: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -30190,10 +29470,7 @@ export const zSchemaFlux1DevImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -30290,10 +29567,7 @@ export const zSchemaFlux1DevReduxInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -30382,10 +29656,7 @@ export const zSchemaFlux1SchnellReduxInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -30454,10 +29725,7 @@ export const zSchemaLumaPhotonReframeInput = z.object({
       description: 'Y position of the grid for reframing',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   grid_position_x: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'X position of the grid for reframing',
@@ -30513,10 +29781,7 @@ export const zSchemaLumaPhotonFlashReframeInput = z.object({
       description: 'Y position of the grid for reframing',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   grid_position_x: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'X position of the grid for reframing',
@@ -30566,10 +29831,7 @@ export const zSchemaImageEditingBabyVersionInput = z
         description: 'The format of the generated image.',
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     sync_mode: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -30634,10 +29896,7 @@ export const zSchemaImageEditingReframeInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -30702,10 +29961,7 @@ export const zSchemaLumaPhotonModifyInput = z.object({
     description:
       'The strength of the initial image. Higher strength values are corresponding to more influence of the initial image on the output.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -30735,10 +29991,7 @@ export const zSchemaLumaPhotonFlashModifyInput = z.object({
     description:
       'The strength of the initial image. Higher strength values are corresponding to more influence of the initial image on the output.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -30752,10 +30005,7 @@ export const zSchemaFfmpegApiExtractFrameOutput = z.object({
  * FrameInput
  */
 export const zSchemaFfmpegApiExtractFrameInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   frame_type: z.optional(
     z.enum(['first', 'middle', 'last']).register(z.globalRegistry, {
       description:
@@ -30775,10 +30025,7 @@ export const zSchemaRecraftVectorizeOutput = z.object({
  * VectorizeInput
  */
 export const zSchemaRecraftVectorizeInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -30807,10 +30054,7 @@ export const zSchemaObjectRemovalInput = z.object({
   model: z.optional(
     z.enum(['low_quality', 'medium_quality', 'high_quality', 'best_quality']),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -30836,14 +30080,8 @@ export const zSchemaObjectRemovalMaskInput = z.object({
       }),
     )
     .default(15),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -30911,10 +30149,7 @@ export const zSchemaObjectRemovalBboxInput = z.object({
       }),
     )
     .default([]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -30949,10 +30184,7 @@ export const zSchemaPasdInput = z.object({
       }),
     )
     .default(''),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   steps: z
     .optional(
       z.int().gte(10).lte(50).register(z.globalRegistry, {
@@ -31040,10 +30272,7 @@ export const zSchemaChainOfZoomInput = z.object({
       }),
     )
     .default(''),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -31193,10 +30422,7 @@ export const zSchemaFluxKontextLoraInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -31266,10 +30492,7 @@ export const zSchemaImageEditingPlushieStyleInput = z
         }),
       )
       .default(1),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     sync_mode: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -31335,10 +30558,7 @@ export const zSchemaImageEditingWojakStyleInput = z
         }),
       )
       .default(1),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     sync_mode: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -31404,10 +30624,7 @@ export const zSchemaImageEditingBroccoliHaircutInput = z
         }),
       )
       .default(1),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     sync_mode: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -31510,10 +30727,7 @@ export const zSchemaTopazUpscaleImageInput = z.object({
         description: 'Model to use for image enhancement.',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   upscale_factor: z
     .optional(
       z.number().gte(1).lte(4).register(z.globalRegistry, {
@@ -31555,10 +30769,7 @@ export const zSchemaImageEditingYoutubeThumbnailsInput = z
         }),
       )
       .default(0.5),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     sync_mode: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -31633,10 +30844,7 @@ export const zSchemaPostProcessingBlurInput = z.object({
       description: 'Type of blur to apply',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -31681,10 +30889,7 @@ export const zSchemaPostProcessingChromaticAberrationInput = z.object({
       description: 'Red channel shift direction',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   green_shift: z
     .optional(
       z.int().gte(-20).lte(20).register(z.globalRegistry, {
@@ -31742,10 +30947,7 @@ export const zSchemaPostProcessingColorCorrectionInput = z.object({
       }),
     )
     .default(0),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -31796,10 +30998,7 @@ export const zSchemaPostProcessingColorTintInput = z.object({
         description: 'Tint color mode',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -31834,10 +31033,7 @@ export const zSchemaPostProcessingDesaturateInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -31860,14 +31056,8 @@ export const zSchemaPostProcessingDissolveInput = z.object({
       }),
     )
     .default(0.5),
-  dissolve_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  dissolve_image_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -31906,10 +31096,7 @@ export const zSchemaPostProcessingDodgeBurnInput = z.object({
       }),
     )
     .default(0.5),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -31946,10 +31133,7 @@ export const zSchemaPostProcessingGrainInput = z.object({
       }),
     )
     .default(10),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -31986,10 +31170,7 @@ export const zSchemaPostProcessingParabolizeInput = z.object({
       }),
     )
     .default(0.5),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -32031,10 +31212,7 @@ export const zSchemaPostProcessingSharpenInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   smart_sharpen_strength: z
     .optional(
       z.number().gte(0).lte(25).register(z.globalRegistry, {
@@ -32085,10 +31263,7 @@ export const zSchemaPostProcessingSolarizeInput = z.object({
       }),
     )
     .default(0.5),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -32111,10 +31286,7 @@ export const zSchemaPostProcessingVignetteInput = z.object({
       }),
     )
     .default(0.5),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -32140,10 +31312,7 @@ export const zSchemaImageEditingRealismInput = z
         }),
       )
       .default(0.6),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     sync_mode: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -32250,9 +31419,7 @@ export const zSchemaBriaReimagineInput = z.object({
       }),
     )
     .default(30),
-  structure_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  structure_image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -32301,19 +31468,12 @@ export const zSchemaCalligrapherInput = z.object({
       }),
     )
     .default(false),
-  reference_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
-  source_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  reference_image_url: z.optional(z.union([z.string(), z.string()])),
+  source_image_url: z.union([z.string(), z.string()]),
   prompt: z.string().register(z.globalRegistry, {
     description: 'Text prompt to inpaint or customize',
   }),
-  mask_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_image_url: z.optional(z.union([z.string(), z.string()])),
   source_text: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -32392,11 +31552,9 @@ export const zSchemaVideoFile = z.object({
     }),
   ),
   file_data: z.optional(
-    z
-      .union([z.instanceof(Blob), z.instanceof(File)])
-      .register(z.globalRegistry, {
-        description: 'File data',
-      }),
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
   ),
 })
 
@@ -32468,14 +31626,8 @@ export const zSchemaFilmInput = z.object({
       }),
     )
     .default(8),
-  start_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  end_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  start_image_url: z.union([z.string(), z.string()]),
+  end_image_url: z.union([z.string(), z.string()]),
   image_format: z.optional(
     z.enum(['png', 'jpeg']).register(z.globalRegistry, {
       description:
@@ -32552,20 +31704,14 @@ export const zSchemaRifeInput = z.object({
       }),
     )
     .default(1),
-  end_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  end_image_url: z.union([z.string(), z.string()]),
   output_type: z.optional(
     z.enum(['images', 'video']).register(z.globalRegistry, {
       description:
         'The type of output to generate; either individual images or a video.',
     }),
   ),
-  start_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  start_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -32624,10 +31770,7 @@ export const zSchemaHidreamE11Input = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -32696,10 +31839,7 @@ export const zSchemaImageEditingRetouchInput = z
         }),
       )
       .default(1),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     sync_mode: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -32756,10 +31896,7 @@ export const zSchemaHunyuanWorldInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The prompt to use for the panorama generation.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -32795,10 +31932,7 @@ export const zSchemaFluxKontextLoraInpaintInput = z.object({
         'The speed of the generation. The higher the speed, the faster the generation.',
     }),
   ),
-  reference_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  reference_image_url: z.union([z.string(), z.string()]),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -32834,10 +31968,7 @@ export const zSchemaFluxKontextLoraInpaintInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -32861,10 +31992,7 @@ export const zSchemaFluxKontextLoraInpaintInput = z.object({
       }),
     )
     .default(30),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -32928,10 +32056,7 @@ export const zSchemaFlux1KreaReduxInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -33010,10 +32135,7 @@ export const zSchemaFlux1KreaImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -33110,10 +32232,7 @@ export const zSchemaFluxKreaReduxInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -33192,10 +32311,7 @@ export const zSchemaFluxKreaImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -33290,10 +32406,7 @@ export const zSchemaFluxKreaLoraImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -33401,10 +32514,7 @@ export const zSchemaFluxKreaLoraInpaintingInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -33444,10 +32554,7 @@ export const zSchemaFluxKreaLoraInpaintingInput = z.object({
       }),
     )
     .default(28),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -33514,19 +32621,15 @@ export const zSchemaIdeogramCharacterRemixInput = z.object({
     }),
   ),
   reference_mask_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'A set of masks to apply to the character references. Currently only 1 mask is supported, rest will be ignored. (maximum total size 10MB across all character references). The masks should be in JPEG, PNG or WebP format',
-      }),
-  ),
-  reference_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
+    z.array(z.string()).register(z.globalRegistry, {
       description:
-        'A set of images to use as character references. Currently only 1 image is supported, rest will be ignored. (maximum total size 10MB across all character references). The images should be in JPEG, PNG or WebP format',
+        'A set of masks to apply to the character references. Currently only 1 mask is supported, rest will be ignored. (maximum total size 10MB across all character references). The masks should be in JPEG, PNG or WebP format',
     }),
+  ),
+  reference_image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'A set of images to use as character references. Currently only 1 image is supported, rest will be ignored. (maximum total size 10MB across all character references). The images should be in JPEG, PNG or WebP format',
+  }),
   image_urls: z.optional(z.union([z.array(z.string()), z.unknown()])),
   negative_prompt: z
     .optional(
@@ -33543,10 +32646,7 @@ export const zSchemaIdeogramCharacterRemixInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -33618,19 +32718,15 @@ export const zSchemaIdeogramCharacterInput = z.object({
     }),
   ),
   reference_mask_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'A set of masks to apply to the character references. Currently only 1 mask is supported, rest will be ignored. (maximum total size 10MB across all character references). The masks should be in JPEG, PNG or WebP format',
-      }),
-  ),
-  reference_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
+    z.array(z.string()).register(z.globalRegistry, {
       description:
-        'A set of images to use as character references. Currently only 1 image is supported, rest will be ignored. (maximum total size 10MB across all character references). The images should be in JPEG, PNG or WebP format',
+        'A set of masks to apply to the character references. Currently only 1 mask is supported, rest will be ignored. (maximum total size 10MB across all character references). The masks should be in JPEG, PNG or WebP format',
     }),
+  ),
+  reference_image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'A set of images to use as character references. Currently only 1 image is supported, rest will be ignored. (maximum total size 10MB across all character references). The images should be in JPEG, PNG or WebP format',
+  }),
   image_urls: z.optional(z.union([z.array(z.string()), z.unknown()])),
   negative_prompt: z
     .optional(
@@ -33697,19 +32793,15 @@ export const zSchemaIdeogramCharacterEditInput = z.object({
     }),
   ),
   reference_mask_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'A set of masks to apply to the character references. Currently only 1 mask is supported, rest will be ignored. (maximum total size 10MB across all character references). The masks should be in JPEG, PNG or WebP format',
-      }),
-  ),
-  reference_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
+    z.array(z.string()).register(z.globalRegistry, {
       description:
-        'A set of images to use as character references. Currently only 1 image is supported, rest will be ignored. (maximum total size 10MB across all character references). The images should be in JPEG, PNG or WebP format',
+        'A set of masks to apply to the character references. Currently only 1 mask is supported, rest will be ignored. (maximum total size 10MB across all character references). The masks should be in JPEG, PNG or WebP format',
     }),
+  ),
+  reference_image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'A set of images to use as character references. Currently only 1 image is supported, rest will be ignored. (maximum total size 10MB across all character references). The images should be in JPEG, PNG or WebP format',
+  }),
   image_urls: z.optional(z.union([z.array(z.string()), z.unknown()])),
   num_images: z
     .optional(
@@ -33718,10 +32810,7 @@ export const zSchemaIdeogramCharacterEditInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -33733,10 +32822,7 @@ export const zSchemaIdeogramCharacterEditInput = z.object({
   color_palette: z.optional(z.union([zSchemaColorPalette, z.unknown()])),
   style_codes: z.optional(z.union([z.array(z.string()), z.unknown()])),
   seed: z.optional(z.union([z.int(), z.unknown()])),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -33797,10 +32883,7 @@ export const zSchemaQwenImageEditInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -33880,10 +32963,7 @@ export const zSchemaNextstep1Input = z.object({
     description:
       "The negative prompt to use. Use it to address details that you don't want\n            in the image. This could be colors, objects, scenery and even the small details\n        ",
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -33944,12 +33024,10 @@ export const zSchemaNanoBananaEditInput = z.object({
       }),
     )
     .default(false),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images to use for image-to-image generation or image editing.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images to use for image-to-image generation or image editing.',
+  }),
   limit_generations: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -34162,10 +33240,7 @@ export const zSchemaQwenImageImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -34255,12 +33330,10 @@ export const zSchemaGemini25FlashImageEditInput = z.object({
       }),
     )
     .default(false),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images to use for image-to-image generation or image editing.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images to use for image-to-image generation or image editing.',
+  }),
   limit_generations: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -34339,12 +33412,10 @@ export const zSchemaUsoInput = z.object({
       }),
     )
     .default(false),
-  input_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'List of image URLs in order: [content_image, style_image, extra_style_image].',
-    }),
+  input_image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'List of image URLs in order: [content_image, style_image, extra_style_image].',
+  }),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -34477,10 +33548,7 @@ export const zSchemaWanV22A14bImageToImageInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -34599,12 +33667,10 @@ export const zSchemaBytedanceSeedreamV4EditInput = z.object({
         'Random seed to control the stochasticity of image generation.',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'List of URLs of input images for editing. Presently, up to 10 image inputs are allowed. If over 10 images are sent, only the last 10 will be used.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'List of URLs of input images for editing. Presently, up to 10 image inputs are allowed. If over 10 images are sent, only the last 10 will be used.',
+  }),
 })
 
 /**
@@ -34626,12 +33692,10 @@ export const zSchemaViduReferenceToImageInput = z.object({
       description: 'The aspect ratio of the output video',
     }),
   ),
-  reference_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'URLs of the reference images to use for consistent subject appearance',
-    }),
+  reference_image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'URLs of the reference images to use for consistent subject appearance',
+  }),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'Random seed for generation',
@@ -34697,10 +33761,7 @@ export const zSchemaQwenImageEditLoraInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -34799,10 +33860,7 @@ export const zSchemaFlux1SrpoImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -34889,10 +33947,7 @@ export const zSchemaFluxSrpoImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -35014,10 +34069,7 @@ export const zSchemaQwenImageEditInpaintInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -35039,10 +34091,7 @@ export const zSchemaQwenImageEditInpaintInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  mask_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.union([z.string(), z.string()]),
   num_inference_steps: z
     .optional(
       z.int().gte(2).lte(50).register(z.globalRegistry, {
@@ -35102,10 +34151,7 @@ export const zSchemaImageAppsV2MakeupApplicationInput = z.object({
       'artistic',
     ]),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35124,10 +34170,7 @@ export const zSchemaImageAppsV2AgeModifyOutput = z.object({
  * AgeModifyInput
  */
 export const zSchemaImageAppsV2AgeModifyInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   aspect_ratio: z.optional(zSchemaAspectRatio),
   preserve_identity: z.optional(z.boolean()).default(true),
   target_age: z.optional(z.int().gte(6).lte(100)).default(30),
@@ -35186,10 +34229,7 @@ export const zSchemaImageAppsV2CityTeleportInput = z.object({
         description: 'Camera angle for the shot',
       }),
   ),
-  person_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  person_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35233,10 +34273,7 @@ export const zSchemaImageAppsV2ExpressionChangeInput = z.object({
       'thoughtful',
     ]),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35300,10 +34337,7 @@ export const zSchemaImageAppsV2HairChangeInput = z.object({
       'balayage',
     ]),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35326,10 +34360,7 @@ export const zSchemaImageAppsV2HeadshotPhotoInput = z.object({
   background_style: z.optional(
     z.enum(['professional', 'corporate', 'clean', 'gradient']),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35352,10 +34383,7 @@ export const zSchemaImageAppsV2ObjectRemovalInput = z.object({
   object_to_remove: z.string().register(z.globalRegistry, {
     description: 'Object to remove',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35388,10 +34416,7 @@ export const zSchemaImageAppsV2PerspectiveInput = z.object({
       'three_quarter_right',
     ]),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35431,10 +34456,7 @@ export const zSchemaImageAppsV2PhotographyEffectsInput = z.object({
     ]),
   ),
   aspect_ratio: z.optional(zSchemaAspectRatio),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35454,10 +34476,7 @@ export const zSchemaImageAppsV2PortraitEnhanceOutput = z.object({
  */
 export const zSchemaImageAppsV2PortraitEnhanceInput = z.object({
   aspect_ratio: z.optional(zSchemaAspectRatio),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35480,10 +34499,7 @@ export const zSchemaImageAppsV2PhotoRestorationInput = z.object({
   aspect_ratio: z.optional(zSchemaAspectRatio),
   remove_scratches: z.optional(z.boolean()).default(true),
   fix_colors: z.optional(z.boolean()).default(true),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35534,10 +34550,7 @@ export const zSchemaImageAppsV2StyleTransferInput = z.object({
   ),
   aspect_ratio: z.optional(zSchemaAspectRatio),
   style_reference_image_url: z.optional(z.union([z.string(), z.unknown()])),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35579,10 +34592,7 @@ export const zSchemaImageAppsV2RelightingInput = z.object({
       'ambient',
     ]),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35628,10 +34638,7 @@ export const zSchemaImageAppsV2TextureTransformInput = z.object({
     ]),
   ),
   aspect_ratio: z.optional(zSchemaAspectRatio),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35652,14 +34659,8 @@ export const zSchemaImageAppsV2VirtualTryOnOutput = z.object({
 export const zSchemaImageAppsV2VirtualTryOnInput = z.object({
   preserve_pose: z.optional(z.boolean()).default(true),
   aspect_ratio: z.optional(zSchemaAspectRatio),
-  clothing_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  person_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  clothing_image_url: z.union([z.string(), z.string()]),
+  person_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35679,10 +34680,7 @@ export const zSchemaImageAppsV2ProductPhotographyOutput = z.object({
  */
 export const zSchemaImageAppsV2ProductPhotographyInput = z.object({
   aspect_ratio: z.optional(zSchemaAspectRatio),
-  product_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  product_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35702,14 +34700,8 @@ export const zSchemaImageAppsV2ProductHoldingOutput = z.object({
  */
 export const zSchemaImageAppsV2ProductHoldingInput = z.object({
   aspect_ratio: z.optional(zSchemaAspectRatio),
-  product_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  person_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  product_image_url: z.union([z.string(), z.string()]),
+  person_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -35750,10 +34742,7 @@ export const zSchemaSeedvrUpscaleImageInput = z.object({
         'The target resolution to upscale to when `upscale_mode` is `target`.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -35860,11 +34849,9 @@ export const zSchemaQwenImageEditPlusInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'The URLs of the images to edit.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'The URLs of the images to edit.',
+  }),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -35949,12 +34936,10 @@ export const zSchemaWan25PreviewImageToImageInput = z
           'Random seed for reproducibility. If None, a random seed is chosen.',
       }),
     ),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URLs of images to edit. For single-image editing, provide 1 URL. For multi-reference generation, provide up to 2 URLs. If more than 2 URLs are provided, only the first 2 will be used.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URLs of images to edit. For single-image editing, provide 1 URL. For multi-reference generation, provide up to 2 URLs. If more than 2 URLs are provided, only the first 2 will be used.',
+    }),
     negative_prompt: z.optional(
       z.string().register(z.globalRegistry, {
         description:
@@ -36024,10 +35009,7 @@ export const zSchemaQwenImageEditImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -36112,10 +35094,7 @@ export const zSchemaLucidfluxInput = z.object({
       }),
     )
     .default(1024),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   target_width: z
     .optional(
       z.int().gte(512).lte(1024).register(z.globalRegistry, {
@@ -36236,11 +35215,9 @@ export const zSchemaQwenImageEditPlusLoraInput = z.object({
       }),
     )
     .default(28),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'The URLs of the images to edit.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'The URLs of the images to edit.',
+  }),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -36270,11 +35247,9 @@ export const zSchemaDreamomni2EditInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The prompt to edit the image.',
   }),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'List of URLs of input images for editing.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'List of URLs of input images for editing.',
+  }),
 })
 
 /**
@@ -36388,10 +35363,7 @@ export const zSchemaImage2PixelInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   background_mode: z.optional(
     z.enum(['edges', 'corners', 'midpoints']).register(z.globalRegistry, {
       description:
@@ -36460,10 +35432,7 @@ export const zSchemaReveEditInput = z
         description: 'Output format for the generated image.',
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
   })
   .register(z.globalRegistry, {
     description: 'Input for Reve image editing',
@@ -36518,12 +35487,10 @@ export const zSchemaReveRemixInput = z
         }),
       )
       .default(false),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'List of URLs of reference images. Must provide between 1 and 6 images (inclusive). Each image must be less than 10 MB. Supports PNG, JPEG, WebP, AVIF, and HEIF formats.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'List of URLs of reference images. Must provide between 1 and 6 images (inclusive). Each image must be less than 10 MB. Supports PNG, JPEG, WebP, AVIF, and HEIF formats.',
+    }),
     output_format: z.optional(
       z.enum(['png', 'jpeg', 'webp']).register(z.globalRegistry, {
         description: 'Output format for the generated image.',
@@ -36587,12 +35554,10 @@ export const zSchemaGptImage1MiniEditInput = z.object({
       }),
     )
     .default(false),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images to use as a reference for the generation.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images to use as a reference for the generation.',
+  }),
 })
 
 /**
@@ -36643,10 +35608,7 @@ export const zSchemaChronoEditInput = z
         description: 'The format of the output image.',
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     turbo_mode: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -36753,10 +35715,7 @@ export const zSchemaEmu35ImageEditImageInput = z.object({
       description: 'The format of the output image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -36814,10 +35773,7 @@ export const zSchemaFluxVisionUpscalerInput = z.object({
       }),
     )
     .default(0.3),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   upscale_factor: z
     .optional(
       z.number().gte(1).lte(4).register(z.globalRegistry, {
@@ -36891,10 +35847,7 @@ export const zSchemaImageAppsV2OutpaintInput = z.object({
       description: 'The format of the output image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -36981,10 +35934,7 @@ export const zSchemaReveFastEditInput = z
         description: 'Output format for the generated image.',
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
   })
   .register(z.globalRegistry, {
     description: 'Input for Reve fast image editing',
@@ -37039,12 +35989,10 @@ export const zSchemaReveFastRemixInput = z
         }),
       )
       .default(false),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'List of URLs of reference images. Must provide between 1 and 6 images (inclusive). Each image must be less than 10 MB. Supports PNG, JPEG, WebP, AVIF, and HEIF formats.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'List of URLs of reference images. Must provide between 1 and 6 images (inclusive). Each image must be less than 10 MB. Supports PNG, JPEG, WebP, AVIF, and HEIF formats.',
+    }),
     output_format: z.optional(
       z.enum(['png', 'jpeg', 'webp']).register(z.globalRegistry, {
         description: 'Output format for the generated image.',
@@ -37149,12 +36097,10 @@ export const zSchemaQwenImageEditPlusLoraGalleryAddBackgroundInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'The URLs of the images to edit. Provide an image with a white or clean background.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'The URLs of the images to edit. Provide an image with a white or clean background.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -37270,12 +36216,10 @@ export const zSchemaQwenImageEditPlusLoraGalleryFaceToFullPortraitInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'The URL of the cropped face image. Provide a close-up face photo.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'The URL of the cropped face image. Provide a close-up face photo.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -37390,12 +36334,10 @@ export const zSchemaQwenImageEditPlusLoraGalleryGroupPhotoInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'The URLs of the images to combine into a group photo. Provide 2 or more individual portrait images.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'The URLs of the images to combine into a group photo. Provide 2 or more individual portrait images.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -37509,12 +36451,10 @@ export const zSchemaQwenImageEditPlusLoraGalleryIntegrateProductInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'The URL of the image with product to integrate into background.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'The URL of the image with product to integrate into background.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -37629,11 +36569,9 @@ export const zSchemaQwenImageEditPlusLoraGalleryNextSceneInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the image to create the next scene from.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the image to create the next scene from.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -37746,11 +36684,9 @@ export const zSchemaQwenImageEditPlusLoraGalleryRemoveElementInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the image containing elements to remove.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the image containing elements to remove.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -37849,11 +36785,9 @@ export const zSchemaQwenImageEditPlusLoraGalleryRemoveLightingInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the image with lighting/shadows to remove.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the image with lighting/shadows to remove.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -37966,12 +36900,10 @@ export const zSchemaQwenImageEditPlusLoraGalleryShirtDesignInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'The URLs of the images: first image is the person wearing a shirt, second image is the design/logo to put on the shirt.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'The URLs of the images: first image is the person wearing a shirt, second image is the design/logo to put on the shirt.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -38056,11 +36988,9 @@ export const zSchemaQwenImageEditPlusLoraGalleryMultipleAnglesInput = z
         }),
       )
       .default(true),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the image to adjust camera angle for.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the image to adjust camera angle for.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -38209,12 +37139,10 @@ export const zSchemaNanoBananaProEditInput = z.object({
       description: 'The seed for the random number generator.',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images to use for image-to-image generation or image editing.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images to use for image-to-image generation or image editing.',
+  }),
   limit_generations: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -38301,12 +37229,10 @@ export const zSchemaGemini3ProImagePreviewEditInput = z.object({
       description: 'The seed for the random number generator.',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images to use for image-to-image generation or image editing.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images to use for image-to-image generation or image editing.',
+  }),
   limit_generations: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -38398,10 +37324,7 @@ export const zSchemaSam3ImageInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -38510,10 +37433,7 @@ export const zSchemaSam3ImageRleInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -38619,10 +37539,7 @@ export const zSchemaChronoEditLoraGalleryUpscalerInput = z
         description: 'The format of the output image.',
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     sync_mode: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -38723,10 +37640,7 @@ export const zSchemaChronoEditLoraGalleryPaintbrushInput = z
         description: 'The format of the output image.',
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     sync_mode: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -38762,9 +37676,7 @@ export const zSchemaChronoEditLoraGalleryPaintbrushInput = z
         }),
       )
       .default(8),
-    mask_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    mask_url: z.optional(z.union([z.string(), z.string()])),
     seed: z.optional(
       z.int().register(z.globalRegistry, {
         description: 'The seed for the inference.',
@@ -38873,10 +37785,7 @@ export const zSchemaChronoEditLoraInput = z
         }),
       )
       .default(false),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     enable_prompt_expansion: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -38975,11 +37884,9 @@ export const zSchemaFlux2FlexEditInput = z.object({
       }),
     )
     .default(28),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'List of URLs of input images for editing',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'List of URLs of input images for editing',
+  }),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -39021,10 +37928,7 @@ export const zSchemaCrystalUpscalerInput = z.object({
       }),
     )
     .default(2),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -39113,12 +38017,10 @@ export const zSchemaFlux2LoraGalleryAddBackgroundInput = z
       )
       .default(2.5),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'The URLs of the images. Provide an image with a white or clean background.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'The URLs of the images. Provide an image with a white or clean background.',
+    }),
     enable_safety_checker: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -39222,11 +38124,9 @@ export const zSchemaFlux2LoraGalleryApartmentStagingInput = z
       )
       .default(2.5),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the empty room image to furnish.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the empty room image to furnish.',
+    }),
     enable_safety_checker: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -39333,11 +38233,9 @@ export const zSchemaFlux2LoraGalleryFaceToFullPortraitInput = z
       )
       .default(2.5),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the cropped face image.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the cropped face image.',
+    }),
     enable_safety_checker: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -39422,11 +38320,9 @@ export const zSchemaFlux2LoraGalleryMultipleAnglesInput = z
         }),
       )
       .default(true),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the image to adjust camera angle for.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the image to adjust camera angle for.',
+    }),
     zoom: z
       .optional(
         z.number().gte(0).lte(10).register(z.globalRegistry, {
@@ -39564,12 +38460,10 @@ export const zSchemaFlux2LoraGalleryVirtualTryonInput = z
       )
       .default(2.5),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'The URLs of the images for virtual try-on. Provide person image and clothing image.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'The URLs of the images for virtual try-on. Provide person image and clothing image.',
+    }),
     enable_safety_checker: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -39596,17 +38490,12 @@ export const zSchemaFlux2LoraGalleryVirtualTryonInput = z
  */
 export const zSchemaOmniImageElementInput = z.object({
   reference_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'Additional reference images from different angles. 1-3 images supported. At least one image is required.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'Additional reference images from different angles. 1-3 images supported. At least one image is required.',
+    }),
   ),
-  frontal_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  frontal_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -39665,12 +38554,10 @@ export const zSchemaKlingImageO1Input = z.object({
         'Elements (characters/objects) to include in the image. Reference in prompt as @Element1, @Element2, etc. Maximum 10 total (elements + reference images).',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'List of reference images. Reference images in prompt using @Image1, @Image2, etc. (1-indexed). Max 10 images.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'List of reference images. Reference images in prompt using @Image1, @Image2, etc. (1-indexed). Max 10 images.',
+  }),
 })
 
 /**
@@ -39692,12 +38579,10 @@ export const zSchemaViduQ2ReferenceToImageInput = z.object({
       description: 'The aspect ratio of the output video',
     }),
   ),
-  reference_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'URLs of the reference images to use for consistent subject appearance',
-    }),
+  reference_image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'URLs of the reference images to use for consistent subject appearance',
+  }),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'Random seed for generation',
@@ -39773,12 +38658,10 @@ export const zSchemaBytedanceSeedreamV45EditInput = z.object({
         'Random seed to control the stochasticity of image generation.',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'List of URLs of input images for editing. Presently, up to 10 image inputs are allowed. If over 10 images are sent, only the last 10 will be used.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'List of URLs of input images for editing. Presently, up to 10 image inputs are allowed. If over 10 images are sent, only the last 10 will be used.',
+  }),
 })
 
 /**
@@ -39825,10 +38708,7 @@ export const zSchemaLongcatImageEditInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -39926,10 +38806,7 @@ export const zSchemaZImageTurboImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -40035,10 +38912,7 @@ export const zSchemaZImageTurboImageToImageLoraInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -40172,10 +39046,7 @@ export const zSchemaZImageTurboControlnetInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -40307,10 +39178,7 @@ export const zSchemaZImageTurboControlnetLoraInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -40418,10 +39286,7 @@ export const zSchemaStepxEdit2Input = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -40591,10 +39456,7 @@ export const zSchemaMoondream3PreviewSegmentInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -40674,11 +39536,9 @@ export const zSchemaQwenImageEditPlusLoraGalleryLightingRestorationInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the image to restore lighting for.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the image to restore lighting for.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -40786,11 +39646,9 @@ export const zSchemaQwenImageEdit2509Input = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'The URLs of the images to edit.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'The URLs of the images to edit.',
+  }),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -40903,11 +39761,9 @@ export const zSchemaQwenImageEdit2509LoraInput = z.object({
       }),
     )
     .default(28),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'The URLs of the images to edit.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'The URLs of the images to edit.',
+  }),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -40987,11 +39843,9 @@ export const zSchemaQwenImageEdit2509LoraGalleryMultipleAnglesInput = z
         }),
       )
       .default(true),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the image to adjust camera angle for.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the image to adjust camera angle for.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -41158,11 +40012,9 @@ export const zSchemaQwenImageEdit2509LoraGalleryNextSceneInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the image to create the next scene from.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the image to create the next scene from.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -41277,12 +40129,10 @@ export const zSchemaQwenImageEdit2509LoraGalleryAddBackgroundInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'The URLs of the images to edit. Provide an image with a white or clean background.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'The URLs of the images to edit. Provide an image with a white or clean background.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -41398,12 +40248,10 @@ export const zSchemaQwenImageEdit2509LoraGalleryFaceToFullPortraitInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'The URL of the cropped face image. Provide a close-up face photo.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'The URL of the cropped face image. Provide a close-up face photo.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -41518,12 +40366,10 @@ export const zSchemaQwenImageEdit2509LoraGalleryGroupPhotoInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'The URLs of the images to combine into a group photo. Provide 2 or more individual portrait images.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'The URLs of the images to combine into a group photo. Provide 2 or more individual portrait images.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -41637,12 +40483,10 @@ export const zSchemaQwenImageEdit2509LoraGalleryIntegrateProductInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'The URL of the image with product to integrate into background.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'The URL of the image with product to integrate into background.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -41740,11 +40584,9 @@ export const zSchemaQwenImageEdit2509LoraGalleryLightingRestorationInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the image to restore lighting for.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the image to restore lighting for.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -41857,11 +40699,9 @@ export const zSchemaQwenImageEdit2509LoraGalleryRemoveElementInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the image containing elements to remove.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the image containing elements to remove.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -41960,11 +40800,9 @@ export const zSchemaQwenImageEdit2509LoraGalleryRemoveLightingInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the image with lighting/shadows to remove.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the image with lighting/shadows to remove.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -42077,12 +40915,10 @@ export const zSchemaQwenImageEdit2509LoraGalleryShirtDesignInput = z
       )
       .default(1),
     seed: z.optional(z.union([z.int(), z.unknown()])),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'The URLs of the images: first image is the person wearing a shirt, second image is the design/logo to put on the shirt.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'The URLs of the images: first image is the person wearing a shirt, second image is the design/logo to put on the shirt.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -42152,13 +40988,10 @@ export const zSchemaAiBabyAndAgingGeneratorSingleInput = z
         ]),
       ]),
     ),
-    id_image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .min(1)
-      .register(z.globalRegistry, {
-        description:
-          'List of ID images for single mode (or general reference images)',
-      }),
+    id_image_urls: z.array(z.string()).min(1).register(z.globalRegistry, {
+      description:
+        'List of ID images for single mode (or general reference images)',
+    }),
     output_format: z.optional(
       z.enum(['jpeg', 'png']).register(z.globalRegistry, {
         description:
@@ -42247,12 +41080,9 @@ export const zSchemaAiBabyAndAgingGeneratorMultiInput = z
         }),
       )
       .default(0.5),
-    mother_image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .min(1)
-      .register(z.globalRegistry, {
-        description: 'List of mother images for multi mode',
-      }),
+    mother_image_urls: z.array(z.string()).min(1).register(z.globalRegistry, {
+      description: 'List of mother images for multi mode',
+    }),
     output_format: z.optional(
       z.enum(['jpeg', 'png']).register(z.globalRegistry, {
         description:
@@ -42278,12 +41108,9 @@ export const zSchemaAiBabyAndAgingGeneratorMultiInput = z
       description:
         "Gender for the generated image. Choose from: 'male' or 'female'.",
     }),
-    father_image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .min(1)
-      .register(z.globalRegistry, {
-        description: 'List of father images for multi mode',
-      }),
+    father_image_urls: z.array(z.string()).min(1).register(z.globalRegistry, {
+      description: 'List of father images for multi mode',
+    }),
     seed: z.optional(z.union([z.int(), z.unknown()])),
   })
   .register(z.globalRegistry, {
@@ -42354,11 +41181,9 @@ export const zSchemaFlux2MaxEditInput = z.object({
       description: 'The seed to use for the generation.',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'List of URLs of input images for editing',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'List of URLs of input images for editing',
+  }),
 })
 
 /**
@@ -42435,12 +41260,10 @@ export const zSchemaFlux2TurboEditInput = z.object({
         'The seed to use for the generation. If not provided, a random seed will be used.',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images for editing. A maximum of 4 images are allowed, if more are provided, only the first 4 will be used.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images for editing. A maximum of 4 images are allowed, if more are provided, only the first 4 will be used.',
+  }),
   enable_prompt_expansion: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -42508,9 +41331,7 @@ export const zSchemaGptImage15EditInput = z.object({
       description: 'Background for the generated image',
     }),
   ),
-  mask_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_image_url: z.optional(z.union([z.string(), z.string()])),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -42519,12 +41340,10 @@ export const zSchemaGptImage15EditInput = z.object({
       }),
     )
     .default(false),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images to use as a reference for the generation.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images to use as a reference for the generation.',
+  }),
 })
 
 /**
@@ -42601,12 +41420,10 @@ export const zSchemaFlux2FlashEditInput = z.object({
         'The seed to use for the generation. If not provided, a random seed will be used.',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images for editing. A maximum of 4 images are allowed, if more are provided, only the first 4 will be used.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images for editing. A maximum of 4 images are allowed, if more are provided, only the first 4 will be used.',
+  }),
   enable_prompt_expansion: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -42672,10 +41489,7 @@ export const zSchemaZImageTurboInpaintInput = z.object({
       ]),
     ]),
   ),
-  mask_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_image_url: z.union([z.string(), z.string()]),
   control_end: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -42709,10 +41523,7 @@ export const zSchemaZImageTurboInpaintInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -42806,10 +41617,7 @@ export const zSchemaZImageTurboInpaintLoraInput = z.object({
       ]),
     ]),
   ),
-  mask_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_image_url: z.union([z.string(), z.string()]),
   loras: z
     .optional(
       z.array(zSchemaLoRaInput).register(z.globalRegistry, {
@@ -42850,10 +41658,7 @@ export const zSchemaZImageTurboInpaintLoraInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -42947,10 +41752,7 @@ export const zSchemaQwenImageLayeredInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -43080,11 +41882,9 @@ export const zSchemaQwenImageEdit2511Input = z.object({
       }),
     )
     .default(28),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'The URLs of the images to edit.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'The URLs of the images to edit.',
+  }),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -43164,12 +41964,10 @@ export const zSchemaV26ImageToImageInput = z
           'Random seed for reproducibility (0-2147483647). Same seed produces more consistent results.',
       }),
     ),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          "Reference images for editing (1-3 images required). Order matters: reference as 'image 1', 'image 2', 'image 3' in prompt. Resolution: 384-5000px each dimension. Max size: 10MB each. Formats: JPEG, JPG, PNG (no alpha), BMP, WEBP.",
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        "Reference images for editing (1-3 images required). Order matters: reference as 'image 1', 'image 2', 'image 3' in prompt. Resolution: 384-5000px each dimension. Max size: 10MB each. Formats: JPEG, JPG, PNG (no alpha), BMP, WEBP.",
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -43239,10 +42037,7 @@ export const zSchemaQwenImageLayeredLoraInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   loras: z
     .optional(
       z.array(zSchemaLoRaInput).register(z.globalRegistry, {
@@ -43308,10 +42103,7 @@ export const zSchemaAiHomeEditOutput = z.object({
  * ArchEditInput
  */
 export const zSchemaAiHomeEditInput = z.object({
-  input_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  input_image_url: z.union([z.string(), z.string()]),
   editing_type: z
     .enum(['structural editing', 'virtual staging', 'both'])
     .register(z.globalRegistry, {
@@ -43521,10 +42313,7 @@ export const zSchemaAiHomeStyleOutput = z.object({
  * ArchStyleInput
  */
 export const zSchemaAiHomeStyleInput = z.object({
-  input_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  input_image_url: z.union([z.string(), z.string()]),
   input_image_strength: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -43816,11 +42605,9 @@ export const zSchemaQwenImageEdit2511LoraInput = z.object({
       }),
     )
     .default(28),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'The URLs of the images to edit.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'The URLs of the images to edit.',
+  }),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -43905,11 +42692,9 @@ export const zSchemaQwenImageEdit2511MultipleAnglesInput = z
         }),
       )
       .default(true),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'The URL of the image to adjust camera angle for.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'The URL of the image to adjust camera angle for.',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -44069,12 +42854,10 @@ export const zSchemaGlmImageImageToImageInput = z.object({
         'Random seed for reproducibility. The same seed with the same prompt will produce the same image.',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'URL(s) of the condition image(s) for image-to-image generation. Supports up to 4 URLs for multi-image references.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'URL(s) of the condition image(s) for image-to-image generation. Supports up to 4 URLs for multi-image references.',
+  }),
   enable_prompt_expansion: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -44167,12 +42950,10 @@ export const zSchemaFlux2Klein9bEditInput = z.object({
       }),
     )
     .default(4),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images for editing. A maximum of 4 images are allowed.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images for editing. A maximum of 4 images are allowed.',
+  }),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -44255,12 +43036,10 @@ export const zSchemaFlux2Klein4bEditInput = z.object({
       }),
     )
     .default(4),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images for editing. A maximum of 4 images are allowed.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images for editing. A maximum of 4 images are allowed.',
+  }),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -44355,12 +43134,10 @@ export const zSchemaFlux2Klein9bBaseEditInput = z.object({
       }),
     )
     .default(28),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images for editing. A maximum of 4 images are allowed.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images for editing. A maximum of 4 images are allowed.',
+  }),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -44463,12 +43240,10 @@ export const zSchemaFlux2Klein4bBaseEditInput = z.object({
       }),
     )
     .default(28),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images for editing. A maximum of 4 images are allowed.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images for editing. A maximum of 4 images are allowed.',
+  }),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -44578,12 +43353,10 @@ export const zSchemaFlux2Klein4bBaseEditLoraInput = z.object({
       }),
     )
     .default(28),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images for editing. A maximum of 4 images are allowed.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images for editing. A maximum of 4 images are allowed.',
+  }),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -44693,12 +43466,10 @@ export const zSchemaFlux2Klein9bBaseEditLoraInput = z.object({
       }),
     )
     .default(28),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images for editing. A maximum of 4 images are allowed.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images for editing. A maximum of 4 images are allowed.',
+  }),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -44748,10 +43519,7 @@ export const zSchemaFiboEditColorizeInput = z.object({
     .register(z.globalRegistry, {
       description: 'Select the color palette or aesthetic for the output image',
     }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -44781,10 +43549,7 @@ export const zSchemaFiboEditBlendInput = z.object({
     description:
       'Instruct what elements you would like to blend in your image.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -44814,10 +43579,7 @@ export const zSchemaFiboEditAddObjectByTextInput = z.object({
     description:
       'The full natural language command describing what to add and where.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -44926,10 +43688,7 @@ export const zSchemaFiboEditEraseByTextInput = z.object({
   object_name: z.string().register(z.globalRegistry, {
     description: 'The name of the object to remove.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -44958,10 +43717,7 @@ export const zSchemaFiboEditRewriteTextInput = z.object({
   new_text: z.string().register(z.globalRegistry, {
     description: 'The new text string to appear in the image.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -45006,10 +43762,7 @@ export const zSchemaFiboEditRestyleInput = z.object({
     .register(z.globalRegistry, {
       description: 'Select the desired artistic style for the output image.',
     }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -45058,10 +43811,7 @@ export const zSchemaFiboEditRelightInput = z.object({
     z.enum(['front', 'side', 'bottom', 'top-down']),
     z.unknown(),
   ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -45092,10 +43842,7 @@ export const zSchemaFiboEditReseasonInput = z.object({
     .register(z.globalRegistry, {
       description: 'The desired season.',
     }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -45121,10 +43868,7 @@ export const zSchemaFiboEditRestoreOutput = z.object({
  * RestoreInput
  */
 export const zSchemaFiboEditRestoreInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -45150,10 +43894,7 @@ export const zSchemaFiboEditSketchToColoredImageOutput = z.object({
  * SketchColoredImageInput
  */
 export const zSchemaFiboEditSketchToColoredImageInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -45183,10 +43924,7 @@ export const zSchemaFiboEditReplaceObjectByTextInput = z.object({
     description:
       'The full natural language command describing what to replace.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -45210,14 +43948,8 @@ export const zSchemaAiFaceSwapFaceswapimageOutput = z
  */
 export const zSchemaAiFaceSwapFaceswapimageInput = z
   .object({
-    source_face_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
-    target_image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    source_face_url: z.union([z.string(), z.string()]),
+    target_image_url: z.union([z.string(), z.string()]),
   })
   .register(z.globalRegistry, {
     description: 'Input schema for image ↔ image face swap',
@@ -45313,10 +44045,7 @@ export const zSchemaClarityUpscalerInput = z.object({
       }),
     )
     .default(0.35),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   upscale_factor: z
     .optional(
       z.number().gte(1).lte(4).register(z.globalRegistry, {
@@ -45389,10 +44118,7 @@ export const zSchemaAuraSrInput = z.object({
       description: 'Upscaling factor. More coming soon.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -45440,10 +44166,7 @@ export const zSchemaFluxDevImageToImageInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -45549,11 +44272,9 @@ export const zSchemaFlux2ProEditInput = z.object({
       description: 'The seed to use for the generation.',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'List of URLs of input images for editing',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'List of URLs of input images for editing',
+  }),
 })
 
 /**
@@ -45642,12 +44363,10 @@ export const zSchemaFlux2EditInput = z.object({
         'The seed to use for the generation. If not provided, a random seed will be used.',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URLs of the images for editing. A maximum of 4 images are allowed, if more are provided, only the first 4 will be used.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URLs of the images for editing. A maximum of 4 images are allowed, if more are provided, only the first 4 will be used.',
+  }),
   enable_prompt_expansion: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -45759,12 +44478,10 @@ export const zSchemaFlux2LoraEditInput = z.object({
         'The seed to use for the generation. If not provided, a random seed will be used.',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'The URsL of the images for editing. A maximum of 3 images are allowed, if more are provided, only the first 3 will be used.',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'The URsL of the images for editing. A maximum of 3 images are allowed, if more are provided, only the first 3 will be used.',
+  }),
   enable_prompt_expansion: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -45828,10 +44545,7 @@ export const zSchemaFluxProKontextInput = z.object({
       description: 'The format of the generated image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {

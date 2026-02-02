@@ -429,10 +429,7 @@ export const zSchemaMinimaxVoiceCloneInput = z.object({
     .default(
       'Hello, this is a preview of your cloned voice! I hope you like it!',
     ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   accuracy: z.optional(
     z.number().gte(0).lte(1).register(z.globalRegistry, {
       description: 'Text validation accuracy threshold (0-1)',
@@ -472,9 +469,7 @@ export const zSchemaChatterboxTextToSpeechInput = z.object({
       }),
     )
     .default(0.25),
-  audio_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  audio_url: z.optional(z.union([z.string(), z.string()])),
   temperature: z
     .optional(
       z.number().gte(0.05).lte(2).register(z.globalRegistry, {
@@ -515,11 +510,9 @@ export const zSchemaAudio = z.object({
     description: 'The URL where the file can be downloaded from.',
   }),
   file_data: z.optional(
-    z
-      .union([z.instanceof(Blob), z.instanceof(File)])
-      .register(z.globalRegistry, {
-        description: 'File data',
-      }),
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
   ),
 })
 
@@ -586,9 +579,7 @@ export const zSchemaChatterboxhdTextToSpeechInput = z
             'The voice to use for the TTS request. If neither voice nor audio are provided, a random voice will be used.',
         }),
     ),
-    audio_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    audio_url: z.optional(z.union([z.string(), z.string()])),
     temperature: z
       .optional(
         z.number().gte(0.05).lte(5).register(z.globalRegistry, {
@@ -1191,13 +1182,8 @@ export const zSchemaIndexTts2TextToSpeechInput = z.object({
       }),
     )
     .default(1),
-  emotional_audio_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  emotional_audio_url: z.optional(z.union([z.string(), z.string()])),
+  audio_url: z.union([z.string(), z.string()]),
   emotion_prompt: z.optional(
     z.string().register(z.globalRegistry, {
       description:
@@ -1713,11 +1699,9 @@ export const zSchemaAudioFile = z.object({
     }),
   ),
   file_data: z.optional(
-    z
-      .union([z.instanceof(Blob), z.instanceof(File)])
-      .register(z.globalRegistry, {
-        description: 'File data',
-      }),
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
   ),
   channels: z.optional(
     z.int().register(z.globalRegistry, {
@@ -1764,7 +1748,7 @@ export const zSchemaQwen3TtsTextToSpeech06bInput = z.object({
     }),
   ),
   speaker_voice_embedding_file_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
+    z.union([z.string(), z.string()]),
   ),
   top_p: z
     .optional(
@@ -1895,7 +1879,7 @@ export const zSchemaQwen3TtsTextToSpeech17bInput = z.object({
     }),
   ),
   speaker_voice_embedding_file_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
+    z.union([z.string(), z.string()]),
   ),
   top_p: z
     .optional(
@@ -2120,13 +2104,8 @@ export const zSchemaChatterboxSpeechToSpeechOutput = z.object({
  * ChatterboxVCRequest
  */
 export const zSchemaChatterboxSpeechToSpeechInput = z.object({
-  source_audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  target_voice_audio_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  source_audio_url: z.union([z.string(), z.string()]),
+  target_voice_audio_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -2157,13 +2136,8 @@ export const zSchemaChatterboxhdSpeechToSpeechInput = z
         }),
       )
       .default(false),
-    target_voice_audio_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
-    source_audio_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    target_voice_audio_url: z.optional(z.union([z.string(), z.string()])),
+    source_audio_url: z.union([z.string(), z.string()]),
     target_voice: z.optional(
       z
         .enum([

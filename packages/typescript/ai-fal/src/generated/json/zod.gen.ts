@@ -361,10 +361,7 @@ export const zSchemaFfmpegApiMetadataInput = z.object({
       }),
     )
     .default(false),
-  media_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  media_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -406,10 +403,7 @@ export const zSchemaFfmpegApiWaveformInput = z.object({
       }),
     )
     .default(3),
-  media_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  media_url: z.union([z.string(), z.string()]),
   points_per_second: z
     .optional(
       z.number().gte(1).lte(10).register(z.globalRegistry, {
@@ -504,10 +498,7 @@ export const zSchemaFfmpegApiLoudnormInput = z.object({
       }),
     )
     .default(-0.1),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   integrated_loudness: z
     .optional(
       z.number().gte(-70).lte(-5).register(z.globalRegistry, {
@@ -554,10 +545,7 @@ export const zSchemaBagelUnderstandInput = z.object({
       description: 'The seed to use for the generation.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 export const zSchemaQueueStatus = z.object({

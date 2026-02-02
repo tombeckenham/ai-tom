@@ -137,7 +137,7 @@ export type SchemaFile = {
    *
    * File data
    */
-  file_data?: Blob | File
+  file_data?: string
 }
 
 /**

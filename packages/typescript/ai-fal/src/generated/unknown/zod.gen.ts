@@ -60,10 +60,7 @@ export const zSchemaRouterAudioInput = z.object({
       }),
     )
     .default(1),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -90,11 +87,9 @@ export const zSchemaFile = z.object({
     description: 'The URL where the file can be downloaded from.',
   }),
   file_data: z.optional(
-    z
-      .union([z.instanceof(Blob), z.instanceof(File)])
-      .register(z.globalRegistry, {
-        description: 'File data',
-      }),
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
   ),
 })
 
@@ -109,10 +104,7 @@ export const zSchemaQwen3TtsCloneVoice06bOutput = z.object({
  * Qwen3CloneVoiceInput
  */
 export const zSchemaQwen3TtsCloneVoice06bInput = z.object({
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   reference_text: z.optional(
     z.string().register(z.globalRegistry, {
       description:
@@ -132,10 +124,7 @@ export const zSchemaQwen3TtsCloneVoice17bOutput = z.object({
  * Qwen3CloneVoiceInput
  */
 export const zSchemaQwen3TtsCloneVoice17bInput = z.object({
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   reference_text: z.optional(
     z.string().register(z.globalRegistry, {
       description:
@@ -164,11 +153,9 @@ export const zSchemaWorkflowUtilitiesInterleaveVideoOutput = z
  */
 export const zSchemaWorkflowUtilitiesInterleaveVideoInput = z
   .object({
-    video_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'List of video URLs to interleave in order',
-      }),
+    video_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'List of video URLs to interleave in order',
+    }),
   })
   .register(z.globalRegistry, {
     description: 'Input model for interleaving multiple videos',

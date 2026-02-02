@@ -30,12 +30,10 @@ export const zSchemaRouterVideoInput = z.object({
     description: 'Prompt to be used for the video processing',
   }),
   video_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'List of URLs or data URIs of video files to process. Supported formats: mp4, mpeg, mov, webm. For Google Gemini on AI Studio, YouTube links are also supported. Mutually exclusive with video_url.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'List of URLs or data URIs of video files to process. Supported formats: mp4, mpeg, mov, webm. For Google Gemini on AI Studio, YouTube links are also supported. Mutually exclusive with video_url.',
+    }),
   ),
   system_prompt: z.optional(
     z.string().register(z.globalRegistry, {
@@ -88,12 +86,10 @@ export const zSchemaRouterVideoEnterpriseInput = z.object({
     description: 'Prompt to be used for the video processing',
   }),
   video_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'List of URLs or data URIs of video files to process. Supported formats: mp4, mpeg, mov, webm. For Google Gemini on AI Studio, YouTube links are also supported. Mutually exclusive with video_url.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'List of URLs or data URIs of video files to process. Supported formats: mp4, mpeg, mov, webm. For Google Gemini on AI Studio, YouTube links are also supported. Mutually exclusive with video_url.',
+    }),
   ),
   system_prompt: z.optional(
     z.string().register(z.globalRegistry, {
@@ -445,10 +441,7 @@ export const zSchemaWhisperInput = z.object({
         'Level of the chunks to return. Either none, segment or word. `none` would imply that all of the audio will be transcribed without the timestamp tokens, we suggest to switch to `none` if you are not satisfied with the transcription quality, since it will usually improve the quality of the results. Switching to `none` will also provide minor speed ups in the transcription due to less amount of generated tokens. Notice that setting to none will produce **a single chunk with the whole transcription**.',
     }),
   ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   diarize: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -718,10 +711,7 @@ export const zSchemaWizperInput = z.object({
       }),
     )
     .default('segment'),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   merge_chunks: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -770,10 +760,7 @@ export const zSchemaElevenlabsSpeechToTextOutput = z.object({
  */
 export const zSchemaElevenlabsSpeechToTextInput = z.object({
   language_code: z.optional(z.union([z.string(), z.unknown()])),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   diarize: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -810,10 +797,7 @@ export const zSchemaSpeechToTextOutput = z.object({
  * SpeechInput
  */
 export const zSchemaSpeechToTextInput = z.object({
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   use_pnc: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -830,10 +814,7 @@ export const zSchemaSpeechToTextStreamOutput = z.unknown()
  * SpeechInput
  */
 export const zSchemaSpeechToTextStreamInput = z.object({
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   use_pnc: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -850,10 +831,7 @@ export const zSchemaSpeechToTextTurboStreamOutput = z.unknown()
  * SpeechInput
  */
 export const zSchemaSpeechToTextTurboStreamInput = z.object({
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   use_pnc: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -884,10 +862,7 @@ export const zSchemaSpeechToTextTurboOutput = z.object({
  * SpeechInput
  */
 export const zSchemaSpeechToTextTurboInput = z.object({
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   use_pnc: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -917,10 +892,7 @@ export const zSchemaSmartTurnOutput = z.object({
  * SmartTurnInput
  */
 export const zSchemaSmartTurnInput = z.object({
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -953,10 +925,7 @@ export const zSchemaElevenlabsSpeechToTextScribeV2Input = z.object({
       }),
     )
     .default([]),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   diarize: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -1002,10 +971,7 @@ export const zSchemaSileroVadOutput = z.object({
  * SileroVADInput
  */
 export const zSchemaSileroVadInput = z.object({
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -1034,10 +1000,7 @@ export const zSchemaNemotronAsrInput = z.object({
         "Controls the speed/accuracy trade-off. 'none' = best accuracy (1.12s chunks, ~7.16% WER), 'low' = balanced (0.56s chunks, ~7.22% WER), 'medium' = faster (0.16s chunks, ~7.84% WER), 'high' = fastest (0.08s chunks, ~8.53% WER).",
     }),
   ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
 })
 
 export const zSchemaNemotronAsrStreamOutput = z.unknown()
@@ -1052,10 +1015,7 @@ export const zSchemaNemotronAsrStreamInput = z.object({
         "Controls the speed/accuracy trade-off. 'none' = best accuracy (1.12s chunks, ~7.16% WER), 'low' = balanced (0.56s chunks, ~7.22% WER), 'medium' = faster (0.16s chunks, ~7.84% WER), 'high' = fastest (0.08s chunks, ~8.53% WER).",
     }),
   ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
 })
 
 export const zSchemaQueueStatus = z.object({

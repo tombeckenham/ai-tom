@@ -45,10 +45,7 @@ export const zSchemaFastAnimatediffVideoToVideoInput = z.object({
     description:
       'The prompt to use for generating the image. Be as descriptive as possible for best results.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   first_n_seconds: z
     .optional(
       z.int().gte(2).lte(4).register(z.globalRegistry, {
@@ -135,10 +132,7 @@ export const zSchemaFastAnimatediffTurboVideoToVideoInput = z.object({
     description:
       'The prompt to use for generating the image. Be as descriptive as possible for best results.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   first_n_seconds: z
     .optional(
       z.int().gte(2).lte(12).register(z.globalRegistry, {
@@ -219,10 +213,7 @@ export const zSchemaAmtInterpolationOutput = z.object({
  * AMTInterpolationInput
  */
 export const zSchemaAmtInterpolationInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   recursive_interpolation_passes: z
     .optional(
       z.int().register(z.globalRegistry, {
@@ -324,10 +315,7 @@ export const zSchemaPointPrompt = z.object({
  * SAM2VideoRLEInput
  */
 export const zSchemaSam2VideoInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   prompts: z
     .optional(
       z.array(zSchemaPointPrompt).register(z.globalRegistry, {
@@ -342,9 +330,7 @@ export const zSchemaSam2VideoInput = z.object({
       }),
     )
     .default(false),
-  mask_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_url: z.optional(z.union([z.string(), z.string()])),
   apply_mask: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -379,10 +365,7 @@ export const zSchemaControlnextInput = z.object({
       }),
     )
     .default(1),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   fps: z
     .optional(
       z.int().gte(1).lte(60).register(z.globalRegistry, {
@@ -439,10 +422,7 @@ export const zSchemaControlnextInput = z.object({
       }),
     )
     .default(2),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   decode_chunk_size: z
     .optional(
       z.int().gte(1).lte(10).register(z.globalRegistry, {
@@ -525,10 +505,7 @@ export const zSchemaCogvideox5bVideoToVideoInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The prompt to generate the video from.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   use_rife: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -613,10 +590,7 @@ export const zSchemaVideoUpscalerOutput = z.object({
  * Input
  */
 export const zSchemaVideoUpscalerInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   scale: z
     .optional(
       z.number().gte(1).lte(8).register(z.globalRegistry, {
@@ -644,10 +618,7 @@ export const zSchemaDubbingInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   target_language: z.optional(
     z.enum(['hindi', 'turkish', 'english']).register(z.globalRegistry, {
       description: 'Target language to dub the video to',
@@ -676,10 +647,7 @@ export const zSchemaAutoCaptionInput = z.object({
       }),
     )
     .default('Standard'),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   top_align: z.optional(z.union([z.string(), z.number()])),
   txt_color: z
     .optional(
@@ -732,10 +700,7 @@ export const zSchemaSyncLipsyncInput = z.object({
         description: 'The model to use for lipsyncing',
       }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   sync_mode: z.optional(
     z
       .enum(['cut_off', 'loop', 'bounce', 'silence', 'remap'])
@@ -744,10 +709,7 @@ export const zSchemaSyncLipsyncInput = z.object({
           'Lipsync mode when audio and video durations are out of sync.',
       }),
   ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -828,10 +790,7 @@ export const zSchemaHunyuanVideoLoraVideoToVideoInput = z.object({
       description: 'The resolution of the video to generate.',
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -901,10 +860,7 @@ export const zSchemaHunyuanVideoVideoToVideoInput = z.object({
       description: 'The resolution of the video to generate.',
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -962,10 +918,7 @@ export const zSchemaBenV2VideoOutput = z.object({
  * Ben2InputVideo
  */
 export const zSchemaBenV2VideoInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'Random seed for reproducible generation.',
@@ -1000,10 +953,7 @@ export const zSchemaTopazUpscaleVideoInput = z.object({
       }),
     )
     .default(false),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   upscale_factor: z
     .optional(
       z.number().gte(1).lte(4).register(z.globalRegistry, {
@@ -1034,10 +984,7 @@ export const zSchemaLtxVideoV095ExtendOutput = z.object({
  * VideoConditioningInput
  */
 export const zSchemaVideoConditioningInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   start_frame_num: z.int().gte(0).lte(120).register(z.globalRegistry, {
     description:
       'Frame number of the video from which the conditioning starts. Must be a multiple of 8.',
@@ -1109,10 +1056,7 @@ export const zSchemaImageConditioningInput = z.object({
     description:
       'Frame number of the image from which the conditioning starts. Must be a multiple of 8.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -1200,10 +1144,7 @@ export const zSchemaPikaV2PikadditionsInput = z
         description: 'Text prompt describing what to add',
       }),
     ),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     seed: z.optional(
       z.int().register(z.globalRegistry, {
         description: 'The seed for the random number generator',
@@ -1214,10 +1155,7 @@ export const zSchemaPikaV2PikadditionsInput = z
         description: 'Negative prompt to guide the model',
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
   })
   .register(z.globalRegistry, {
     description: 'Request model for Pikadditions endpoint',
@@ -1234,10 +1172,7 @@ export const zSchemaLatentsyncOutput = z.object({
  * Input
  */
 export const zSchemaLatentsyncInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   guidance_scale: z
     .optional(
       z.number().gte(1).lte(2).register(z.globalRegistry, {
@@ -1251,10 +1186,7 @@ export const zSchemaLatentsyncInput = z.object({
         'Random seed for generation. If None, a random seed will be used.',
     }),
   ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   loop_mode: z.optional(
     z.enum(['pingpong', 'loop']).register(z.globalRegistry, {
       description:
@@ -1280,10 +1212,7 @@ export const zSchemaSyncLipsyncV2Input = z.object({
         'The model to use for lipsyncing. `lipsync-2-pro` will cost roughly 1.67 times as much as `lipsync-2` for the same duration.',
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   sync_mode: z.optional(
     z
       .enum(['cut_off', 'loop', 'bounce', 'silence', 'remap'])
@@ -1292,10 +1221,7 @@ export const zSchemaSyncLipsyncV2Input = z.object({
           'Lipsync mode when audio and video durations are out of sync.',
       }),
   ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -1325,9 +1251,7 @@ export const zSchemaVideo = z
     url: z.string().register(z.globalRegistry, {
       description: 'The URL where the file can be downloaded from.',
     }),
-    file_data: z.optional(
-      z.union([z.union([z.instanceof(Blob), z.instanceof(File)]), z.unknown()]),
-    ),
+    file_data: z.optional(z.union([z.string(), z.unknown()])),
   })
   .register(z.globalRegistry, {
     description: 'Represents a video file.',
@@ -1368,19 +1292,15 @@ export const zSchemaWanVaceInput = z.object({
       }),
     )
     .default(5),
-  video_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  video_url: z.optional(z.union([z.string(), z.string()])),
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt to guide video generation.',
   }),
   ref_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'Urls to source reference image. If provided, the model will use this image as reference.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'Urls to source reference image. If provided, the model will use this image as reference.',
+    }),
   ),
   task: z.optional(
     z.enum(['depth', 'inpainting']).register(z.globalRegistry, {
@@ -1395,9 +1315,7 @@ export const zSchemaWanVaceInput = z.object({
       }),
     )
     .default(16),
-  mask_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_image_url: z.optional(z.union([z.string(), z.string()])),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -1432,9 +1350,7 @@ export const zSchemaWanVaceInput = z.object({
       description: 'Resolution of the generated video (480p,580p, or 720p).',
     }),
   ),
-  mask_video_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_video_url: z.optional(z.union([z.string(), z.string()])),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -1494,10 +1410,7 @@ export const zSchemaMagiDistilledExtendVideoInput = z.object({
         "Aspect ratio of the generated video. If 'auto', the aspect ratio will be determined automatically based on the input image.",
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   start_frame: z.optional(
     z.int().gte(0).register(z.globalRegistry, {
       description:
@@ -1564,10 +1477,7 @@ export const zSchemaMagiExtendVideoInput = z.object({
         "Aspect ratio of the generated video. If 'auto', the aspect ratio will be determined automatically based on the input image.",
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   start_frame: z.optional(
     z.int().gte(0).register(z.globalRegistry, {
       description:
@@ -2413,12 +2323,10 @@ export const zSchemaWanVace14bInput = z.object({
     .default(0),
   first_frame_url: z.optional(z.union([z.string(), z.unknown()])),
   ref_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URLs to source reference image. If provided, the model will use this image as reference.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URLs to source reference image. If provided, the model will use this image as reference.',
+    }),
   ),
   transparency_mode: z.optional(
     z.enum(['content_aware', 'white', 'black']).register(z.globalRegistry, {
@@ -2596,14 +2504,8 @@ export const zSchemaLipsyncOutput = z.object({
  * LipsyncInput
  */
 export const zSchemaLipsyncInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
+  audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -2637,10 +2539,7 @@ export const zSchemaLumaDreamMachineRay2ReframeInput = z.object({
       description: 'End X coordinate for reframing',
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   y_end: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'End Y coordinate for reframing',
@@ -2661,9 +2560,7 @@ export const zSchemaLumaDreamMachineRay2ReframeInput = z.object({
       description: 'X position of the grid for reframing',
     }),
   ),
-  image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -2697,10 +2594,7 @@ export const zSchemaLumaDreamMachineRay2FlashReframeInput = z.object({
       description: 'End X coordinate for reframing',
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   y_end: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'End Y coordinate for reframing',
@@ -2721,9 +2615,7 @@ export const zSchemaLumaDreamMachineRay2FlashReframeInput = z.object({
       description: 'X position of the grid for reframing',
     }),
   ),
-  image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -2747,15 +2639,11 @@ export const zSchemaWanVace13bInput = z.object({
       }),
     )
     .default(5),
-  video_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  video_url: z.optional(z.union([z.string(), z.string()])),
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt to guide video generation.',
   }),
-  mask_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_image_url: z.optional(z.union([z.string(), z.string()])),
   task: z.optional(
     z.enum(['depth', 'inpainting', 'pose']).register(z.globalRegistry, {
       description: 'Task type for the model.',
@@ -2770,12 +2658,10 @@ export const zSchemaWanVace13bInput = z.object({
     )
     .default(16),
   ref_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'Urls to source reference image. If provided, the model will use this image as reference.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'Urls to source reference image. If provided, the model will use this image as reference.',
+    }),
   ),
   enable_safety_checker: z
     .optional(
@@ -2811,9 +2697,7 @@ export const zSchemaWanVace13bInput = z.object({
       description: 'Aspect ratio of the generated video (16:9 or 9:16).',
     }),
   ),
-  mask_video_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_video_url: z.optional(z.union([z.string(), z.string()])),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -2855,10 +2739,7 @@ export const zSchemaFfmpegApiMergeAudioVideoOutput = z.object({
  * CombineInput
  */
 export const zSchemaFfmpegApiMergeAudioVideoInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   start_offset: z
     .optional(
       z.number().gte(0).register(z.globalRegistry, {
@@ -2867,10 +2748,7 @@ export const zSchemaFfmpegApiMergeAudioVideoInput = z.object({
       }),
     )
     .default(0),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -2884,10 +2762,7 @@ export const zSchemaDwposeVideoOutput = z.object({
  * DWPoseVideoInput
  */
 export const zSchemaDwposeVideoInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   draw_mode: z.optional(
     z
       .enum([
@@ -2927,10 +2802,7 @@ export const zSchemaWanVace14bDepthInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt to guide video generation.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   num_interpolated_frames: z
     .optional(
       z.int().gte(0).lte(5).register(z.globalRegistry, {
@@ -2949,12 +2821,10 @@ export const zSchemaWanVace14bDepthInput = z.object({
     .default(0),
   first_frame_url: z.optional(z.union([z.string(), z.unknown()])),
   ref_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URLs to source reference image. If provided, the model will use this image as reference.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URLs to source reference image. If provided, the model will use this image as reference.',
+    }),
   ),
   transparency_mode: z.optional(
     z.enum(['content_aware', 'white', 'black']).register(z.globalRegistry, {
@@ -3134,10 +3004,7 @@ export const zSchemaWanVace14bPoseInput = z.object({
     description:
       'The text prompt to guide video generation. For pose task, the prompt should describe the desired pose and action of the subject in the video.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   num_interpolated_frames: z
     .optional(
       z.int().gte(0).lte(5).register(z.globalRegistry, {
@@ -3156,12 +3023,10 @@ export const zSchemaWanVace14bPoseInput = z.object({
     .default(0),
   first_frame_url: z.optional(z.union([z.string(), z.unknown()])),
   ref_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URLs to source reference image. If provided, the model will use this image as reference.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URLs to source reference image. If provided, the model will use this image as reference.',
+    }),
   ),
   transparency_mode: z.optional(
     z.enum(['content_aware', 'white', 'black']).register(z.globalRegistry, {
@@ -3340,10 +3205,7 @@ export const zSchemaWanVace14bInpaintingInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt to guide video generation.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   num_interpolated_frames: z
     .optional(
       z.int().gte(0).lte(5).register(z.globalRegistry, {
@@ -3362,12 +3224,10 @@ export const zSchemaWanVace14bInpaintingInput = z.object({
     .default(0),
   first_frame_url: z.optional(z.union([z.string(), z.unknown()])),
   ref_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'Urls to source reference image. If provided, the model will use this image as reference.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'Urls to source reference image. If provided, the model will use this image as reference.',
+    }),
   ),
   transparency_mode: z.optional(
     z.enum(['content_aware', 'white', 'black']).register(z.globalRegistry, {
@@ -3548,10 +3408,7 @@ export const zSchemaWanVace14bOutpaintingInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt to guide video generation.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   num_interpolated_frames: z
     .optional(
       z.int().gte(0).lte(5).register(z.globalRegistry, {
@@ -3570,12 +3427,10 @@ export const zSchemaWanVace14bOutpaintingInput = z.object({
     .default(0),
   first_frame_url: z.optional(z.union([z.string(), z.unknown()])),
   ref_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URLs to source reference image. If provided, the model will use this image as reference.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URLs to source reference image. If provided, the model will use this image as reference.',
+    }),
   ),
   expand_ratio: z
     .optional(
@@ -3788,10 +3643,7 @@ export const zSchemaWanVace14bReframeInput = z.object({
       }),
     )
     .default(''),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   num_interpolated_frames: z
     .optional(
       z.int().gte(0).lte(5).register(z.globalRegistry, {
@@ -3989,10 +3841,7 @@ export const zSchemaLumaDreamMachineRay2ModifyInput = z.object({
       description: 'Instruction for modifying the video',
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   mode: z.optional(
     z
       .enum([
@@ -4011,9 +3860,7 @@ export const zSchemaLumaDreamMachineRay2ModifyInput = z.object({
           'Amount of modification to apply to the video, adhere_1 is the least amount of modification, reimagine_3 is the most',
       }),
   ),
-  image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -4032,13 +3879,8 @@ export const zSchemaPixverseLipsyncInput = z.object({
       description: 'Text content for TTS when audio_url is not provided',
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  audio_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  video_url: z.union([z.string(), z.string()]),
+  audio_url: z.optional(z.union([z.string(), z.string()])),
   voice_id: z.optional(
     z
       .enum([
@@ -4096,10 +3938,7 @@ export const zSchemaPixverseExtendInput = z.object({
         description: 'The style of the extended video',
       }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   model: z.optional(
     z
       .enum(['v3.5', 'v4', 'v4.5', 'v5', 'v5.5', 'v5.6'])
@@ -4141,10 +3980,7 @@ export const zSchemaPixverseExtendFastInput = z.object({
         "The resolution of the generated video. Fast mode doesn't support 1080p",
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   style: z.optional(
     z
       .enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk'])
@@ -4195,10 +4031,7 @@ export const zSchemaThinksoundInput = z.object({
       }),
     )
     .default(''),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'The seed for the random number generator',
@@ -4242,10 +4075,7 @@ export const zSchemaThinksoundAudioInput = z.object({
       }),
     )
     .default(''),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'The seed for the random number generator',
@@ -4286,10 +4116,7 @@ export const zSchemaPixverseSoundEffectsInput = z.object({
       }),
     )
     .default(''),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   original_sound_switch: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -4477,10 +4304,7 @@ export const zSchemaLumaDreamMachineRay2FlashModifyInput = z.object({
       description: 'Instruction for modifying the video',
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   mode: z.optional(
     z
       .enum([
@@ -4499,9 +4323,7 @@ export const zSchemaLumaDreamMachineRay2FlashModifyInput = z.object({
           'Amount of modification to apply to the video, adhere_1 is the least amount of modification, reimagine_3 is the most',
       }),
   ),
-  image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -4521,10 +4343,7 @@ export const zSchemaFilmVideoInput = z.object({
         "The write mode of the output video. Only applicable if output_type is 'video'.",
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   use_calculated_fps: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -4592,10 +4411,7 @@ export const zSchemaRifeVideoOutput = z.object({
  * RIFEVideoInput
  */
 export const zSchemaRifeVideoInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   use_scene_detection: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -4642,10 +4458,7 @@ export const zSchemaRifeVideoInput = z.object({
  * ExtendVideoConditioningInput
  */
 export const zSchemaExtendVideoConditioningInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   start_frame_num: z
     .optional(
       z.int().gte(0).lte(1440).register(z.globalRegistry, {
@@ -4877,10 +4690,7 @@ export const zSchemaWanV22A14bVideoToVideoInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt to guide video generation.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   acceleration: z.optional(
     z.enum(['none', 'regular']).register(z.globalRegistry, {
       description:
@@ -5050,12 +4860,9 @@ export const zSchemaFfmpegApiMergeVideosOutput = z.object({
  */
 export const zSchemaFfmpegApiMergeVideosInput = z.object({
   target_fps: z.optional(z.union([z.number().gte(1).lte(60), z.unknown()])),
-  video_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .min(2)
-    .register(z.globalRegistry, {
-      description: 'List of video URLs to merge in order',
-    }),
+  video_urls: z.array(z.string()).min(2).register(z.globalRegistry, {
+    description: 'List of video URLs to merge in order',
+  }),
   resolution: z.optional(
     z.union([
       zSchemaImageSize,
@@ -5086,10 +4893,7 @@ export const zSchemaMareyMotionTransferInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The prompt to generate a video from',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   seed: z.optional(z.union([z.int(), z.unknown()])),
   reference_image_url: z.optional(z.union([z.string(), z.unknown()])),
   negative_prompt: z.optional(z.union([z.string(), z.unknown()])),
@@ -5110,10 +4914,7 @@ export const zSchemaMareyPoseTransferInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The prompt to generate a video from',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   seed: z.optional(z.union([z.int(), z.unknown()])),
   reference_image_url: z.optional(z.union([z.string(), z.unknown()])),
   negative_prompt: z.optional(z.union([z.string(), z.unknown()])),
@@ -5134,10 +4935,7 @@ export const zSchemaSfxV1VideoToVideoOutput = z.object({
  */
 export const zSchemaSfxV1VideoToVideoInput = z.object({
   num_samples: z.optional(z.union([z.int().gte(2).lte(8), z.unknown()])),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   duration: z.optional(z.union([z.number().gte(1).lte(10), z.unknown()])),
   seed: z.optional(z.union([z.int().gte(1), z.unknown()])),
   text_prompt: z.optional(z.union([z.string(), z.unknown()])),
@@ -5171,14 +4969,8 @@ export const zSchemaInfinitalkInput = z.object({
       description: 'The acceleration level to use for generation.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
+  audio_url: z.union([z.string(), z.string()]),
   num_frames: z
     .optional(
       z.int().gte(41).lte(721).register(z.globalRegistry, {
@@ -5207,10 +4999,7 @@ export const zSchemaVideoIncreaseResolutionOutput = z.object({
  * InputIncreaseResolutionModel
  */
 export const zSchemaVideoIncreaseResolutionInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   output_container_and_codec: z.optional(
     z
       .enum([
@@ -5265,9 +5054,7 @@ export const zSchemaWanFunControlInput = z.object({
       }),
     )
     .default(false),
-  reference_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  reference_image_url: z.optional(z.union([z.string(), z.string()])),
   fps: z
     .optional(
       z.int().gte(4).lte(60).register(z.globalRegistry, {
@@ -5297,10 +5084,7 @@ export const zSchemaWanFunControlInput = z.object({
         'The type of preprocess to apply to the video. Only used when preprocess_video is True.',
     }),
   ),
-  control_video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  control_video_url: z.union([z.string(), z.string()]),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -5356,14 +5140,8 @@ export const zSchemaSyncLipsyncV2ProInput = z.object({
           'Lipsync mode when audio and video durations are out of sync.',
       }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
+  audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -5377,10 +5155,7 @@ export const zSchemaHunyuanVideoFoleyOutput = z.object({
  * HunyuanFoleyRequest
  */
 export const zSchemaHunyuanVideoFoleyInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   guidance_scale: z
     .optional(
       z.number().gte(1).lte(10).register(z.globalRegistry, {
@@ -5434,10 +5209,7 @@ export const zSchemaWan22VaceFunA14bPoseInput = z.object({
     description:
       'The text prompt to guide video generation. For pose task, the prompt should describe the desired pose and action of the subject in the video.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   num_interpolated_frames: z
     .optional(
       z.int().gte(0).lte(5).register(z.globalRegistry, {
@@ -5456,12 +5228,10 @@ export const zSchemaWan22VaceFunA14bPoseInput = z.object({
     .default(0),
   first_frame_url: z.optional(z.union([z.string(), z.unknown()])),
   ref_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URLs to source reference image. If provided, the model will use this image as reference.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URLs to source reference image. If provided, the model will use this image as reference.',
+    }),
   ),
   guidance_scale: z
     .optional(
@@ -5640,10 +5410,7 @@ export const zSchemaWan22VaceFunA14bDepthInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt to guide video generation.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   num_interpolated_frames: z
     .optional(
       z.int().gte(0).lte(5).register(z.globalRegistry, {
@@ -5662,12 +5429,10 @@ export const zSchemaWan22VaceFunA14bDepthInput = z.object({
     .default(0),
   first_frame_url: z.optional(z.union([z.string(), z.unknown()])),
   ref_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URLs to source reference image. If provided, the model will use this image as reference.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URLs to source reference image. If provided, the model will use this image as reference.',
+    }),
   ),
   guidance_scale: z
     .optional(
@@ -5846,10 +5611,7 @@ export const zSchemaWan22VaceFunA14bInpaintingInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt to guide video generation.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   num_interpolated_frames: z
     .optional(
       z.int().gte(0).lte(5).register(z.globalRegistry, {
@@ -5868,12 +5630,10 @@ export const zSchemaWan22VaceFunA14bInpaintingInput = z.object({
     .default(0),
   first_frame_url: z.optional(z.union([z.string(), z.unknown()])),
   ref_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'Urls to source reference image. If provided, the model will use this image as reference.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'Urls to source reference image. If provided, the model will use this image as reference.',
+    }),
   ),
   guidance_scale: z
     .optional(
@@ -6054,10 +5814,7 @@ export const zSchemaWan22VaceFunA14bOutpaintingInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt to guide video generation.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   num_interpolated_frames: z
     .optional(
       z.int().gte(0).lte(5).register(z.globalRegistry, {
@@ -6076,12 +5833,10 @@ export const zSchemaWan22VaceFunA14bOutpaintingInput = z.object({
     .default(0),
   first_frame_url: z.optional(z.union([z.string(), z.unknown()])),
   ref_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URLs to source reference image. If provided, the model will use this image as reference.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URLs to source reference image. If provided, the model will use this image as reference.',
+    }),
   ),
   expand_ratio: z
     .optional(
@@ -6294,10 +6049,7 @@ export const zSchemaWan22VaceFunA14bReframeInput = z.object({
       }),
     )
     .default(''),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   num_interpolated_frames: z
     .optional(
       z.int().gte(0).lte(5).register(z.globalRegistry, {
@@ -6498,10 +6250,7 @@ export const zSchemaLucyEditDevInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   prompt: z.string().max(1500).register(z.globalRegistry, {
     description: 'Text description of the desired video content',
   }),
@@ -6533,10 +6282,7 @@ export const zSchemaLucyEditProInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   prompt: z.string().max(1500).register(z.globalRegistry, {
     description: 'Text description of the desired video content',
   }),
@@ -6578,10 +6324,7 @@ export const zSchemaWanV2214bAnimateMoveInput = z.object({
         'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   resolution: z.optional(
     z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
       description: 'Resolution of the generated video (480p, 580p, or 720p).',
@@ -6610,10 +6353,7 @@ export const zSchemaWanV2214bAnimateMoveInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   video_quality: z.optional(
     z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
       description:
@@ -6684,10 +6424,7 @@ export const zSchemaWanV2214bAnimateReplaceInput = z.object({
         'The write mode of the output video. Faster write mode means faster results but larger file size, balanced write mode is a good compromise between speed and quality, and small write mode is the slowest but produces the smallest file size.',
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   resolution: z.optional(
     z.enum(['480p', '580p', '720p']).register(z.globalRegistry, {
       description: 'Resolution of the generated video (480p, 580p, or 720p).',
@@ -6716,10 +6453,7 @@ export const zSchemaWanV2214bAnimateReplaceInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   video_quality: z.optional(
     z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
       description:
@@ -6781,10 +6515,7 @@ export const zSchemaWanVaceAppsVideoEditInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'Prompt to edit the video.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   acceleration: z.optional(
     z.enum(['none', 'low', 'regular']).register(z.globalRegistry, {
       description:
@@ -6826,12 +6557,10 @@ export const zSchemaWanVaceAppsVideoEditInput = z.object({
   ),
   image_urls: z
     .optional(
-      z
-        .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-        .register(z.globalRegistry, {
-          description:
-            'URLs of the input images to use as a reference for the generation.',
-        }),
+      z.array(z.string()).register(z.globalRegistry, {
+        description:
+          'URLs of the input images to use as a reference for the generation.',
+      }),
     )
     .default([]),
   enable_auto_downsample: z
@@ -6872,10 +6601,7 @@ export const zSchemaSeedvrUpscaleVideoInput = z.object({
         "The mode to use for the upscale. If 'target', the upscale factor will be calculated based on the target resolution. If 'factor', the upscale factor will be used directly.",
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   noise_scale: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -6953,14 +6679,8 @@ export const zSchemaInfinitalkVideoToVideoInput = z.object({
       description: 'The acceleration level to use for generation.',
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
+  audio_url: z.union([z.string(), z.string()]),
   num_frames: z
     .optional(
       z.int().gte(41).lte(241).register(z.globalRegistry, {
@@ -6998,10 +6718,7 @@ export const zSchemaWanVaceAppsLongReframeInput = z.object({
       }),
     )
     .default(''),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   acceleration: z.optional(
     z.enum(['none', 'low', 'regular']).register(z.globalRegistry, {
       description:
@@ -7189,11 +6906,9 @@ export const zSchemaImageFile = z.object({
     }),
   ),
   file_data: z.optional(
-    z
-      .union([z.instanceof(Blob), z.instanceof(File)])
-      .register(z.globalRegistry, {
-        description: 'File data',
-      }),
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
   ),
 })
 
@@ -7244,10 +6959,7 @@ export const zSchemaKreaWan14bVideoToVideoInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'Prompt for the video-to-video generation.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -7295,10 +7007,7 @@ export const zSchemaSfxV15VideoToVideoInput = z.object({
   num_samples: z.optional(z.union([z.int().gte(2).lte(8), z.unknown()])),
   duration: z.optional(z.union([z.number().gte(1).lte(10), z.unknown()])),
   start_offset: z.optional(z.union([z.number().gte(0), z.unknown()])),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   seed: z.optional(z.union([z.int().gte(1), z.unknown()])),
   text_prompt: z.optional(z.union([z.string(), z.unknown()])),
 })
@@ -7333,10 +7042,7 @@ export const zSchemaViduQ2VideoExtensionProInput = z.object({
         description: 'Duration of the extension in seconds',
       }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   resolution: z.optional(
     z.enum(['720p', '1080p']).register(z.globalRegistry, {
       description: 'Output video resolution',
@@ -7380,10 +7086,7 @@ export const zSchemaBirefnetV2VideoInput = z.object({
         "The resolution to operate on. The higher the resolution, the more accurate the output will be for high res input images. The '2304x2304' option is only available for the 'General Use (Dynamic)' model.",
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   model: z.optional(
     z
       .enum([
@@ -7453,14 +7156,8 @@ export const zSchemaVideoAsPromptInput = z.object({
       description: 'Resolution of the generated video.',
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
   fps: z
     .optional(
       z.int().gte(1).lte(60).register(z.globalRegistry, {
@@ -7515,10 +7212,7 @@ export const zSchemaBytedanceUpscalerUpscaleVideoInput = z.object({
       description: 'The target FPS of the video to upscale.',
     }),
   ),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   target_resolution: z.optional(
     z.enum(['1080p', '2k', '4k']).register(z.globalRegistry, {
       description: 'The target resolution of the video to upscale.',
@@ -7568,10 +7262,7 @@ export const zSchemaWorkflowUtilitiesAutoSubtitleInput = z
         description: 'Font weight (TikTok style typically uses bold or black)',
       }),
     ),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     stroke_width: z
       .optional(
         z.int().gte(0).lte(10).register(z.globalRegistry, {
@@ -7750,10 +7441,7 @@ export const zSchemaFlashvsrUpscaleVideoOutput = z.object({
  */
 export const zSchemaFlashvsrUpscaleVideoInput = z
   .object({
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     acceleration: z.optional(
       z.enum(['regular', 'high', 'full']).register(z.globalRegistry, {
         description:
@@ -7846,10 +7534,7 @@ export const zSchemaEdittoInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The text prompt to guide video generation.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   acceleration: z.optional(
     z.union([z.enum(['none', 'low', 'regular']), z.unknown()]),
   ),
@@ -8066,10 +7751,7 @@ export const zSchemaSam3VideoInput = z.object({
       }),
     )
     .default(''),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   detection_threshold: z
     .optional(
       z.number().gte(0.1).lte(1).register(z.globalRegistry, {
@@ -8128,10 +7810,7 @@ export const zSchemaSam3VideoRleInput = z.object({
       }),
     )
     .default(''),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   detection_threshold: z
     .optional(
       z.number().gte(0.01).lte(1).register(z.globalRegistry, {
@@ -8169,9 +7848,7 @@ export const zSchemaSam3VideoRleInput = z.object({
       }),
     )
     .default(0),
-  mask_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  mask_url: z.optional(z.union([z.string(), z.string()])),
   apply_mask: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -8200,10 +7877,7 @@ export const zSchemaLucyEditFastInput = z.object({
       }),
     )
     .default(false),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   prompt: z.string().max(1500).register(z.globalRegistry, {
     description: 'Text description of the desired video content',
   }),
@@ -8237,10 +7911,7 @@ export const zSchemaLtx2RetakeVideoInput = z.object({
       }),
     )
     .default(5),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   start_time: z
     .optional(
       z.number().gte(0).lte(20).register(z.globalRegistry, {
@@ -8268,10 +7939,7 @@ export const zSchemaVideoBackgroundRemovalGreenScreenOutput = z.object({
  * GreenScreenRembgInput
  */
 export const zSchemaVideoBackgroundRemovalGreenScreenInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   output_codec: z.optional(
     z.enum(['vp9', 'h264']).register(z.globalRegistry, {
       description:
@@ -8295,17 +7963,12 @@ export const zSchemaKlingVideoO1VideoToVideoReferenceOutput = z.object({
  */
 export const zSchemaOmniVideoElementInput = z.object({
   reference_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'Additional reference images from different angles. 1-4 images supported. At least one image is required.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'Additional reference images from different angles. 1-4 images supported. At least one image is required.',
+    }),
   ),
-  frontal_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  frontal_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -8332,10 +7995,7 @@ export const zSchemaKlingVideoO1VideoToVideoReferenceInput = z
           description: 'Video duration in seconds.',
         }),
     ),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     keep_audio: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -8350,12 +8010,10 @@ export const zSchemaKlingVideoO1VideoToVideoReferenceInput = z
       }),
     ),
     image_urls: z.optional(
-      z
-        .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-        .register(z.globalRegistry, {
-          description:
-            'Reference images for style/appearance. Reference in prompt as @Image1, @Image2, etc. Maximum 4 total (elements + reference images) when using video.',
-        }),
+      z.array(z.string()).register(z.globalRegistry, {
+        description:
+          'Reference images for style/appearance. Reference in prompt as @Image1, @Image2, etc. Maximum 4 total (elements + reference images) when using video.',
+      }),
     ),
   })
   .register(z.globalRegistry, {
@@ -8380,10 +8038,7 @@ export const zSchemaKlingVideoO1VideoToVideoEditInput = z
       description:
         'Use @Element1, @Element2 to reference elements and @Image1, @Image2 to reference images in order.',
     }),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     elements: z.optional(
       z.array(zSchemaOmniVideoElementInput).register(z.globalRegistry, {
         description:
@@ -8391,12 +8046,10 @@ export const zSchemaKlingVideoO1VideoToVideoEditInput = z
       }),
     ),
     image_urls: z.optional(
-      z
-        .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-        .register(z.globalRegistry, {
-          description:
-            'Reference images for style/appearance. Reference in prompt as @Image1, @Image2, etc. Maximum 4 total (elements + reference images) when using video.',
-        }),
+      z.array(z.string()).register(z.globalRegistry, {
+        description:
+          'Reference images for style/appearance. Reference in prompt as @Image1, @Image2, etc. Maximum 4 total (elements + reference images) when using video.',
+      }),
     ),
     keep_audio: z
       .optional(
@@ -8421,10 +8074,7 @@ export const zSchemaVideoBackgroundRemovalFastOutput = z.object({
  * FastGeneralRembgInput
  */
 export const zSchemaVideoBackgroundRemovalFastInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   subject_is_person: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -8464,10 +8114,7 @@ export const zSchemaSyncLipsyncReact1Input = z.object({
       description:
         'Emotion prompt for the generation. Currently supports single-word emotions only.',
     }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   lipsync_mode: z.optional(
     z
       .enum(['cut_off', 'loop', 'bounce', 'silence', 'remap'])
@@ -8476,10 +8123,7 @@ export const zSchemaSyncLipsyncReact1Input = z.object({
           'Lipsync mode when audio and video durations are out of sync.',
       }),
   ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   temperature: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -8522,10 +8166,7 @@ export const zSchemaWanVisionEnhancerOutput = z
 export const zSchemaWanVisionEnhancerInput = z
   .object({
     prompt: z.optional(z.union([z.string(), z.unknown()])),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     seed: z.optional(z.union([z.int(), z.unknown()])),
     target_resolution: z.optional(
       z.enum(['720p', '1080p']).register(z.globalRegistry, {
@@ -8581,14 +8222,8 @@ export const zSchemaOneToAllAnimation14bInput = z.object({
       }),
     )
     .default(1.5),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
   num_inference_steps: z
     .optional(
       z.int().gte(2).lte(30).register(z.globalRegistry, {
@@ -8636,14 +8271,8 @@ export const zSchemaOneToAllAnimation13bInput = z.object({
       }),
     )
     .default(1.5),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
   num_inference_steps: z
     .optional(
       z.int().gte(2).lte(30).register(z.globalRegistry, {
@@ -8691,9 +8320,7 @@ export const zSchemaSteadyDancerInput = z
         }),
       )
       .default('A person dancing with smooth and natural movements.'),
-    video_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    video_url: z.optional(z.union([z.string(), z.string()])),
     acceleration: z.optional(
       z.enum(['light', 'moderate', 'aggressive']).register(z.globalRegistry, {
         description: 'Acceleration levels.',
@@ -8784,9 +8411,7 @@ export const zSchemaSteadyDancerInput = z
           'Resolution of the generated video. 576p is default, 720p for higher quality. 480p is lower quality.',
       }),
     ),
-    image_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    image_url: z.optional(z.union([z.string(), z.string()])),
     preserve_audio: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -8832,10 +8457,7 @@ export const zSchemaKlingVideoO1StandardVideoToVideoEditInput = z
       description:
         'Use @Element1, @Element2 to reference elements and @Image1, @Image2 to reference images in order.',
     }),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     elements: z.optional(
       z.array(zSchemaOmniVideoElementInput).register(z.globalRegistry, {
         description:
@@ -8843,12 +8465,10 @@ export const zSchemaKlingVideoO1StandardVideoToVideoEditInput = z
       }),
     ),
     image_urls: z.optional(
-      z
-        .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-        .register(z.globalRegistry, {
-          description:
-            'Reference images for style/appearance. Reference in prompt as @Image1, @Image2, etc. Maximum 4 total (elements + reference images) when using video.',
-        }),
+      z.array(z.string()).register(z.globalRegistry, {
+        description:
+          'Reference images for style/appearance. Reference in prompt as @Image1, @Image2, etc. Maximum 4 total (elements + reference images) when using video.',
+      }),
     ),
     keep_audio: z
       .optional(
@@ -8893,10 +8513,7 @@ export const zSchemaKlingVideoO1StandardVideoToVideoReferenceInput = z
           description: 'Video duration in seconds.',
         }),
     ),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     keep_audio: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -8911,12 +8528,10 @@ export const zSchemaKlingVideoO1StandardVideoToVideoReferenceInput = z
       }),
     ),
     image_urls: z.optional(
-      z
-        .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-        .register(z.globalRegistry, {
-          description:
-            'Reference images for style/appearance. Reference in prompt as @Image1, @Image2, etc. Maximum 4 total (elements + reference images) when using video.',
-        }),
+      z.array(z.string()).register(z.globalRegistry, {
+        description:
+          'Reference images for style/appearance. Reference in prompt as @Image1, @Image2, etc. Maximum 4 total (elements + reference images) when using video.',
+      }),
     ),
   })
   .register(z.globalRegistry, {
@@ -8966,10 +8581,7 @@ export const zSchemaVeo31ExtendVideoInput = z
         }),
       )
       .default(false),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     resolution: z.optional(
       z.enum(['720p']).register(z.globalRegistry, {
         description: 'The resolution of the generated video.',
@@ -9033,10 +8645,7 @@ export const zSchemaVeo31FastExtendVideoInput = z
         }),
       )
       .default(false),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     resolution: z.optional(
       z.enum(['720p']).register(z.globalRegistry, {
         description: 'The resolution of the generated video.',
@@ -9095,12 +8704,10 @@ export const zSchemaV26ReferenceToVideoInput = z
           'Video resolution tier. R2V only supports 720p and 1080p (no 480p).',
       }),
     ),
-    video_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          "Reference videos for subject consistency (1-3 videos). Videos' FPS must be at least 16 FPS.Reference in prompt as @Video1, @Video2, @Video3. Works for people, animals, or objects.",
-      }),
+    video_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        "Reference videos for subject consistency (1-3 videos). Videos' FPS must be at least 16 FPS.Reference in prompt as @Video1, @Video2, @Video3. Works for people, animals, or objects.",
+    }),
     aspect_ratio: z.optional(
       z.enum(['16:9', '9:16', '1:1', '4:3', '3:4']).register(z.globalRegistry, {
         description: 'The aspect ratio of the generated video.',
@@ -9171,10 +8778,7 @@ export const zSchemaBriaVideoEraserErasePromptInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   prompt: z.string().register(z.globalRegistry, {
     description: 'Input prompt to detect object to erase',
   }),
@@ -9225,10 +8829,7 @@ export const zSchemaBriaVideoEraserEraseKeypointsInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   output_container_and_codec: z.optional(
     z
       .enum([
@@ -9280,10 +8881,7 @@ export const zSchemaBriaVideoEraserEraseMaskInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   output_container_and_codec: z.optional(
     z
       .enum([
@@ -9304,10 +8902,7 @@ export const zSchemaBriaVideoEraserEraseMaskInput = z.object({
           'Output container and codec. Options: mp4_h265, mp4_h264, webm_vp9, gif, mov_h264, mov_h265, mov_proresks, mkv_h264, mkv_h265, mkv_vp9, mkv_mpeg4.',
       }),
   ),
-  mask_video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_video_url: z.union([z.string(), z.string()]),
   auto_trim: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -9328,10 +8923,7 @@ export const zSchemaCrystalVideoUpscalerOutput = z.object({
  * CrystalVideoUpscaleInput
  */
 export const zSchemaCrystalVideoUpscalerInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   scale_factor: z
     .optional(
       z.number().gte(1).lte(200).register(z.globalRegistry, {
@@ -9356,10 +8948,7 @@ export const zSchemaScailInput = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The prompt to guide video generation.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   resolution: z.optional(
     z.enum(['512p']).register(z.globalRegistry, {
       description:
@@ -9382,10 +8971,7 @@ export const zSchemaScailInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -9407,10 +8993,7 @@ export const zSchemaLucyRestyleInput = z.object({
       }),
     )
     .default(false),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   resolution: z.optional(
     z.enum(['720p']).register(z.globalRegistry, {
       description: 'Resolution of the generated video',
@@ -9454,10 +9037,7 @@ export const zSchemaKlingVideoV26ProMotionControlOutput = z
 export const zSchemaKlingVideoV26ProMotionControlInput = z
   .object({
     prompt: z.optional(z.string().max(2500)),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     character_orientation: z
       .enum(['image', 'video'])
       .register(z.globalRegistry, {
@@ -9472,10 +9052,7 @@ export const zSchemaKlingVideoV26ProMotionControlInput = z
         }),
       )
       .default(true),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
   })
   .register(z.globalRegistry, {
     description: 'Request model for motion control video generation.',
@@ -9502,10 +9079,7 @@ export const zSchemaKlingVideoV26StandardMotionControlOutput = z
 export const zSchemaKlingVideoV26StandardMotionControlInput = z
   .object({
     prompt: z.optional(z.string().max(2500)),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     character_orientation: z
       .enum(['image', 'video'])
       .register(z.globalRegistry, {
@@ -9520,10 +9094,7 @@ export const zSchemaKlingVideoV26StandardMotionControlInput = z
         }),
       )
       .default(true),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
   })
   .register(z.globalRegistry, {
     description: 'Request model for motion control video generation.',
@@ -9582,10 +9153,7 @@ export const zSchemaLightxRecameraInput = z
       }),
     ),
     trajectory: z.optional(zSchemaTrajectoryParameters),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     camera: z.optional(
       z.enum(['traj', 'target']).register(z.globalRegistry, {
         description: 'Camera control mode.',
@@ -9677,10 +9245,7 @@ export const zSchemaLightxRelightInput = z
           'Optional text prompt. If omitted, Light-X will auto-caption the video.',
       }),
     ),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     relight_parameters: z.optional(zSchemaRelightParameters),
     ref_id: z
       .optional(
@@ -9690,9 +9255,7 @@ export const zSchemaLightxRelightInput = z
         }),
       )
       .default(0),
-    relit_cond_img_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    relit_cond_img_url: z.optional(z.union([z.string(), z.string()])),
     relit_cond_type: z.optional(
       z.enum(['ic', 'ref', 'hdr', 'bg']).register(z.globalRegistry, {
         description: 'Relight condition type.',
@@ -9727,10 +9290,7 @@ export const zSchemaVideoEraseMaskInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   output_container_and_codec: z.optional(
     z
       .enum([
@@ -9751,10 +9311,7 @@ export const zSchemaVideoEraseMaskInput = z.object({
           'Output container and codec. Options: mp4_h265, mp4_h264, webm_vp9, gif, mov_h264, mov_h265, mov_proresks, mkv_h264, mkv_h265, mkv_vp9, mkv_mpeg4.',
       }),
   ),
-  mask_video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_video_url: z.union([z.string(), z.string()]),
   auto_trim: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -9782,10 +9339,7 @@ export const zSchemaVideoErasePromptInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   prompt: z.string().register(z.globalRegistry, {
     description: 'Input prompt to detect object to erase',
   }),
@@ -9836,10 +9390,7 @@ export const zSchemaVideoEraseKeypointsInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   output_container_and_codec: z.optional(
     z
       .enum([
@@ -9906,10 +9457,7 @@ export const zSchemaLtx219bExtendVideoInput = z
         }),
       )
       .default(true),
-    video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    video_url: z.union([z.string(), z.string()]),
     acceleration: z.optional(
       z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
         description: 'The acceleration level to use.',
@@ -10127,10 +9675,7 @@ export const zSchemaLtx219bExtendVideoLoraInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   acceleration: z.optional(
     z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
       description: 'The acceleration level to use.',
@@ -10324,10 +9869,7 @@ export const zSchemaLtx219bDistilledExtendVideoInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   acceleration: z.optional(
     z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
       description: 'The acceleration level to use.',
@@ -10504,10 +10046,7 @@ export const zSchemaLtx219bDistilledExtendVideoLoraInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   acceleration: z.optional(
     z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
       description: 'The acceleration level to use.',
@@ -10687,10 +10226,7 @@ export const zSchemaLtx219bVideoToVideoInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   prompt: z.string().register(z.globalRegistry, {
     description: 'The prompt to generate the video from.',
   }),
@@ -10911,10 +10447,7 @@ export const zSchemaLtx219bVideoToVideoLoraInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   prompt: z.string().register(z.globalRegistry, {
     description: 'The prompt to generate the video from.',
   }),
@@ -11138,10 +10671,7 @@ export const zSchemaLtx219bDistilledVideoToVideoInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   acceleration: z.optional(
     z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
       description: 'The acceleration level to use.',
@@ -11348,10 +10878,7 @@ export const zSchemaLtx219bDistilledVideoToVideoLoraInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   acceleration: z.optional(
     z.enum(['none', 'regular', 'high', 'full']).register(z.globalRegistry, {
       description: 'The acceleration level to use.',
@@ -11557,14 +11084,8 @@ export const zSchemaAiFaceSwapFaceswapvideoOutput = z
  */
 export const zSchemaAiFaceSwapFaceswapvideoInput = z
   .object({
-    source_face_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
-    target_video_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    source_face_url: z.union([z.string(), z.string()]),
+    target_video_url: z.union([z.string(), z.string()]),
   })
   .register(z.globalRegistry, {
     description: 'Input schema for image ↔ video face swap',
@@ -11584,10 +11105,7 @@ export const zSchemaMmaudioV2Input = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The prompt to generate the audio for.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   num_steps: z
     .optional(
       z.int().gte(4).lte(50).register(z.globalRegistry, {
@@ -11641,10 +11159,7 @@ export const zSchemaVideoBackgroundRemovalOutput = z.object({
  * GeneralRembgInput
  */
 export const zSchemaVideoBackgroundRemovalInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   subject_is_person: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -11713,13 +11228,7 @@ export const zSchemaAnimatediffSparsectrlLcmInput = z.object({
       }),
     )
     .default(0),
-  keyframe_1_image_url: z.optional(
-    z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-      z.null(),
-    ]),
-  ),
+  keyframe_1_image_url: z.optional(z.union([z.string(), z.string(), z.null()])),
   keyframe_1_index: z
     .optional(
       z.int().register(z.globalRegistry, {
@@ -11744,13 +11253,7 @@ export const zSchemaAnimatediffSparsectrlLcmInput = z.object({
       }),
     )
     .default(4),
-  keyframe_2_image_url: z.optional(
-    z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-      z.null(),
-    ]),
-  ),
+  keyframe_2_image_url: z.optional(z.union([z.string(), z.string(), z.null()])),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -11759,13 +11262,7 @@ export const zSchemaAnimatediffSparsectrlLcmInput = z.object({
       }),
     )
     .default(''),
-  keyframe_0_image_url: z.optional(
-    z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-      z.null(),
-    ]),
-  ),
+  keyframe_0_image_url: z.optional(z.union([z.string(), z.string(), z.null()])),
 })
 
 /**
@@ -13078,12 +12575,10 @@ export const zSchemaKlingVideoV16StandardEffectsInput = z.object({
     }),
   ),
   input_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URL of images to be used for hug, kiss or heart_gesture video.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URL of images to be used for hug, kiss or heart_gesture video.',
+    }),
   ),
   effect_scene: z
     .enum([
@@ -13307,12 +12802,10 @@ export const zSchemaKlingVideoV1StandardEffectsInput = z.object({
     }),
   ),
   input_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URL of images to be used for hug, kiss or heart_gesture video.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URL of images to be used for hug, kiss or heart_gesture video.',
+    }),
   ),
   effect_scene: z
     .enum([
@@ -13536,12 +13029,10 @@ export const zSchemaKlingVideoV16ProEffectsInput = z.object({
     }),
   ),
   input_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URL of images to be used for hug, kiss or heart_gesture video.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URL of images to be used for hug, kiss or heart_gesture video.',
+    }),
   ),
   effect_scene: z
     .enum([
@@ -13765,12 +13256,10 @@ export const zSchemaKlingVideoV15ProEffectsInput = z.object({
     }),
   ),
   input_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URL of images to be used for hug, kiss or heart_gesture video.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URL of images to be used for hug, kiss or heart_gesture video.',
+    }),
   ),
   effect_scene: z
     .enum([
@@ -14329,10 +13818,7 @@ export const zSchemaKlingVideoLipsyncTextToVideoInput = z.object({
     description:
       'Text content for lip-sync video generation. Max 120 characters.',
   }),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   voice_id: z
     .enum([
       'genshin_vindi2',
@@ -14410,14 +13896,8 @@ export const zSchemaKlingVideoLipsyncAudioToVideoOutput = z.object({
  * LipsyncA2VRequest
  */
 export const zSchemaKlingVideoLipsyncAudioToVideoInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
+  audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -16221,10 +15701,7 @@ export const zSchemaInfinitalkSingleTextInput = z.object({
   text_input: z.string().register(z.globalRegistry, {
     description: 'The text input to guide video generation.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   voice: z
     .enum([
       'Aria',
@@ -16427,9 +15904,7 @@ export const zSchemaWan25PreviewTextToVideoInput = z
           'Random seed for reproducibility. If None, a random seed is chosen.',
       }),
     ),
-    audio_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    audio_url: z.optional(z.union([z.string(), z.string()])),
     negative_prompt: z.optional(
       z.string().register(z.globalRegistry, {
         description:
@@ -18008,10 +17483,7 @@ export const zSchemaFabric10TextInput = z.object({
     description: 'Resolution',
   }),
   voice_description: z.optional(z.union([z.string(), z.unknown()])),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -18071,9 +17543,7 @@ export const zSchemaV26TextToVideoInput = z
         }),
       )
       .default(true),
-    audio_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    audio_url: z.optional(z.union([z.string(), z.string()])),
     seed: z.optional(
       z.int().register(z.globalRegistry, {
         description:
@@ -19150,10 +18620,7 @@ export const zSchemaFastSvdLcmInput = z.object({
         '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -19174,14 +18641,8 @@ export const zSchemaSadtalkerInput = z.object({
       }),
     )
     .default(0),
-  source_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  driven_audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  source_image_url: z.union([z.string(), z.string()]),
+  driven_audio_url: z.union([z.string(), z.string()]),
   face_enhancer: z.optional(
     z.enum(['gfpgan']).register(z.globalRegistry, {
       description: 'The type of face enhancer to use',
@@ -19227,14 +18688,8 @@ export const zSchemaMusetalkOutput = z.object({
  * MuseTalkInput
  */
 export const zSchemaMusetalkInput = z.object({
-  source_video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  source_video_url: z.union([z.string(), z.string()]),
+  audio_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -19255,10 +18710,7 @@ export const zSchemaLivePortraitInput = z.object({
       }),
     )
     .default(0),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   eyebrow: z
     .optional(
       z.number().gte(-30).lte(30).register(z.globalRegistry, {
@@ -19352,10 +18804,7 @@ export const zSchemaLivePortraitInput = z.object({
       }),
     )
     .default(0),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   flag_relative: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -19529,10 +18978,7 @@ export const zSchemaStableVideoInput = z.object({
         '\n            The same seed and the same prompt given to the same version of Stable Diffusion\n            will output the same image every time.\n        ',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -19584,21 +19030,14 @@ export const zSchemaKlingVideoV1StandardImageToVideoInput = z.object({
   negative_prompt: z
     .optional(z.string().max(2500))
     .default('blur, distort, and low quality'),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  static_mask_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.union([z.string(), z.string()]),
+  static_mask_url: z.optional(z.union([z.string(), z.string()])),
   dynamic_masks: z.optional(
     z.array(zSchemaDynamicMask).register(z.globalRegistry, {
       description: 'List of dynamic masks',
     }),
   ),
-  tail_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  tail_image_url: z.optional(z.union([z.string(), z.string()])),
   cfg_scale: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -19634,21 +19073,14 @@ export const zSchemaKlingVideoV15ProImageToVideoInput = z.object({
   negative_prompt: z
     .optional(z.string().max(2500))
     .default('blur, distort, and low quality'),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  static_mask_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.union([z.string(), z.string()]),
+  static_mask_url: z.optional(z.union([z.string(), z.string()])),
   dynamic_masks: z.optional(
     z.array(zSchemaDynamicMask).register(z.globalRegistry, {
       description: 'List of dynamic masks',
     }),
   ),
-  tail_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  tail_image_url: z.optional(z.union([z.string(), z.string()])),
   cfg_scale: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -19688,10 +19120,7 @@ export const zSchemaCogvideox5bImageToVideoInput = z.object({
       }),
     )
     .default(true),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   loras: z
     .optional(
       z.array(zSchemaLoraWeight).register(z.globalRegistry, {
@@ -19795,10 +19224,7 @@ export const zSchemaLtxVideoImageToVideoInput = z.object({
     .default(
       'low quality, worst quality, deformed, distorted, disfigured, motion smear, motion artifacts, fused fingers, bad anatomy, weird hand, ugly',
     ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -19820,10 +19246,7 @@ export const zSchemaMinimaxVideo01LiveImageToVideoInput = z.object({
     )
     .default(true),
   prompt: z.string().max(2000),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -19844,18 +19267,9 @@ export const zSchemaSadtalkerReferenceInput = z.object({
       }),
     )
     .default(0),
-  source_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  reference_pose_video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  driven_audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  source_image_url: z.union([z.string(), z.string()]),
+  reference_pose_video_url: z.union([z.string(), z.string()]),
+  driven_audio_url: z.union([z.string(), z.string()]),
   face_enhancer: z.optional(
     z.enum(['gfpgan']).register(z.globalRegistry, {
       description: 'The type of face enhancer to use',
@@ -19907,10 +19321,7 @@ export const zSchemaKlingVideoV16StandardImageToVideoInput = z.object({
       description: 'The duration of the generated video in seconds',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   negative_prompt: z
     .optional(z.string().max(2500))
     .default('blur, distort, and low quality'),
@@ -19943,10 +19354,7 @@ export const zSchemaMinimaxVideo01SubjectReferenceInput = z.object({
     )
     .default(true),
   prompt: z.string().max(2000),
-  subject_reference_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  subject_reference_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -19979,10 +19387,7 @@ export const zSchemaPixverseV35ImageToVideoInput = z.object({
         description: 'The style of the generated video',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -20035,10 +19440,7 @@ export const zSchemaPixverseV35ImageToVideoFastInput = z.object({
       }),
     )
     .default(''),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20063,10 +19465,7 @@ export const zSchemaHunyuanVideoImg2VidLoraInput = z.object({
       description: 'The seed to use for generating the video.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20107,12 +19506,8 @@ export const zSchemaLumaDreamMachineRay2ImageToVideoInput = z.object({
       description: 'The duration of the generated video',
     }),
   ),
-  image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.optional(z.union([z.string(), z.string()])),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -20137,10 +19532,7 @@ export const zSchemaSkyreelsI2vInput = z.object({
       description: 'Aspect ratio of the output video',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   guidance_scale: z
     .optional(
       z.number().gte(1).lte(20).register(z.globalRegistry, {
@@ -20192,10 +19584,7 @@ export const zSchemaMinimaxVideo01DirectorImageToVideoInput = z.object({
     description:
       'Text prompt for video generation. Camera movement instructions can be added using square brackets (e.g. [Pan left] or [Zoom in]). You can use up to 3 combined movements per prompt. Supported movements: Truck left/right, Pan left/right, Push in/Pull out, Pedestal up/down, Tilt up/down, Zoom in/out, Shake, Tracking shot, Static shot. For example: [Truck left, Pan right, Zoom in]. For a more detailed guide, refer https://sixth-switch-2ac.notion.site/T2V-01-Director-Model-Tutorial-with-camera-movement-1886c20a98eb80f395b8e05291ad8645',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20225,10 +19614,7 @@ export const zSchemaHunyuanVideoImageToVideoInput = z.object({
       description: 'The resolution of the video to generate.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'The seed to use for generating the video.',
@@ -20338,10 +19724,7 @@ export const zSchemaWanI2vLoraInput = z.object({
         'Resolution of the generated video (480p or 720p). 480p is 0.5 billing units, and 720p is 1 billing unit.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   enable_prompt_expansion: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -20584,12 +19967,10 @@ export const zSchemaViduTemplateToVideoInput = z.object({
       description: 'Random seed for generation',
     }),
   ),
-  input_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        "URLs of the images to use with the template. Number of images required varies by template: 'dynasty_dress' and 'shop_frame' accept 1-2 images, 'wish_sender' requires exactly 3 images, all other templates accept only 1 image.",
-    }),
+  input_image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      "URLs of the images to use with the template. Number of images required varies by template: 'dynasty_dress' and 'shop_frame' accept 1-2 images, 'wish_sender' requires exactly 3 images, all other templates accept only 1 image.",
+  }),
 })
 
 /**
@@ -20611,12 +19992,10 @@ export const zSchemaViduReferenceToVideoInput = z.object({
       description: 'The aspect ratio of the output video',
     }),
   ),
-  reference_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'URLs of the reference images to use for consistent subject appearance',
-    }),
+  reference_image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'URLs of the reference images to use for consistent subject appearance',
+  }),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'Random seed for generation',
@@ -20643,10 +20022,7 @@ export const zSchemaViduStartEndToVideoInput = z.object({
   prompt: z.string().max(1500).register(z.globalRegistry, {
     description: 'Text prompt for video generation, max 1500 characters',
   }),
-  start_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  start_image_url: z.union([z.string(), z.string()]),
   movement_amplitude: z.optional(
     z.enum(['auto', 'small', 'medium', 'large']).register(z.globalRegistry, {
       description: 'The movement amplitude of objects in the frame',
@@ -20657,10 +20033,7 @@ export const zSchemaViduStartEndToVideoInput = z.object({
       description: 'Random seed for generation',
     }),
   ),
-  end_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  end_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20687,10 +20060,7 @@ export const zSchemaViduImageToVideoInput = z.object({
       description: 'The movement amplitude of objects in the frame',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -20738,10 +20108,7 @@ export const zSchemaPikaV21ImageToVideoInput = z
         }),
       )
       .default(''),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
   })
   .register(z.globalRegistry, {
     description: 'Base request for image-to-video generation',
@@ -20790,10 +20157,7 @@ export const zSchemaPikaV22ImageToVideoInput = z
         }),
       )
       .default(''),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
   })
   .register(z.globalRegistry, {
     description: 'Request model for Pika 2.2 image-to-video generation',
@@ -20850,11 +20214,9 @@ export const zSchemaPikaV22PikascenesInput = z
         description: 'The seed for the random number generator',
       }),
     ),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description: 'URLs of images to combine into a video',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description: 'URLs of images to combine into a video',
+    }),
     negative_prompt: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -20913,10 +20275,7 @@ export const zSchemaPikaV2TurboImageToVideoInput = z
         }),
       )
       .default(''),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
   })
   .register(z.globalRegistry, {
     description: 'Base request for image-to-video generation',
@@ -20979,10 +20338,7 @@ export const zSchemaPikaV15PikaffectsInput = z
         description: 'Negative prompt to guide the model',
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
   })
   .register(z.globalRegistry, {
     description: 'Request model for Pikaffects endpoint',
@@ -21026,12 +20382,8 @@ export const zSchemaLumaDreamMachineRay2FlashImageToVideoInput = z.object({
       description: 'The duration of the generated video',
     }),
   ),
-  image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.optional(z.union([z.string(), z.string()])),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -21045,10 +20397,7 @@ export const zSchemaPixverseV35TransitionOutput = z.object({
  * TransitionRequest
  */
 export const zSchemaPixverseV35TransitionInput = z.object({
-  first_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  first_image_url: z.union([z.string(), z.string()]),
   aspect_ratio: z.optional(
     z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
       description: 'The aspect ratio of the generated video',
@@ -21080,9 +20429,7 @@ export const zSchemaPixverseV35TransitionInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
     }),
   ),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -21222,10 +20569,7 @@ export const zSchemaPixverseV35EffectsInput = z.object({
     .register(z.globalRegistry, {
       description: 'The effect to apply to the video',
     }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -21286,10 +20630,7 @@ export const zSchemaPixverseV4ImageToVideoInput = z.object({
         description: 'The type of camera movement to apply to the video',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -21357,10 +20698,7 @@ export const zSchemaPixverseV4ImageToVideoFastInput = z.object({
         description: 'The type of camera movement to apply to the video',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -21411,10 +20749,7 @@ export const zSchemaFramepackInput = z.object({
       }),
     )
     .default(180),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   guidance_scale: z
     .optional(
       z.number().gte(0).lte(32).register(z.globalRegistry, {
@@ -21491,14 +20826,8 @@ export const zSchemaWanFlf2vInput = z.object({
       }),
     )
     .default(false),
-  start_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  end_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  start_image_url: z.union([z.string(), z.string()]),
+  end_image_url: z.union([z.string(), z.string()]),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -21601,10 +20930,7 @@ export const zSchemaFramepackFlf2vInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   strength: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -21621,10 +20947,7 @@ export const zSchemaFramepackFlf2vInput = z.object({
     )
     .default(10),
   seed: z.optional(z.union([z.int(), z.unknown()])),
-  end_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  end_image_url: z.union([z.string(), z.string()]),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -21670,10 +20993,7 @@ export const zSchemaMagiDistilledImageToVideoInput = z.object({
         "Aspect ratio of the generated video. If 'auto', the aspect ratio will be determined automatically based on the input image.",
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -21835,10 +21155,7 @@ export const zSchemaPixverseV4EffectsInput = z.object({
     .register(z.globalRegistry, {
       description: 'The effect to apply to the video',
     }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -21870,10 +21187,7 @@ export const zSchemaMagiImageToVideoInput = z.object({
         "Aspect ratio of the generated video. If 'auto', the aspect ratio will be determined automatically based on the input image.",
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -21935,10 +21249,7 @@ export const zSchemaViduQ1ImageToVideoInput = z.object({
       description: 'The movement amplitude of objects in the frame',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -21955,10 +21266,7 @@ export const zSchemaViduQ1StartEndToVideoInput = z.object({
   prompt: z.string().max(1500).register(z.globalRegistry, {
     description: 'Text prompt for video generation, max 1500 characters',
   }),
-  start_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  start_image_url: z.union([z.string(), z.string()]),
   movement_amplitude: z.optional(
     z.enum(['auto', 'small', 'medium', 'large']).register(z.globalRegistry, {
       description: 'The movement amplitude of objects in the frame',
@@ -21969,10 +21277,7 @@ export const zSchemaViduQ1StartEndToVideoInput = z.object({
       description: 'Seed for the random number generator',
     }),
   ),
-  end_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  end_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22010,10 +21315,7 @@ export const zSchemaFramepackF1Input = z.object({
       }),
     )
     .default(180),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   guidance_scale: z
     .optional(
       z.number().gte(0).lte(32).register(z.globalRegistry, {
@@ -22087,10 +21389,7 @@ export const zSchemaHunyuanCustomInput = z.object({
       }),
     )
     .default(129),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   fps: z
     .optional(
       z.int().gte(16).lte(30).register(z.globalRegistry, {
@@ -22266,10 +21565,7 @@ export const zSchemaPixverseV45EffectsInput = z.object({
     .register(z.globalRegistry, {
       description: 'The effect to apply to the video',
     }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22324,10 +21620,7 @@ export const zSchemaPixverseV45ImageToVideoFastInput = z.object({
         description: 'The type of camera movement to apply to the video',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -22354,10 +21647,7 @@ export const zSchemaPixverseV45TransitionOutput = z.object({
  * TransitionRequest
  */
 export const zSchemaPixverseV45TransitionInput = z.object({
-  first_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  first_image_url: z.union([z.string(), z.string()]),
   aspect_ratio: z.optional(
     z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
       description: 'The aspect ratio of the generated video',
@@ -22389,9 +21679,7 @@ export const zSchemaPixverseV45TransitionInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
     }),
   ),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -22466,10 +21754,7 @@ export const zSchemaLtxVideoLoraImageToVideoInput = z
         }),
       )
       .default(89),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     loras: z
       .optional(
         z.array(zSchemaLoRaWeight).register(z.globalRegistry, {
@@ -22607,10 +21892,7 @@ export const zSchemaLtxVideo13bDevImageToVideoInput = z.object({
       description: 'The aspect ratio of the video.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   constant_rate_factor: z
     .optional(
       z.int().gte(20).lte(60).register(z.globalRegistry, {
@@ -22740,10 +22022,7 @@ export const zSchemaLtxVideo13bDistilledImageToVideoInput = z
         description: 'The aspect ratio of the video.',
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     constant_rate_factor: z
       .optional(
         z.int().gte(20).lte(60).register(z.globalRegistry, {
@@ -22792,12 +22071,10 @@ export const zSchemaKlingVideoV16ProElementsInput = z.object({
       description: 'The aspect ratio of the generated video frame',
     }),
   ),
-  input_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'List of image URLs to use for video generation. Supports up to 4 images.',
-    }),
+  input_image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'List of image URLs to use for video generation. Supports up to 4 images.',
+  }),
   negative_prompt: z
     .optional(z.string().max(2500))
     .default('blur, distort, and low quality'),
@@ -22825,12 +22102,10 @@ export const zSchemaKlingVideoV16StandardElementsInput = z.object({
       description: 'The aspect ratio of the generated video frame',
     }),
   ),
-  input_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'List of image URLs to use for video generation. Supports up to 4 images.',
-    }),
+  input_image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'List of image URLs to use for video generation. Supports up to 4 images.',
+  }),
   negative_prompt: z
     .optional(z.string().max(2500))
     .default('blur, distort, and low quality'),
@@ -22847,10 +22122,7 @@ export const zSchemaHunyuanPortraitOutput = z.object({
  * Input
  */
 export const zSchemaHunyuanPortraitInput = z.object({
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -22864,10 +22136,7 @@ export const zSchemaHunyuanPortraitInput = z.object({
       }),
     )
     .default(true),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -22887,16 +22156,11 @@ export const zSchemaKlingVideoV21ProImageToVideoInput = z.object({
       description: 'The duration of the generated video in seconds',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   negative_prompt: z
     .optional(z.string().max(2500))
     .default('blur, distort, and low quality'),
-  tail_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  tail_image_url: z.optional(z.union([z.string(), z.string()])),
   cfg_scale: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -22925,10 +22189,7 @@ export const zSchemaHunyuanAvatarInput = z.object({
       }),
     )
     .default('A cat is singing.'),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   turbo_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -22937,10 +22198,7 @@ export const zSchemaHunyuanAvatarInput = z.object({
       }),
     )
     .default(true),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'Random seed for generation.',
@@ -23001,10 +22259,7 @@ export const zSchemaBytedanceSeedanceV1LiteImageToVideoInput = z.object({
         description: 'Duration of the video in seconds',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -23019,9 +22274,7 @@ export const zSchemaBytedanceSeedanceV1LiteImageToVideoInput = z.object({
       }),
     )
     .default(false),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -23049,13 +22302,8 @@ export const zSchemaMinimaxHailuo02ProImageToVideoInput = z.object({
     )
     .default(true),
   prompt: z.string().max(2000),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -23086,17 +22334,9 @@ export const zSchemaAiAvatarMultiInput = z.object({
       description: 'The acceleration level to use for generation.',
     }),
   ),
-  first_audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  second_audio_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  first_audio_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
+  second_audio_url: z.optional(z.union([z.string(), z.string()])),
   seed: z
     .optional(
       z.int().register(z.globalRegistry, {
@@ -23156,10 +22396,7 @@ export const zSchemaAiAvatarMultiTextInput = z.object({
   first_text_input: z.string().register(z.globalRegistry, {
     description: 'The text input to guide video generation.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   voice2: z.optional(
     z
       .enum([
@@ -23262,14 +22499,8 @@ export const zSchemaAiAvatarInput = z.object({
       description: 'The acceleration level to use for generation.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
+  audio_url: z.union([z.string(), z.string()]),
   num_frames: z
     .optional(
       z.int().gte(41).lte(241).register(z.globalRegistry, {
@@ -23319,10 +22550,7 @@ export const zSchemaAiAvatarSingleTextInput = z.object({
   text_input: z.string().register(z.globalRegistry, {
     description: 'The text input to guide video generation.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   voice: z
     .enum([
       'Aria',
@@ -23393,12 +22621,10 @@ export const zSchemaViduQ1ReferenceToVideoInput = z.object({
       }),
     )
     .default(false),
-  reference_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'URLs of the reference images to use for consistent subject appearance. Q1 model supports up to 7 reference images.',
-    }),
+  reference_image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'URLs of the reference images to use for consistent subject appearance. Q1 model supports up to 7 reference images.',
+  }),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'Random seed for generation',
@@ -23455,10 +22681,7 @@ export const zSchemaVeo3FastImageToVideoInput = z.object({
       description: 'The duration of the generated video.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -23591,10 +22814,7 @@ export const zSchemaLtxv13B098DistilledImageToVideoInput = z
         }),
       )
       .default(0),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     constant_rate_factor: z
       .optional(
         z.int().gte(0).lte(51).register(z.globalRegistry, {
@@ -23627,14 +22847,8 @@ export const zSchemaBytedanceOmnihumanOutput = z.object({
  * OmniHumanInput
  */
 export const zSchemaBytedanceOmnihumanInput = z.object({
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -23706,9 +22920,7 @@ export const zSchemaWanV22A14bImageToVideoInput = z.object({
       }),
     )
     .default(81),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -23749,10 +22961,7 @@ export const zSchemaWanV22A14bImageToVideoInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   video_quality: z.optional(
     z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
       description:
@@ -23908,10 +23117,7 @@ export const zSchemaWanV225bImageToVideoInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   video_quality: z.optional(
     z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
       description:
@@ -24011,10 +23217,7 @@ export const zSchemaWanV22A14bImageToVideoTurboInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   video_quality: z.optional(
     z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
       description:
@@ -24035,9 +23238,7 @@ export const zSchemaWanV22A14bImageToVideoTurboInput = z.object({
         'Random seed for reproducibility. If None, a random seed is chosen.',
     }),
   ),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
   enable_prompt_expansion: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -24092,10 +23293,7 @@ export const zSchemaVeo3ImageToVideoInput = z.object({
       description: 'The duration of the generated video.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24123,10 +23321,7 @@ export const zSchemaMinimaxHailuo02FastImageToVideoInput = z.object({
     }),
   ),
   prompt: z.string().max(2000),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24212,9 +23407,7 @@ export const zSchemaWanV22A14bImageToVideoLoraInput = z.object({
       }),
     )
     .default(81),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -24255,10 +23448,7 @@ export const zSchemaWanV22A14bImageToVideoLoraInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   video_quality: z.optional(
     z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
       description:
@@ -24321,10 +23511,7 @@ export const zSchemaBytedanceVideoStylizeInput = z.object({
     description:
       'The style for your character in the video. Please use a short description.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24346,10 +23533,7 @@ export const zSchemaMareyI2vInput = z.object({
       description: 'The duration of the generated video.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   dimensions: z.optional(
     z
       .enum(['1920x1080', '1080x1920', '1152x1152', '1536x1152', '1152x1536'])
@@ -24393,10 +23577,7 @@ export const zSchemaPixverseV5ImageToVideoInput = z.object({
         description: 'The style of the generated video',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -24542,10 +23723,7 @@ export const zSchemaPixverseV5EffectsInput = z.object({
     .register(z.globalRegistry, {
       description: 'The effect to apply to the video',
     }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24559,10 +23737,7 @@ export const zSchemaPixverseV5TransitionOutput = z.object({
  * TransitionRequest
  */
 export const zSchemaPixverseV5TransitionInput = z.object({
-  first_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  first_image_url: z.union([z.string(), z.string()]),
   aspect_ratio: z.optional(
     z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
       description: 'The aspect ratio of the generated video',
@@ -24594,9 +23769,7 @@ export const zSchemaPixverseV5TransitionInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
     }),
   ),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -24638,10 +23811,7 @@ export const zSchemaDecartLucy5bImageToVideoInput = z.object({
       description: 'Resolution of the generated video',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24679,10 +23849,7 @@ export const zSchemaWanAtiInput = z.object({
       description: 'Resolution of the generated video (480p, 580p, 720p).',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   track: z.array(z.array(zSchemaTrackPoint)).register(z.globalRegistry, {
     description:
       "Motion tracks to guide video generation. Each track is a sequence of points defining a motion trajectory. Multiple tracks can control different elements or objects in the video. Expected format: array of tracks, where each track is an array of points with 'x' and 'y' coordinates (up to 121 points per track). Points will be automatically padded to 121 if fewer are provided. Coordinates should be within the image dimensions.",
@@ -24762,11 +23929,9 @@ export const zSchemaBytedanceSeedanceV1LiteReferenceToVideoInput = z.object({
       }),
     )
     .default(false),
-  reference_image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'Reference images to generate the video with.',
-    }),
+  reference_image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'Reference images to generate the video with.',
+  }),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -24807,10 +23972,7 @@ export const zSchemaLucy14bImageToVideoInput = z.object({
       description: 'Resolution of the generated video',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24834,14 +23996,8 @@ export const zSchemaKlingVideoV1ProAiAvatarInput = z.object({
       }),
     )
     .default('.'),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24865,14 +24021,8 @@ export const zSchemaKlingVideoV1StandardAiAvatarInput = z.object({
       }),
     )
     .default('.'),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24889,14 +24039,8 @@ export const zSchemaFabric10Input = z.object({
   resolution: z.enum(['720p', '480p']).register(z.globalRegistry, {
     description: 'Resolution',
   }),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24932,14 +24076,8 @@ export const zSchemaBytedanceOmnihumanV15Input = z.object({
       description: 'The text prompt used to guide the video generation.',
     }),
   ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -24956,14 +24094,8 @@ export const zSchemaFabric10FastInput = z.object({
   resolution: z.enum(['720p', '480p']).register(z.globalRegistry, {
     description: 'Resolution',
   }),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -25005,10 +24137,7 @@ export const zSchemaOviImageToVideoInput = z.object({
       }),
     )
     .default('jitter, bad hands, blur, distortion'),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -25047,10 +24176,7 @@ export const zSchemaSora2ImageToVideoInput = z.object({
       description: 'The aspect ratio of the generated video',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   model: z.optional(
     z
       .enum(['sora-2', 'sora-2-2025-12-08', 'sora-2-2025-10-06'])
@@ -25113,10 +24239,7 @@ export const zSchemaSora2ImageToVideoProInput = z.object({
       }),
     )
     .default(true),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -25164,10 +24287,7 @@ export const zSchemaVeo31ImageToVideoInput = z.object({
       description: 'The resolution of the generated video.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'The seed for the random number generator.',
@@ -25225,10 +24345,7 @@ export const zSchemaVeo31FastImageToVideoInput = z.object({
       description: 'The resolution of the generated video.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'The seed for the random number generator.',
@@ -25285,12 +24402,10 @@ export const zSchemaVeo31ReferenceToVideoInput = z.object({
       }),
     )
     .default(false),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'URLs of the reference images to use for consistent subject appearance',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'URLs of the reference images to use for consistent subject appearance',
+  }),
 })
 
 /**
@@ -25337,19 +24452,13 @@ export const zSchemaVeo31FirstLastFrameToVideoInput = z.object({
       description: 'The resolution of the generated video.',
     }),
   ),
-  first_frame_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  first_frame_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'The seed for the random number generator.',
     }),
   ),
-  last_frame_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  last_frame_url: z.union([z.string(), z.string()]),
   negative_prompt: z.optional(
     z.string().register(z.globalRegistry, {
       description: 'A negative prompt to guide the video generation.',
@@ -25401,19 +24510,13 @@ export const zSchemaVeo31FastFirstLastFrameToVideoInput = z.object({
       description: 'The resolution of the generated video.',
     }),
   ),
-  first_frame_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  first_frame_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'The seed for the random number generator.',
     }),
   ),
-  last_frame_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  last_frame_url: z.union([z.string(), z.string()]),
   negative_prompt: z.optional(
     z.string().register(z.globalRegistry, {
       description: 'A negative prompt to guide the video generation.',
@@ -25438,10 +24541,7 @@ export const zSchemaKlingVideoV25TurboStandardImageToVideoInput = z.object({
       description: 'The duration of the generated video in seconds',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   negative_prompt: z
     .optional(z.string().max(2500))
     .default('blur, distort, and low quality'),
@@ -25489,10 +24589,7 @@ export const zSchemaViduQ2ImageToVideoProInput = z.object({
         description: 'Duration of the video in seconds',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   bgm: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -25512,9 +24609,7 @@ export const zSchemaViduQ2ImageToVideoProInput = z.object({
       description: 'The movement amplitude of objects in the frame',
     }),
   ),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -25551,10 +24646,7 @@ export const zSchemaViduQ2ImageToVideoTurboInput = z.object({
         description: 'Duration of the video in seconds',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   bgm: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -25574,9 +24666,7 @@ export const zSchemaViduQ2ImageToVideoTurboInput = z.object({
       description: 'The movement amplitude of objects in the frame',
     }),
   ),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -25616,10 +24706,7 @@ export const zSchemaBytedanceSeedanceV1ProFastImageToVideoInput = z.object({
         description: 'Duration of the video in seconds',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -25663,10 +24750,7 @@ export const zSchemaMinimaxHailuo23FastProImageToVideoInput = z.object({
   prompt: z.string().min(1).max(2000).register(z.globalRegistry, {
     description: 'Text prompt for video generation',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -25695,10 +24779,7 @@ export const zSchemaMinimaxHailuo23StandardImageToVideoInput = z.object({
   prompt: z.string().min(1).max(2000).register(z.globalRegistry, {
     description: 'Text prompt for video generation',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -25727,10 +24808,7 @@ export const zSchemaMinimaxHailuo23FastStandardImageToVideoInput = z.object({
   prompt: z.string().min(1).max(2000).register(z.globalRegistry, {
     description: 'Text prompt for video generation',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -25786,10 +24864,7 @@ export const zSchemaLongcatVideoDistilledImageToVideo480pInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   video_quality: z.optional(
     z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
       description: 'The quality of the generated video.',
@@ -25897,10 +24972,7 @@ export const zSchemaLongcatVideoDistilledImageToVideo720pInput = z.object({
       }),
     )
     .default(12),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -26014,10 +25086,7 @@ export const zSchemaLongcatVideoImageToVideo480pInput = z.object({
         description: 'The output type of the generated video.',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -26140,10 +25209,7 @@ export const zSchemaLongcatVideoImageToVideo720pInput = z.object({
         description: 'The output type of the generated video.',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   sync_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -26243,12 +25309,10 @@ export const zSchemaPikaV22PikaframesInput = z.object({
       description: 'The seed for the random number generator',
     }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description:
-        'URLs of keyframe images (2-5 images) to create transitions between',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description:
+      'URLs of keyframe images (2-5 images) to create transitions between',
+  }),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -26276,10 +25340,7 @@ export const zSchemaPixverseSwapInput = z.object({
       }),
     )
     .default(true),
-  video_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  video_url: z.union([z.string(), z.string()]),
   keyframe_id: z
     .optional(
       z.int().gte(1).register(z.globalRegistry, {
@@ -26297,10 +25358,7 @@ export const zSchemaPixverseSwapInput = z.object({
       description: 'The output resolution (1080p not supported)',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26362,10 +25420,7 @@ export const zSchemaLynxInput = z.object({
       }),
     )
     .default(16),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   guidance_scale: z
     .optional(
       z.number().gte(1).lte(20).register(z.globalRegistry, {
@@ -26446,10 +25501,7 @@ export const zSchemaLtx2ImageToVideoInput = z.object({
       description: 'The resolution of the generated video',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   fps: z.optional(
     z.union([z.literal(25), z.literal(50)]).register(z.globalRegistry, {
       description: 'The frames per second of the generated video',
@@ -26505,10 +25557,7 @@ export const zSchemaLtx2ImageToVideoFastInput = z.object({
       description: 'The resolution of the generated video',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   fps: z.optional(
     z.union([z.literal(25), z.literal(50)]).register(z.globalRegistry, {
       description: 'The frames per second of the generated video',
@@ -26553,12 +25602,10 @@ export const zSchemaKlingVideoO1ReferenceToVideoInput = z
       }),
     ),
     image_urls: z.optional(
-      z
-        .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-        .register(z.globalRegistry, {
-          description:
-            'Additional reference images for style/appearance. Reference in prompt as @Image1, @Image2, etc. Maximum 7 total (elements + reference images + start image).',
-        }),
+      z.array(z.string()).register(z.globalRegistry, {
+        description:
+          'Additional reference images for style/appearance. Reference in prompt as @Image1, @Image2, etc. Maximum 7 total (elements + reference images + start image).',
+      }),
     ),
   })
   .register(z.globalRegistry, {
@@ -26594,13 +25641,8 @@ export const zSchemaKlingVideoO1ImageToVideoInput = z.object({
         description: 'Video duration in seconds.',
       }),
   ),
-  start_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  start_image_url: z.union([z.string(), z.string()]),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -26646,10 +25688,7 @@ export const zSchemaPixverseV55ImageToVideoInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   generate_audio_switch: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -26683,10 +25722,7 @@ export const zSchemaPixverseV55TransitionOutput = z.object({
  * TransitionRequestV5_5
  */
 export const zSchemaPixverseV55TransitionInput = z.object({
-  first_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  first_image_url: z.union([z.string(), z.string()]),
   aspect_ratio: z.optional(
     z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
       description: 'The aspect ratio of the generated video',
@@ -26732,9 +25768,7 @@ export const zSchemaPixverseV55TransitionInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
     }),
   ),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -26880,10 +25914,7 @@ export const zSchemaPixverseV55EffectsInput = z.object({
     .register(z.globalRegistry, {
       description: 'The effect to apply to the video',
     }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26917,13 +25948,8 @@ export const zSchemaKlingVideoV26ProImageToVideoInput = z.object({
       }),
     )
     .default(true),
-  start_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  start_image_url: z.union([z.string(), z.string()]),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
   negative_prompt: z
     .optional(z.string().max(2500))
     .default('blur, distort, and low quality'),
@@ -26950,14 +25976,8 @@ export const zSchemaKlingVideoAiAvatarV2StandardInput = z.object({
       }),
     )
     .default('.'),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -26981,14 +26001,8 @@ export const zSchemaKlingVideoAiAvatarV2ProInput = z.object({
       }),
     )
     .default('.'),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -27026,14 +26040,8 @@ export const zSchemaCreatifyAuroraInput = z.object({
       }),
     )
     .default(2),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -27064,13 +26072,8 @@ export const zSchemaKlingVideoO1StandardImageToVideoInput = z.object({
         description: 'Video duration in seconds.',
       }),
   ),
-  start_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  start_image_url: z.union([z.string(), z.string()]),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -27110,12 +26113,10 @@ export const zSchemaKlingVideoO1StandardReferenceToVideoInput = z
       }),
     ),
     image_urls: z.optional(
-      z
-        .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-        .register(z.globalRegistry, {
-          description:
-            'Additional reference images for style/appearance. Reference in prompt as @Image1, @Image2, etc. Maximum 7 total (elements + reference images + start image).',
-        }),
+      z.array(z.string()).register(z.globalRegistry, {
+        description:
+          'Additional reference images for style/appearance. Reference in prompt as @Image1, @Image2, etc. Maximum 7 total (elements + reference images + start image).',
+      }),
     ),
   })
   .register(z.globalRegistry, {
@@ -27166,13 +26167,8 @@ export const zSchemaV26ImageToVideoInput = z
           'Duration of the generated video in seconds. Choose between 5, 10 or 15 seconds.',
       }),
     ),
-    audio_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    audio_url: z.optional(z.union([z.string(), z.string()])),
+    image_url: z.union([z.string(), z.string()]),
     enable_prompt_expansion: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -27241,10 +26237,7 @@ export const zSchemaHunyuanVideoV15ImageToVideoInput = z.object({
       description: 'The resolution of the video.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   enable_prompt_expansion: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -27311,10 +26304,7 @@ export const zSchemaLiveAvatarInput = z.object({
       description: 'Acceleration level for faster video decoding ',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   num_clips: z
     .optional(
       z.int().gte(1).lte(100).register(z.globalRegistry, {
@@ -27323,10 +26313,7 @@ export const zSchemaLiveAvatarInput = z.object({
       }),
     )
     .default(10),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'Random seed for reproducible generation.',
@@ -27393,10 +26380,7 @@ export const zSchemaBytedanceSeedanceV15ProImageToVideoInput = z.object({
         description: 'Duration of the video in seconds',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -27411,9 +26395,7 @@ export const zSchemaBytedanceSeedanceV15ProImageToVideoInput = z.object({
       }),
     )
     .default(false),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -27452,10 +26434,7 @@ export const zSchemaKandinsky5ProImageToVideoInput = z.object({
     }),
   ),
   num_inference_steps: z.optional(z.int().gte(1).lte(40)).default(28),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -27491,10 +26470,7 @@ export const zSchemaWanMoveInput = z.object({
       description:
         'A list of trajectories. Each trajectory list means the movement of one object.',
     }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   guidance_scale: z
     .optional(
       z.number().gte(1).register(z.globalRegistry, {
@@ -27664,10 +26640,7 @@ export const zSchemaLtx219bImageToVideoInput = z.object({
       }),
     )
     .default(121),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   video_quality: z.optional(
     z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
       description: 'The quality of the generated video.',
@@ -27837,10 +26810,7 @@ export const zSchemaLtx219bImageToVideoLoraInput = z.object({
       }),
     )
     .default(121),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   video_quality: z.optional(
     z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
       description: 'The quality of the generated video.',
@@ -28000,10 +26970,7 @@ export const zSchemaLtx219bDistilledImageToVideoInput = z.object({
         description: 'The output type of the generated video.',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   video_quality: z.optional(
     z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
       description: 'The quality of the generated video.',
@@ -28159,10 +27126,7 @@ export const zSchemaLtx219bDistilledImageToVideoLoraInput = z.object({
         description: 'The output type of the generated video.',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   video_quality: z.optional(
     z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
       description: 'The quality of the generated video.',
@@ -28229,13 +27193,8 @@ export const zSchemaV26ImageToVideoFlashInput = z
           'Duration of the generated video in seconds. Choose between 5, 10 or 15 seconds.',
       }),
     ),
-    audio_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    audio_url: z.optional(z.union([z.string(), z.string()])),
+    image_url: z.union([z.string(), z.string()]),
     enable_prompt_expansion: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -28313,12 +27272,10 @@ export const zSchemaViduQ2ReferenceToVideoProInput = z.object({
     )
     .default(4),
   reference_video_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URLs of the reference videos for video editing or motion reference. Supports up to 2 videos.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URLs of the reference videos for video editing or motion reference. Supports up to 2 videos.',
+    }),
   ),
   bgm: z
     .optional(
@@ -28328,12 +27285,10 @@ export const zSchemaViduQ2ReferenceToVideoProInput = z.object({
     )
     .default(false),
   reference_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URLs of the reference images for subject appearance. If videos are provided, up to 4 images are allowed; otherwise up to 7 images.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URLs of the reference images for subject appearance. If videos are provided, up to 4 images are allowed; otherwise up to 7 images.',
+    }),
   ),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
@@ -28384,10 +27339,7 @@ export const zSchemaPixverseV56ImageToVideoInput = z.object({
         "Prompt optimization mode: 'enabled' to optimize, 'disabled' to turn off, 'auto' for model decision",
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   generate_audio_switch: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -28421,10 +27373,7 @@ export const zSchemaPixverseV56TransitionOutput = z.object({
  * TransitionRequestV5_6
  */
 export const zSchemaPixverseV56TransitionInput = z.object({
-  first_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  first_image_url: z.union([z.string(), z.string()]),
   aspect_ratio: z.optional(
     z.enum(['16:9', '4:3', '1:1', '3:4', '9:16']).register(z.globalRegistry, {
       description: 'The aspect ratio of the generated video',
@@ -28470,9 +27419,7 @@ export const zSchemaPixverseV56TransitionInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same video every time.\n        ',
     }),
   ),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
   negative_prompt: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -28556,10 +27503,7 @@ export const zSchemaWanI2vInput = z.object({
         'Resolution of the generated video (480p or 720p). 480p is 0.5 billing units, and 720p is 1 billing unit.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   enable_prompt_expansion: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -28608,10 +27552,7 @@ export const zSchemaKlingVideoV2MasterImageToVideoInput = z.object({
       description: 'The duration of the generated video in seconds',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   negative_prompt: z
     .optional(z.string().max(2500))
     .default('blur, distort, and low quality'),
@@ -28683,10 +27624,7 @@ export const zSchemaPixverseV45ImageToVideoInput = z.object({
         description: 'The type of camera movement to apply to the video',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -28719,10 +27657,7 @@ export const zSchemaKlingVideoV21StandardImageToVideoInput = z.object({
       description: 'The duration of the generated video in seconds',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   negative_prompt: z
     .optional(z.string().max(2500))
     .default('blur, distort, and low quality'),
@@ -28753,10 +27688,7 @@ export const zSchemaKlingVideoV21MasterImageToVideoInput = z.object({
       description: 'The duration of the generated video in seconds',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   negative_prompt: z
     .optional(z.string().max(2500))
     .default('blur, distort, and low quality'),
@@ -28807,10 +27739,7 @@ export const zSchemaBytedanceSeedanceV1ProImageToVideoInput = z.object({
         description: 'Duration of the video in seconds',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   enable_safety_checker: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -28825,9 +27754,7 @@ export const zSchemaBytedanceSeedanceV1ProImageToVideoInput = z.object({
       }),
     )
     .default(false),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
@@ -28866,13 +27793,8 @@ export const zSchemaMinimaxHailuo02StandardImageToVideoInput = z.object({
     }),
   ),
   prompt: z.string().max(2000),
-  end_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  end_image_url: z.optional(z.union([z.string(), z.string()])),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -28892,16 +27814,11 @@ export const zSchemaKlingVideoV25TurboProImageToVideoInput = z.object({
       description: 'The duration of the generated video in seconds',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   negative_prompt: z
     .optional(z.string().max(2500))
     .default('blur, distort, and low quality'),
-  tail_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  tail_image_url: z.optional(z.union([z.string(), z.string()])),
   cfg_scale: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -28955,10 +27872,7 @@ export const zSchemaWan25PreviewImageToVideoInput = z
           'Duration of the generated video in seconds. Choose between 5 or 10 seconds.',
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     enable_safety_checker: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -28972,9 +27886,7 @@ export const zSchemaWan25PreviewImageToVideoInput = z
           'Random seed for reproducibility. If None, a random seed is chosen.',
       }),
     ),
-    audio_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    audio_url: z.optional(z.union([z.string(), z.string()])),
     negative_prompt: z.optional(
       z.string().register(z.globalRegistry, {
         description:
@@ -29014,10 +27926,7 @@ export const zSchemaMinimaxHailuo23ProImageToVideoInput = z.object({
   prompt: z.string().min(1).max(2000).register(z.globalRegistry, {
     description: 'Text prompt for video generation',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -29039,10 +27948,7 @@ export const zSchemaMinimaxVideo01ImageToVideoInput = z.object({
     )
     .default(true),
   prompt: z.string().max(2000),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -29070,13 +27976,8 @@ export const zSchemaKlingVideoV16ProImageToVideoInput = z.object({
       description: 'The duration of the generated video in seconds',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  tail_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.union([z.string(), z.string()]),
+  tail_image_url: z.optional(z.union([z.string(), z.string()])),
   cfg_scale: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -29113,10 +28014,7 @@ export const zSchemaVeo2ImageToVideoInput = z.object({
         description: 'The aspect ratio of the generated video',
       }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -29141,10 +28039,7 @@ export const zSchemaWanProImageToVideoInput = z.object({
     )
     .default(true),
   seed: z.optional(z.union([z.int(), z.unknown()])),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -29227,10 +28122,7 @@ export const zSchemaWanEffectsInput = z.object({
       }),
     )
     .default(1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   turbo_mode: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -29283,14 +28175,8 @@ export const zSchemaEchomimicV3Input = z.object({
   prompt: z.string().register(z.globalRegistry, {
     description: 'The prompt to use for the video generation.',
   }),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
+  image_url: z.union([z.string(), z.string()]),
   guidance_scale: z
     .optional(
       z.number().gte(1).lte(10).register(z.globalRegistry, {
@@ -29355,10 +28241,7 @@ export const zSchemaStableAvatarInput = z.object({
       }),
     )
     .default(0.1),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   guidance_scale: z
     .optional(
       z.number().gte(1).lte(10).register(z.globalRegistry, {
@@ -29379,10 +28262,7 @@ export const zSchemaStableAvatarInput = z.object({
       }),
     )
     .default(50),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   audio_guidance_scale: z
     .optional(
       z.number().gte(0).lte(10).register(z.globalRegistry, {
@@ -29472,20 +28352,14 @@ export const zSchemaWanV2214bSpeechToVideoInput = z.object({
       }),
     )
     .default(false),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   video_quality: z.optional(
     z.enum(['low', 'medium', 'high', 'maximum']).register(z.globalRegistry, {
       description:
         'The quality of the output video. Higher quality means better visual quality but larger file size.',
     }),
   ),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   num_inference_steps: z
     .optional(
       z.int().gte(2).lte(40).register(z.globalRegistry, {
@@ -29513,10 +28387,7 @@ export const zSchemaAvatarsAudioToVideoOutput = z.object({
  * Audio2VideoInput
  */
 export const zSchemaAvatarsAudioToVideoInput = z.object({
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   avatar_id: z
     .enum([
       'emily_vertical_primary',
@@ -29615,10 +28486,7 @@ export const zSchemaLongcatSingleAvatarAudioToVideoInput = z
         }),
       )
       .default(1),
-    audio_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    audio_url: z.union([z.string(), z.string()]),
     num_inference_steps: z
       .optional(
         z.int().gte(10).lte(100).register(z.globalRegistry, {
@@ -29707,14 +28575,8 @@ export const zSchemaLongcatSingleAvatarImageAudioToVideoInput = z
         }),
       )
       .default(1),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
-    audio_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
+    audio_url: z.union([z.string(), z.string()]),
     num_inference_steps: z
       .optional(
         z.int().gte(10).lte(100).register(z.globalRegistry, {
@@ -29854,10 +28716,7 @@ export const zSchemaLongcatMultiAvatarImageAudioToVideoInput = z
           "How to combine the two audio tracks. 'para' (parallel) plays both simultaneously, 'add' (sequential) plays person 1 first then person 2.",
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     audio_url_person1: z
       .optional(
         z.string().register(z.globalRegistry, {
@@ -30084,10 +28943,7 @@ export const zSchemaLtx219bAudioToVideoInput = z.object({
       }),
     )
     .default(false),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   audio_strength: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -30265,10 +29121,7 @@ export const zSchemaLtx219bDistilledAudioToVideoInput = z.object({
       }),
     )
     .default(false),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   audio_strength: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -30449,10 +29302,7 @@ export const zSchemaLtx219bAudioToVideoLoraInput = z.object({
       }),
     )
     .default(false),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   audio_strength: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {
@@ -30633,10 +29483,7 @@ export const zSchemaLtx219bDistilledAudioToVideoLoraInput = z.object({
       }),
     )
     .default(false),
-  audio_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  audio_url: z.union([z.string(), z.string()]),
   audio_strength: z
     .optional(
       z.number().gte(0).lte(1).register(z.globalRegistry, {

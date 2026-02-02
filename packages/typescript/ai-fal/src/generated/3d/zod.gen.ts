@@ -26,11 +26,9 @@ export const zSchemaFile = z.object({
     description: 'The URL where the file can be downloaded from.',
   }),
   file_data: z.optional(
-    z
-      .union([z.instanceof(Blob), z.instanceof(File)])
-      .register(z.globalRegistry, {
-        description: 'File data',
-      }),
+    z.string().register(z.globalRegistry, {
+      description: 'File data',
+    }),
   ),
 })
 
@@ -160,9 +158,7 @@ export const zSchemaMeshyV6PreviewTextTo3dInput = z
         }),
       )
       .default(true),
-    texture_image_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    texture_image_url: z.optional(z.union([z.string(), z.string()])),
     topology: z.optional(
       z.enum(['quad', 'triangle']).register(z.globalRegistry, {
         description:
@@ -385,10 +381,7 @@ export const zSchemaTriposrInput = z.object({
       description: 'Output format for the 3D model.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -419,10 +412,7 @@ export const zSchemaTrellisInput = z.object({
       }),
     )
     .default(12),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   slat_guidance_strength: z
     .optional(
       z.number().gte(0).lte(10).register(z.globalRegistry, {
@@ -491,11 +481,9 @@ export const zSchemaImage = z
       }),
     ),
     file_data: z.optional(
-      z
-        .union([z.instanceof(Blob), z.instanceof(File)])
-        .register(z.globalRegistry, {
-          description: 'File data',
-        }),
+      z.string().register(z.globalRegistry, {
+        description: 'File data',
+      }),
     ),
   })
   .register(z.globalRegistry, {
@@ -560,12 +548,10 @@ export const zSchemaHyper3dRodinInput = z.object({
     )
     .default(false),
   input_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URL of images to use while generating the 3D model. Required for Image-to-3D mode. Optional for Text-to-3D mode.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URL of images to use while generating the 3D model. Required for Image-to-3D mode. Optional for Text-to-3D mode.',
+    }),
   ),
   geometry_file_format: z.optional(
     z.enum(['glb', 'usdz', 'fbx', 'obj', 'stl']).register(z.globalRegistry, {
@@ -615,10 +601,7 @@ export const zSchemaHunyuan3dV2MiniTurboOutput = z.object({
  * Hunyuan3DInput
  */
 export const zSchemaHunyuan3dV2MiniTurboInput = z.object({
-  input_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  input_image_url: z.union([z.string(), z.string()]),
   octree_resolution: z
     .optional(
       z.int().gte(1).lte(1024).register(z.globalRegistry, {
@@ -670,10 +653,7 @@ export const zSchemaHunyuan3dV2TurboOutput = z.object({
  * Hunyuan3DInput
  */
 export const zSchemaHunyuan3dV2TurboInput = z.object({
-  input_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  input_image_url: z.union([z.string(), z.string()]),
   octree_resolution: z
     .optional(
       z.int().gte(1).lte(1024).register(z.globalRegistry, {
@@ -725,10 +705,7 @@ export const zSchemaHunyuan3dV2MultiViewOutput = z.object({
  * Hunyuan3DInputMultiView
  */
 export const zSchemaHunyuan3dV2MultiViewInput = z.object({
-  front_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  front_image_url: z.union([z.string(), z.string()]),
   octree_resolution: z
     .optional(
       z.int().gte(1).lte(1024).register(z.globalRegistry, {
@@ -736,10 +713,7 @@ export const zSchemaHunyuan3dV2MultiViewInput = z.object({
       }),
     )
     .default(256),
-  back_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  back_image_url: z.union([z.string(), z.string()]),
   guidance_scale: z
     .optional(
       z.number().gte(0).lte(20).register(z.globalRegistry, {
@@ -768,10 +742,7 @@ export const zSchemaHunyuan3dV2MultiViewInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  left_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  left_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -788,10 +759,7 @@ export const zSchemaHunyuan3dV2MiniOutput = z.object({
  * Hunyuan3DInput
  */
 export const zSchemaHunyuan3dV2MiniInput = z.object({
-  input_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  input_image_url: z.union([z.string(), z.string()]),
   octree_resolution: z
     .optional(
       z.int().gte(1).lte(1024).register(z.globalRegistry, {
@@ -843,10 +811,7 @@ export const zSchemaHunyuan3dV2Output = z.object({
  * Hunyuan3DInput
  */
 export const zSchemaHunyuan3dV2Input = z.object({
-  input_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  input_image_url: z.union([z.string(), z.string()]),
   octree_resolution: z
     .optional(
       z.int().gte(1).lte(1024).register(z.globalRegistry, {
@@ -898,10 +863,7 @@ export const zSchemaHunyuan3dV2MultiViewTurboOutput = z.object({
  * Hunyuan3DInputMultiView
  */
 export const zSchemaHunyuan3dV2MultiViewTurboInput = z.object({
-  front_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  front_image_url: z.union([z.string(), z.string()]),
   octree_resolution: z
     .optional(
       z.int().gte(1).lte(1024).register(z.globalRegistry, {
@@ -909,10 +871,7 @@ export const zSchemaHunyuan3dV2MultiViewTurboInput = z.object({
       }),
     )
     .default(256),
-  back_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  back_image_url: z.union([z.string(), z.string()]),
   guidance_scale: z
     .optional(
       z.number().gte(0).lte(20).register(z.globalRegistry, {
@@ -941,10 +900,7 @@ export const zSchemaHunyuan3dV2MultiViewTurboInput = z.object({
         '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
     }),
   ),
-  left_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  left_image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -1001,10 +957,7 @@ export const zSchemaTripoV25ImageTo3dInput = z.object({
         'Determines the prioritization of texture alignment in the 3D model. The default value is original_image.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   texture: z.optional(
     z.enum(['no', 'standard', 'HD']).register(z.globalRegistry, {
       description:
@@ -1109,11 +1062,9 @@ export const zSchemaTrellisMultiInput = z.object({
         description: 'Texture resolution',
       }),
   ),
-  image_urls: z
-    .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-    .register(z.globalRegistry, {
-      description: 'List of URLs of input images to convert to 3D',
-    }),
+  image_urls: z.array(z.string()).register(z.globalRegistry, {
+    description: 'List of URLs of input images to convert to 3D',
+  }),
 })
 
 /**
@@ -1132,10 +1083,7 @@ export const zSchemaHunyuan3dV21Output = z.object({
  * Hunyuan3DInput
  */
 export const zSchemaHunyuan3dV21Input = z.object({
-  input_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  input_image_url: z.union([z.string(), z.string()]),
   octree_resolution: z
     .optional(
       z.int().gte(1).lte(1024).register(z.globalRegistry, {
@@ -1196,9 +1144,7 @@ export const zSchemaTripoV25MultiviewTo3dInput = z.object({
         'Limits the number of faces on the output model. If this option is not set, the face limit will be adaptively determined.',
     }),
   ),
-  right_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  right_image_url: z.optional(z.union([z.string(), z.string()])),
   style: z.optional(
     z
       .enum([
@@ -1224,19 +1170,14 @@ export const zSchemaTripoV25MultiviewTo3dInput = z.object({
       }),
     )
     .default(false),
-  front_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  front_image_url: z.union([z.string(), z.string()]),
   texture_seed: z.optional(
     z.int().register(z.globalRegistry, {
       description:
         'This is the random seed for texture generation. Using the same seed will produce identical textures. This parameter is an integer and is randomly chosen if not set. If you want a model with different textures, please use same seed and different texture_seed.',
     }),
   ),
-  back_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  back_image_url: z.optional(z.union([z.string(), z.string()])),
   pbr: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -1277,9 +1218,7 @@ export const zSchemaTripoV25MultiviewTo3dInput = z.object({
         'Set orientation=align_image to automatically rotate the model to align the original image. The default value is default.',
     }),
   ),
-  left_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  left_image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -1309,10 +1248,7 @@ export const zSchemaHunyuanWorldImageToWorldInput = z.object({
   labels_fg2: z.string().register(z.globalRegistry, {
     description: 'Labels for the second foreground object.',
   }),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -1341,10 +1277,7 @@ export const zSchemaPshumanInput = z.object({
         'Seed for reproducibility. If None, a random seed will be used.',
     }),
   ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -1412,12 +1345,10 @@ export const zSchemaHyper3dRodinV2Input = z.object({
     )
     .default(false),
   input_image_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'URL of images to use while generating the 3D model. Required for Image-to-3D mode. Up to 5 images allowed.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'URL of images to use while generating the 3D model. Required for Image-to-3D mode. Up to 5 images allowed.',
+    }),
   ),
   use_original_alpha: z
     .optional(
@@ -1515,19 +1446,14 @@ export const zSchemaMeshyV6PreviewImageTo3dInput = z
         }),
       )
       .default(true),
-    texture_image_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    texture_image_url: z.optional(z.union([z.string(), z.string()])),
     topology: z.optional(
       z.enum(['quad', 'triangle']).register(z.globalRegistry, {
         description:
           'Specify the topology of the generated model. Quad for smooth surfaces, Triangle for detailed geometry.',
       }),
     ),
-    image_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    image_url: z.union([z.string(), z.string()]),
     enable_safety_checker: z
       .optional(
         z.boolean().register(z.globalRegistry, {
@@ -1621,9 +1547,7 @@ export const zSchemaMeshyV5MultiImageTo3dInput = z
         }),
       )
       .default(false),
-    texture_image_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    texture_image_url: z.optional(z.union([z.string(), z.string()])),
     topology: z.optional(
       z.enum(['quad', 'triangle']).register(z.globalRegistry, {
         description:
@@ -1643,12 +1567,10 @@ export const zSchemaMeshyV5MultiImageTo3dInput = z
         description: 'Controls symmetry behavior during model generation.',
       }),
     ),
-    image_urls: z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          '1 to 4 images for 3D model creation. All images should depict the same object from different angles. Supports .jpg, .jpeg, .png formats, and AVIF/HEIF which will be automatically converted. If more than 4 images are provided, only the first 4 will be used.',
-      }),
+    image_urls: z.array(z.string()).register(z.globalRegistry, {
+      description:
+        '1 to 4 images for 3D model creation. All images should depict the same object from different angles. Supports .jpg, .jpeg, .png formats, and AVIF/HEIF which will be automatically converted. If more than 4 images are provided, only the first 4 will be used.',
+    }),
     texture_prompt: z.optional(
       z.string().max(600).register(z.globalRegistry, {
         description:
@@ -1682,10 +1604,7 @@ export const zSchemaBytedanceSeed3dImageTo3dOutput = z.object({
  * Seed3DImageTo3DInput
  */
 export const zSchemaBytedanceSeed3dImageTo3dInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -1704,10 +1623,7 @@ export const zSchemaOmnipartOutput = z.object({
  * OmnipartInput
  */
 export const zSchemaOmnipartInput = z.object({
-  input_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  input_image_url: z.union([z.string(), z.string()]),
   parts: z
     .optional(
       z.string().register(z.globalRegistry, {
@@ -1862,9 +1778,7 @@ export const zSchemaSam33dObjectsOutput = z.object({
  * SAM3DObjectInput
  */
 export const zSchemaSam33dObjectsInput = z.object({
-  pointmap_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  pointmap_url: z.optional(z.union([z.string(), z.string()])),
   export_textured_glb: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -1889,17 +1803,12 @@ export const zSchemaSam33dObjectsInput = z.object({
       }),
     )
     .default([]),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   mask_urls: z.optional(
-    z
-      .array(z.union([z.string(), z.instanceof(Blob), z.instanceof(File)]))
-      .register(z.globalRegistry, {
-        description:
-          'Optional list of mask URLs (one per object). If not provided, use prompt/point_prompts/box_prompts to auto-segment, or entire image will be used.',
-      }),
+    z.array(z.string()).register(z.globalRegistry, {
+      description:
+        'Optional list of mask URLs (one per object). If not provided, use prompt/point_prompts/box_prompts to auto-segment, or entire image will be used.',
+    }),
   ),
   point_prompts: z
     .optional(
@@ -2001,13 +1910,8 @@ export const zSchemaSam33dBodyInput = z.object({
       }),
     )
     .default(true),
-  mask_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  mask_url: z.optional(z.union([z.string(), z.string()])),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 /**
@@ -2028,10 +1932,7 @@ export const zSchemaHunyuan3dV3ImageTo3dOutput = z.object({
  * ImageTo3DInput
  */
 export const zSchemaHunyuan3dV3ImageTo3dInput = z.object({
-  input_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  input_image_url: z.union([z.string(), z.string()]),
   polygon_type: z.optional(
     z.enum(['triangle', 'quadrilateral']).register(z.globalRegistry, {
       description:
@@ -2045,12 +1946,8 @@ export const zSchemaHunyuan3dV3ImageTo3dInput = z.object({
       }),
     )
     .default(500000),
-  right_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
-  back_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  right_image_url: z.optional(z.union([z.string(), z.string()])),
+  back_image_url: z.optional(z.union([z.string(), z.string()])),
   enable_pbr: z
     .optional(
       z.boolean().register(z.globalRegistry, {
@@ -2065,9 +1962,7 @@ export const zSchemaHunyuan3dV3ImageTo3dInput = z.object({
         'Generation type. Normal: textured model. LowPoly: polygon reduction. Geometry: white model without texture.',
     }),
   ),
-  left_image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  left_image_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -2088,10 +1983,7 @@ export const zSchemaHunyuan3dV3SketchTo3dOutput = z.object({
  * SketchTo3DInput
  */
 export const zSchemaHunyuan3dV3SketchTo3dInput = z.object({
-  input_image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  input_image_url: z.union([z.string(), z.string()]),
   prompt: z.string().max(1024).register(z.globalRegistry, {
     description:
       'Text prompt describing the 3D content attributes such as color, category, and material.',
@@ -2158,10 +2050,7 @@ export const zSchemaTrellis2Input = z.object({
   shape_slat_guidance_rescale: z
     .optional(z.number().gte(0).lte(1))
     .default(0.5),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
   seed: z.optional(
     z.int().register(z.globalRegistry, {
       description: 'Random seed for reproducibility',
@@ -2241,10 +2130,7 @@ export const zSchemaHunyuanPartInput = z.object({
       }),
     )
     .default(100000),
-  model_file_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  model_file_url: z.union([z.string(), z.string()]),
   point_prompt_y: z
     .optional(
       z.number().gte(-1).lte(1).register(z.globalRegistry, {
@@ -2304,10 +2190,7 @@ export const zSchemaMeshyV5RemeshInput = z
         }),
       )
       .default(30000),
-    model_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
+    model_url: z.union([z.string(), z.string()]),
     origin_at: z.optional(
       z.enum(['bottom', 'center']).register(z.globalRegistry, {
         description: 'Position of the origin. None means no effect.',
@@ -2394,13 +2277,8 @@ export const zSchemaMeshyV5RetextureInput = z
         }),
       )
       .default(true),
-    model_url: z.union([
-      z.string(),
-      z.union([z.instanceof(Blob), z.instanceof(File)]),
-    ]),
-    image_style_url: z.optional(
-      z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-    ),
+    model_url: z.union([z.string(), z.string()]),
+    image_style_url: z.optional(z.union([z.string(), z.string()])),
   })
   .register(z.globalRegistry, {
     description: 'Input for 3D Model Retexturing',
@@ -2451,26 +2329,16 @@ export const zSchemaSam33dAlignOutput = z.object({
  * SAM3DAlignmentInput
  */
 export const zSchemaSam33dAlignInput = z.object({
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  body_mesh_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
-  object_mesh_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.union([z.string(), z.string()]),
+  body_mesh_url: z.union([z.string(), z.string()]),
+  object_mesh_url: z.optional(z.union([z.string(), z.string()])),
   focal_length: z.optional(
     z.number().register(z.globalRegistry, {
       description:
         'Focal length from SAM-3D Body metadata. If not provided, estimated from MoGe.',
     }),
   ),
-  body_mask_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  body_mask_url: z.optional(z.union([z.string(), z.string()])),
 })
 
 /**
@@ -2505,10 +2373,7 @@ export const zSchemaUltrashapeInput = z.object({
       }),
     )
     .default(50),
-  model_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  model_url: z.union([z.string(), z.string()]),
   seed: z
     .optional(
       z.int().register(z.globalRegistry, {
@@ -2516,10 +2381,7 @@ export const zSchemaUltrashapeInput = z.object({
       }),
     )
     .default(42),
-  image_url: z.union([
-    z.string(),
-    z.union([z.instanceof(Blob), z.instanceof(File)]),
-  ]),
+  image_url: z.union([z.string(), z.string()]),
 })
 
 export const zSchemaQueueStatus = z.object({

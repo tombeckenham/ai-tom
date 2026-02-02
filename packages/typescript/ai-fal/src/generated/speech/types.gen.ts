@@ -617,7 +617,7 @@ export type SchemaAudio = {
    *
    * File data
    */
-  file_data?: Blob | File
+  file_data?: string
 }
 
 /**
@@ -1950,7 +1950,7 @@ export type SchemaAudioFile = {
    *
    * File data
    */
-  file_data?: Blob | File
+  file_data?: string
   /**
    * Channels
    *

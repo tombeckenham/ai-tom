@@ -123,9 +123,7 @@ export const zSchemaVideoPromptGeneratorInput = z.object({
         description: 'Special effects approach',
       }),
   ),
-  image_url: z.optional(
-    z.union([z.string(), z.union([z.instanceof(Blob), z.instanceof(File)])]),
-  ),
+  image_url: z.optional(z.union([z.string(), z.string()])),
   model: z.optional(
     z
       .enum([

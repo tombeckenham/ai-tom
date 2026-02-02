@@ -133,7 +133,7 @@ export type SchemaFile = {
    *
    * File data
    */
-  file_data?: Blob | File
+  file_data?: string
 }
 
 /**
@@ -1102,7 +1102,7 @@ export type SchemaCsm1bOutput = {
    *
    * The generated audio.
    */
-  audio: SchemaFile | Blob | File
+  audio: SchemaFile | string
 }
 
 /**
