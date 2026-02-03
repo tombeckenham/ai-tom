@@ -1,7 +1,7 @@
 export const IMAGE_MODELS = [
   {
     id: 'fal-ai/nano-banana-pro',
-    name: 'Nano Banana Pro',
+    name: 'Nano Banana Pro (4k)',
     description: 'Fast, high-quality image generation',
     defaultSize: 'landscape_16_9' as const,
     sizeType: 'standard' as const,
