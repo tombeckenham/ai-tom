@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createFalImage, mapSizeToFalFormat } from '../src'
+import { createFalImage } from '../src/adapters/image'
 
 // Declare mocks at module level
 let mockSubscribe: any
@@ -15,7 +15,8 @@ vi.mock('@fal-ai/client', () => {
   }
 })
 
-const createAdapter = () => createFalImage('fal-ai/flux/dev', 'test-key')
+const createAdapter = () =>
+  createFalImage('fal-ai/flux/dev', { apiKey: 'test-key' })
 
 function createMockImageResponse(images: Array<{ url: string }>) {
   return {
@@ -213,7 +214,7 @@ describe('Fal Image Adapter', () => {
   })
 
   it('configures client with API key', () => {
-    createFalImage('fal-ai/flux/dev', 'my-api-key')
+    createFalImage('fal-ai/flux/dev', { apiKey: 'my-api-key' })
 
     expect(mockConfig).toHaveBeenCalledWith({
       credentials: 'my-api-key',
@@ -221,41 +222,13 @@ describe('Fal Image Adapter', () => {
   })
 
   it('configures client with proxy URL when provided', () => {
-    createFalImage('fal-ai/flux/dev', 'my-api-key', {
+    createFalImage('fal-ai/flux/dev', {
+      apiKey: 'my-api-key',
       proxyUrl: '/api/fal/proxy',
     })
 
     expect(mockConfig).toHaveBeenCalledWith({
       proxyUrl: '/api/fal/proxy',
     })
-  })
-})
-
-describe('mapSizeToFalFormat', () => {
-  it('maps known sizes to presets', () => {
-    expect(mapSizeToFalFormat('1024x1024')).toBe('square_hd')
-    expect(mapSizeToFalFormat('512x512')).toBe('square')
-    expect(mapSizeToFalFormat('1024x768')).toBe('landscape_4_3')
-    expect(mapSizeToFalFormat('768x1024')).toBe('portrait_4_3')
-    expect(mapSizeToFalFormat('1280x720')).toBe('landscape_16_9')
-    expect(mapSizeToFalFormat('720x1280')).toBe('portrait_16_9')
-  })
-
-  it('parses custom WIDTHxHEIGHT format', () => {
-    expect(mapSizeToFalFormat('800x600')).toEqual({ width: 800, height: 600 })
-    expect(mapSizeToFalFormat('1920x1200')).toEqual({
-      width: 1920,
-      height: 1200,
-    })
-  })
-
-  it('returns preset names as-is', () => {
-    expect(mapSizeToFalFormat('square_hd')).toBe('square_hd')
-    expect(mapSizeToFalFormat('landscape_4_3')).toBe('landscape_4_3')
-  })
-
-  it('returns undefined for invalid input', () => {
-    expect(mapSizeToFalFormat(undefined)).toBeUndefined()
-    expect(mapSizeToFalFormat('invalid')).toBeUndefined()
   })
 })

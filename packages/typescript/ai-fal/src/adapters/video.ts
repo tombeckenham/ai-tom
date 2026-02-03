@@ -1,19 +1,37 @@
 import { fal } from '@fal-ai/client'
 import { BaseVideoAdapter } from '@tanstack/ai/adapters'
 import { configureFalClient, generateId as utilGenerateId } from '../utils'
-import { getFalVideoSchema } from '../generated'
-import type { FalVideoInput, FalVideoModel, FalVideoOutput } from '../generated'
 import type {
   VideoGenerationOptions,
   VideoJobResult,
   VideoStatusResult,
   VideoUrlResult,
 } from '@tanstack/ai'
-import type { FalVideoProviderOptions } from '../model-meta'
+import type {
+  FalModel,
+  FalModelInput,
+  FalVideoProviderOptions,
+} from '../model-meta'
 import type { FalClientConfig } from '../utils'
-import type { z } from 'zod'
 
 type FalQueueStatus = 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED'
+
+const HEIGHT_TO_RESOLUTION: Record<number, string> = {
+  240: '240p',
+  360: '360p',
+  480: '480p',
+  512: '512p',
+  520: '520p',
+  540: '540p',
+  576: '576p',
+  580: '580p',
+  720: '720p',
+  768: '768p',
+  1024: '1024p',
+  1080: '1080p',
+  1440: '1440p',
+  2160: '4k',
+}
 
 interface FalStatusResponse {
   status: FalQueueStatus
@@ -53,46 +71,45 @@ function mapFalStatusToVideoStatus(
  *
  * @experimental Video generation is an experimental feature and may change.
  */
-export class FalVideoAdapter<
-  TModel extends FalVideoModel,
-> extends BaseVideoAdapter<TModel, FalVideoProviderOptions<TModel>> {
+export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
+  TModel,
+  FalVideoProviderOptions<TModel>
+> {
   readonly kind = 'video' as const
   readonly name = 'fal' as const
-  readonly model: TModel
-  readonly inputSchema: z.ZodSchema<FalVideoInput<TModel>>
-  readonly outputSchema: z.ZodSchema<FalVideoOutput<TModel>>
 
   constructor(model: TModel, config?: FalClientConfig) {
     super({}, model)
-    this.model = model
     // Use accessor function to avoid merged type slowdown
-    const schemas = getFalVideoSchema(model)
-    this.inputSchema = schemas.input as z.ZodSchema<FalVideoInput<TModel>>
-    this.outputSchema = schemas.output as z.ZodSchema<FalVideoOutput<TModel>>
+
     configureFalClient(config)
   }
 
   async createVideoJob(
     options: VideoGenerationOptions<FalVideoProviderOptions<TModel>>,
   ): Promise<VideoJobResult> {
-    const { model, prompt, size, duration, modelOptions } = options
+    const { prompt, size, duration, modelOptions } = options
+    const sizeParams = size ? this.sizeToResolutionAspectRatio(size) : undefined
 
-    // Build the input object for fal.ai
-    const input = this.inputSchema.parse({
+    const input = {
       ...modelOptions,
       prompt,
       ...(duration ? { duration } : {}),
-      ...(size ? { aspect_ratio: this.sizeToAspectRatio(size) } : {}),
-    })
-
+      ...(sizeParams
+        ? {
+            resolution: sizeParams.resolution,
+            aspect_ratio: sizeParams.aspectRatio,
+          }
+        : {}),
+    } as FalModelInput<TModel>
     // Submit to queue and get request ID
-    const { request_id } = await fal.queue.submit(model, {
+    const { request_id } = await fal.queue.submit(this.model, {
       input,
     })
 
     return {
       jobId: request_id,
-      model,
+      model: this.model,
     }
   }
 
@@ -136,20 +153,29 @@ export class FalVideoAdapter<
   }
 
   /**
-   * Convert WIDTHxHEIGHT size format to aspect ratio.
+   * Convert WIDTHxHEIGHT size format to resolution and aspect ratio.
    */
-  private sizeToAspectRatio(size: string): string | undefined {
+  private sizeToResolutionAspectRatio(
+    size: string,
+  ): { resolution: string; aspectRatio: string } | undefined {
     const match = size.match(/^(\d+)x(\d+)$/)
     if (!match || !match[1] || !match[2]) return undefined
 
     const width = parseInt(match[1], 10)
     const height = parseInt(match[2], 10)
 
-    // Calculate GCD for simplest ratio
+    // Map height to resolution string
+    const resolution = HEIGHT_TO_RESOLUTION[height]
+    if (!resolution) return undefined
+
+    // Calculate GCD for simplest aspect ratio
     const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b))
     const divisor = gcd(width, height)
 
-    return `${width / divisor}:${height / divisor}`
+    return {
+      resolution,
+      aspectRatio: `${width / divisor}:${height / divisor}`,
+    }
   }
 }
 
@@ -158,7 +184,7 @@ export class FalVideoAdapter<
  *
  * @experimental Video generation is an experimental feature and may change.
  */
-export function createFalVideo<TModel extends FalVideoModel>(
+export function createFalVideo<TModel extends FalModel>(
   model: TModel,
   config?: FalClientConfig,
 ): FalVideoAdapter<TModel> {
@@ -170,7 +196,7 @@ export function createFalVideo<TModel extends FalVideoModel>(
  *
  * @experimental Video generation is an experimental feature and may change.
  */
-export function falVideo<TModel extends FalVideoModel>(
+export function falVideo<TModel extends FalModel>(
   model: TModel,
   config?: FalClientConfig,
 ): FalVideoAdapter<TModel> {

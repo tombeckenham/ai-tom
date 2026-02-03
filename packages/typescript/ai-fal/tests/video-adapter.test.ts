@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createFalVideo } from '../src'
+import { createFalVideo } from '../src/adapters/video'
 
 // Declare mocks at module level
 let mockQueueSubmit: any
@@ -22,7 +22,7 @@ vi.mock('@fal-ai/client', () => {
 })
 
 const createAdapter = () =>
-  createFalVideo('fal-ai/veo3/image-to-video', 'test-key')
+  createFalVideo('fal-ai/veo3/image-to-video', { apiKey: 'test-key' })
 
 describe('Fal Video Adapter', () => {
   beforeEach(() => {
@@ -100,7 +100,7 @@ describe('Fal Video Adapter', () => {
       })
     })
 
-    it('converts size to aspect ratio', async () => {
+    it('converts size to resolution and aspect ratio', async () => {
       mockQueueSubmit.mockResolvedValueOnce({
         request_id: 'job-ar',
       })
@@ -110,11 +110,12 @@ describe('Fal Video Adapter', () => {
       await adapter.createVideoJob({
         model: 'fal-ai/veo3/image-to-video',
         prompt: 'A wide landscape video',
-        size: '1920x1080', // 16:9
+        size: '1920x1080', // 1080p, 16:9
       })
 
       const [, options] = mockQueueSubmit.mock.calls[0]!
       expect(options.input).toMatchObject({
+        resolution: '1080p',
         aspect_ratio: '16:9',
       })
     })
@@ -240,7 +241,7 @@ describe('Fal Video Adapter', () => {
 
   describe('client configuration', () => {
     it('configures client with API key', () => {
-      createFalVideo('fal-ai/veo3/image-to-video', 'my-api-key')
+      createFalVideo('fal-ai/veo3/image-to-video', { apiKey: 'my-api-key' })
 
       expect(mockConfig).toHaveBeenCalledWith({
         credentials: 'my-api-key',
@@ -248,7 +249,8 @@ describe('Fal Video Adapter', () => {
     })
 
     it('configures client with proxy URL when provided', () => {
-      createFalVideo('fal-ai/veo3/image-to-video', 'my-api-key', {
+      createFalVideo('fal-ai/veo3/image-to-video', {
+        apiKey: 'my-api-key',
         proxyUrl: '/api/fal/proxy',
       })
 

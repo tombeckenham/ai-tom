@@ -122,3 +122,10 @@ export class FalImageAdapter<TModel extends FalModel> extends BaseImageAdapter<
     return { url }
   }
 }
+
+export function createFalImage<TModel extends FalModel>(
+  model: TModel,
+  config?: FalClientConfig,
+): FalImageAdapter<TModel> {
+  return new FalImageAdapter(model, config)
+}
