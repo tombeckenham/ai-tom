@@ -71,7 +71,6 @@ export class FalImageAdapter<TModel extends FalModel> extends BaseImageAdapter<
     return {
       ...options.modelOptions,
       prompt: options.prompt,
-      image_size: options.size,
       num_images: options.numberOfImages,
     } as FalModelInput<TModel>
   }

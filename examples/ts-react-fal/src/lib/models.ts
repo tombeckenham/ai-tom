@@ -56,9 +56,15 @@ export const VIDEO_MODELS = [
   },
   {
     id: 'xai/grok-imagine-video/text-to-video',
-    name: 'Grok Imagine Video',
+    name: 'Grok Imagine Video (Text-to-Video)',
     description: 'xAI video generation from text',
     mode: 'text-to-video' as const,
+  },
+  {
+    id: 'xai/grok-imagine-video/image-to-video',
+    name: 'Grok Imagine Video (Image-to-Video)',
+    description: 'xAI animate images to video',
+    mode: 'image-to-video' as const,
   },
   {
     id: 'fal-ai/ltx-2/text-to-video/fast',

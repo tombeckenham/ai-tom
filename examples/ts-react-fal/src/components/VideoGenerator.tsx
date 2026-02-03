@@ -24,11 +24,11 @@ interface VideoGeneratorProps {
 export default function VideoGenerator({ initialImageUrl }: VideoGeneratorProps) {
   const [mode, setMode] = useState<VideoMode>('text-to-video')
   const [prompt, setPrompt] = useState('')
-  const [selectedModel, setSelectedModel] = useState<string>(VIDEO_MODELS[0].id)
+  const [selectedModel, setSelectedModel] = useState<string>('all')
   const [imagePreview, setImagePreview] = useState<string | null>(initialImageUrl ?? null)
-  const [jobState, setJobState] = useState<JobState>({ status: 'idle' })
+  const [jobStates, setJobStates] = useState<Record<string, JobState>>({})
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const pollingRef = useRef<NodeJS.Timeout | null>(null)
+  const pollingRefs = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
   const filteredModels = VIDEO_MODELS.filter((m) => m.mode === mode)
 
@@ -39,14 +39,15 @@ export default function VideoGenerator({ initialImageUrl }: VideoGeneratorProps)
   }, [initialImageUrl])
 
   useEffect(() => {
-    if (filteredModels.length > 0 && !filteredModels.find((m) => m.id === selectedModel)) {
-      setSelectedModel(filteredModels[0].id)
-    }
-  }, [mode, filteredModels, selectedModel])
+    // When mode changes, reset to "all" or first available model
+    setSelectedModel('all')
+  }, [mode])
 
   useEffect(() => {
     return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current)
+      // Clear all polling intervals on unmount
+      pollingRefs.current.forEach((interval) => clearInterval(interval))
+      pollingRefs.current.clear()
     }
   }, [])
 
@@ -71,25 +72,75 @@ export default function VideoGenerator({ initialImageUrl }: VideoGeneratorProps)
       const status = await getVideoStatus({ data: { jobId, model } })
 
       if (status.status === 'completed') {
-        if (pollingRef.current) clearInterval(pollingRef.current)
+        const interval = pollingRefs.current.get(model)
+        if (interval) {
+          clearInterval(interval)
+          pollingRefs.current.delete(model)
+        }
         const urlResult = await getVideoUrl({ data: { jobId, model } })
-        setJobState({ status: 'completed', url: urlResult.url })
+        setJobStates((prev) => ({
+          ...prev,
+          [model]: { status: 'completed', url: urlResult.url },
+        }))
       } else if (status.status === 'processing') {
-        setJobState({
-          status: 'processing',
-          jobId,
-          model,
-          progress: status.progress,
-        })
+        setJobStates((prev) => ({
+          ...prev,
+          [model]: { status: 'processing', jobId, model, progress: status.progress },
+        }))
       } else {
-        setJobState({ status: 'pending', jobId, model })
+        setJobStates((prev) => ({
+          ...prev,
+          [model]: { status: 'pending', jobId, model },
+        }))
       }
     } catch (err) {
-      if (pollingRef.current) clearInterval(pollingRef.current)
-      setJobState({
-        status: 'error',
-        message: err instanceof Error ? err.message : 'Failed to get status',
+      const interval = pollingRefs.current.get(model)
+      if (interval) {
+        clearInterval(interval)
+        pollingRefs.current.delete(model)
+      }
+      setJobStates((prev) => ({
+        ...prev,
+        [model]: {
+          status: 'error',
+          message: err instanceof Error ? err.message : 'Failed to get status',
+        },
+      }))
+    }
+  }
+
+  const startJobForModel = async (modelId: string) => {
+    setJobStates((prev) => ({
+      ...prev,
+      [modelId]: { status: 'submitting' },
+    }))
+
+    try {
+      const result = await createVideoJob({
+        data: {
+          prompt,
+          model: modelId,
+          imageUrl: mode === 'image-to-video' ? imagePreview ?? undefined : undefined,
+        },
       })
+
+      setJobStates((prev) => ({
+        ...prev,
+        [modelId]: { status: 'pending', jobId: result.jobId, model: result.model },
+      }))
+
+      const interval = setInterval(() => {
+        pollStatus(result.jobId, result.model)
+      }, 4000)
+      pollingRefs.current.set(modelId, interval)
+    } catch (err) {
+      setJobStates((prev) => ({
+        ...prev,
+        [modelId]: {
+          status: 'error',
+          message: err instanceof Error ? err.message : 'Failed to create video job',
+        },
+      }))
     }
   }
 
@@ -97,39 +148,31 @@ export default function VideoGenerator({ initialImageUrl }: VideoGeneratorProps)
     if (!prompt.trim()) return
     if (mode === 'image-to-video' && !imagePreview) return
 
-    setJobState({ status: 'submitting' })
+    // Clear all existing polling
+    pollingRefs.current.forEach((interval) => clearInterval(interval))
+    pollingRefs.current.clear()
+    setJobStates({})
 
-    try {
-      const result = await createVideoJob({
-        data: {
-          prompt,
-          model: selectedModel,
-          imageUrl: mode === 'image-to-video' ? imagePreview ?? undefined : undefined,
-        },
-      })
-
-      setJobState({ status: 'pending', jobId: result.jobId, model: result.model })
-
-      pollingRef.current = setInterval(() => {
-        pollStatus(result.jobId, result.model)
-      }, 4000)
-    } catch (err) {
-      setJobState({
-        status: 'error',
-        message: err instanceof Error ? err.message : 'Failed to create video job',
-      })
+    if (selectedModel === 'all') {
+      // Fire all requests in parallel
+      await Promise.all(filteredModels.map((model) => startJobForModel(model.id)))
+    } else {
+      await startJobForModel(selectedModel)
     }
   }
 
   const reset = () => {
-    if (pollingRef.current) clearInterval(pollingRef.current)
-    setJobState({ status: 'idle' })
+    pollingRefs.current.forEach((interval) => clearInterval(interval))
+    pollingRefs.current.clear()
+    setJobStates({})
   }
 
-  const isGenerating =
-    jobState.status === 'submitting' ||
-    jobState.status === 'pending' ||
-    jobState.status === 'processing'
+  const isGenerating = Object.values(jobStates).some(
+    (state) =>
+      state.status === 'submitting' ||
+      state.status === 'pending' ||
+      state.status === 'processing'
+  )
 
   return (
     <div className="space-y-6">
@@ -167,6 +210,7 @@ export default function VideoGenerator({ initialImageUrl }: VideoGeneratorProps)
             disabled={isGenerating}
             className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
           >
+            <option value="all">All Models</option>
             {filteredModels.map((model) => (
               <option key={model.id} value={model.id}>
                 {model.name}
@@ -252,56 +296,80 @@ export default function VideoGenerator({ initialImageUrl }: VideoGeneratorProps)
           {isGenerating ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              {jobState.status === 'submitting' && 'Submitting...'}
-              {jobState.status === 'pending' && 'Queued...'}
-              {jobState.status === 'processing' && (
-                <>
-                  Processing
-                  {'progress' in jobState && jobState.progress != null
-                    ? ` (${jobState.progress}%)`
-                    : '...'}
-                </>
-              )}
+              Generating...
             </>
           ) : (
             <>
               <Film className="w-5 h-5" />
-              Generate Video
+              Generate Video{selectedModel === 'all' ? 's' : ''}
             </>
           )}
         </button>
       </div>
 
-      {jobState.status === 'error' && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400">
-          {jobState.message}
-          <button
-            onClick={reset}
-            className="ml-4 text-sm underline hover:no-underline"
-          >
-            Try again
-          </button>
-        </div>
-      )}
-
-      {jobState.status === 'completed' && (
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium text-white">Generated Video</h3>
-          <div className="rounded-lg overflow-hidden border border-gray-700">
-            <video
-              src={jobState.url}
-              controls
-              autoPlay
-              loop
-              className="w-full h-auto"
-            />
+      {Object.keys(jobStates).length > 0 && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium text-white">
+              {selectedModel === 'all' ? 'Generated Videos' : 'Generated Video'}
+            </h3>
+            {!isGenerating && (
+              <button
+                onClick={reset}
+                className="text-sm text-gray-400 hover:text-white underline"
+              >
+                Generate another
+              </button>
+            )}
           </div>
-          <button
-            onClick={reset}
-            className="text-sm text-gray-400 hover:text-white underline"
-          >
-            Generate another
-          </button>
+          {Object.entries(jobStates).map(([modelId, state]) => {
+            const model = VIDEO_MODELS.find((m) => m.id === modelId)
+            return (
+              <div key={modelId} className="space-y-2">
+                {selectedModel === 'all' && (
+                  <h4 className="text-sm font-medium text-gray-300">
+                    {model?.name ?? modelId}
+                  </h4>
+                )}
+                {state.status === 'submitting' && (
+                  <div className="flex items-center gap-2 p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
+                    <span className="text-gray-400">Submitting...</span>
+                  </div>
+                )}
+                {state.status === 'pending' && (
+                  <div className="flex items-center gap-2 p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
+                    <span className="text-gray-400">Queued...</span>
+                  </div>
+                )}
+                {state.status === 'processing' && (
+                  <div className="flex items-center gap-2 p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
+                    <span className="text-gray-400">
+                      Processing{state.progress != null ? ` (${state.progress}%)` : '...'}
+                    </span>
+                  </div>
+                )}
+                {state.status === 'error' && (
+                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400">
+                    {state.message}
+                  </div>
+                )}
+                {state.status === 'completed' && (
+                  <div className="rounded-lg overflow-hidden border border-gray-700">
+                    <video
+                      src={state.url}
+                      controls
+                      autoPlay
+                      loop
+                      className="w-full h-auto"
+                    />
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

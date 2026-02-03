@@ -9,12 +9,17 @@ interface ImageGeneratorProps {
   onImageGenerated?: (imageUrl: string) => void
 }
 
+type ModelResult = {
+  status: 'loading' | 'success' | 'error'
+  result?: ImageGenerationResult
+  error?: string
+}
+
 export default function ImageGenerator({ onImageGenerated }: ImageGeneratorProps) {
   const [prompt, setPrompt] = useState('')
   const [selectedModel, setSelectedModel] = useState<string>(IMAGE_MODELS[0].id)
   const [isLoading, setIsLoading] = useState(false)
-  const [result, setResult] = useState<ImageGenerationResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [results, setResults] = useState<Record<string, ModelResult>>({})
 
   const currentModel = IMAGE_MODELS.find((m) => m.id === selectedModel)
 
@@ -22,20 +27,62 @@ export default function ImageGenerator({ onImageGenerated }: ImageGeneratorProps
     if (!prompt.trim()) return
 
     setIsLoading(true)
-    setError(null)
-    setResult(null)
+    setResults({})
 
-    try {
-      const response = await generateImage({ data: { prompt, model: selectedModel } })
-      setResult(response)
-      const imageUrl = response.images[0]?.url
-      if (imageUrl) {
-        onImageGenerated?.(imageUrl)
+    if (selectedModel === 'all') {
+      // Initialize all models as loading
+      const initialResults: Record<string, ModelResult> = {}
+      for (const model of IMAGE_MODELS) {
+        initialResults[model.id] = { status: 'loading' }
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate image')
-    } finally {
+      setResults(initialResults)
+
+      // Fire all requests in parallel
+      const promises = IMAGE_MODELS.map(async (model) => {
+        try {
+          const response = await generateImage({ data: { prompt, model: model.id } })
+          setResults((prev) => ({
+            ...prev,
+            [model.id]: { status: 'success', result: response },
+          }))
+          const imageUrl = response.images[0]?.url
+          if (imageUrl) {
+            onImageGenerated?.(imageUrl)
+          }
+        } catch (err) {
+          setResults((prev) => ({
+            ...prev,
+            [model.id]: {
+              status: 'error',
+              error: err instanceof Error ? err.message : 'Failed to generate image',
+            },
+          }))
+        }
+      })
+
+      await Promise.allSettled(promises)
       setIsLoading(false)
+    } else {
+      // Single model generation
+      setResults({ [selectedModel]: { status: 'loading' } })
+
+      try {
+        const response = await generateImage({ data: { prompt, model: selectedModel } })
+        setResults({ [selectedModel]: { status: 'success', result: response } })
+        const imageUrl = response.images[0]?.url
+        if (imageUrl) {
+          onImageGenerated?.(imageUrl)
+        }
+      } catch (err) {
+        setResults({
+          [selectedModel]: {
+            status: 'error',
+            error: err instanceof Error ? err.message : 'Failed to generate image',
+          },
+        })
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -52,13 +99,14 @@ export default function ImageGenerator({ onImageGenerated }: ImageGeneratorProps
             disabled={isLoading}
             className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50"
           >
+            <option value="all">All Models</option>
             {IMAGE_MODELS.map((model) => (
               <option key={model.id} value={model.id}>
                 {model.name}
               </option>
             ))}
           </select>
-          {currentModel && (
+          {currentModel && selectedModel !== 'all' && (
             <p className="mt-1 text-xs text-gray-500">{currentModel.description}</p>
           )}
         </div>
@@ -104,22 +152,43 @@ export default function ImageGenerator({ onImageGenerated }: ImageGeneratorProps
         </button>
       </div>
 
-      {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400">
-          {error}
-        </div>
-      )}
-
-      {result && result.images.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium text-white">Generated Image</h3>
-          <div className="rounded-lg overflow-hidden border border-gray-700">
-            <img
-              src={result.images[0]?.url}
-              alt="Generated"
-              className="w-full h-auto"
-            />
-          </div>
+      {Object.keys(results).length > 0 && (
+        <div className="space-y-6">
+          <h3 className="text-lg font-medium text-white">
+            {selectedModel === 'all' ? 'Generated Images' : 'Generated Image'}
+          </h3>
+          {Object.entries(results).map(([modelId, modelResult]) => {
+            const model = IMAGE_MODELS.find((m) => m.id === modelId)
+            return (
+              <div key={modelId} className="space-y-2">
+                {selectedModel === 'all' && (
+                  <h4 className="text-sm font-medium text-gray-300">
+                    {model?.name ?? modelId}
+                  </h4>
+                )}
+                {modelResult.status === 'loading' && (
+                  <div className="flex items-center gap-2 p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <Loader2 className="w-5 h-5 animate-spin text-purple-400" />
+                    <span className="text-gray-400">Generating...</span>
+                  </div>
+                )}
+                {modelResult.status === 'error' && (
+                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400">
+                    {modelResult.error}
+                  </div>
+                )}
+                {modelResult.status === 'success' && modelResult.result && modelResult.result.images.length > 0 && (
+                  <div className="rounded-lg overflow-hidden border border-gray-700">
+                    <img
+                      src={modelResult.result.images[0]?.url}
+                      alt={`Generated by ${model?.name ?? modelId}`}
+                      className="w-full h-auto"
+                    />
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

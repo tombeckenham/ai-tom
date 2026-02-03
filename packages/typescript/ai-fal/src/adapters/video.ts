@@ -2,7 +2,6 @@ import { fal } from '@fal-ai/client'
 import { BaseVideoAdapter } from '@tanstack/ai/adapters'
 import { configureFalClient, generateId as utilGenerateId } from '../utils'
 import type {
-  VideoGenerationOptions,
   VideoJobResult,
   VideoStatusResult,
   VideoUrlResult,
@@ -10,6 +9,7 @@ import type {
 import type {
   FalModel,
   FalModelInput,
+  FalVideoGenerationOptions,
   FalVideoProviderOptions,
 } from '../model-meta'
 import type { FalClientConfig } from '../utils'
@@ -86,7 +86,7 @@ export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
   }
 
   async createVideoJob(
-    options: VideoGenerationOptions<FalVideoProviderOptions<TModel>>,
+    options: FalVideoGenerationOptions<TModel>,
   ): Promise<VideoJobResult> {
     const { prompt, size, duration, modelOptions } = options
     const sizeParams = size ? this.sizeToResolutionAspectRatio(size) : undefined

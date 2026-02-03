@@ -4,7 +4,10 @@
  * These types give you full autocomplete and type safety for any model.
  */
 import type { EndpointTypeMap } from '@fal-ai/client/endpoints'
-import type { ImageGenerationOptions } from '@tanstack/ai'
+import type {
+  ImageGenerationOptions,
+  VideoGenerationOptions,
+} from '@tanstack/ai'
 
 export type { EndpointTypeMap } from '@fal-ai/client/endpoints'
 
@@ -61,7 +64,7 @@ export type FalModelImageSize<TModel extends string> =
  */
 export type FalImageProviderOptions<TModel extends string> = Omit<
   FalModelInput<TModel>,
-  'prompt' | 'image_size' | 'num_images'
+  'prompt'
 >
 
 export type FalImageGenerationOptions<TModel extends string> = Omit<
@@ -75,5 +78,10 @@ export type FalImageGenerationOptions<TModel extends string> = Omit<
  */
 export type FalVideoProviderOptions<TModel extends string> =
   TModel extends keyof EndpointTypeMap
-    ? Omit<FalModelInput<TModel>, 'prompt' | 'duration'>
+    ? Omit<FalModelInput<TModel>, 'prompt'>
     : Record<string, any>
+
+export type FalVideoGenerationOptions<TModel extends string> = Omit<
+  VideoGenerationOptions<FalVideoProviderOptions<TModel>>,
+  'model'
+>
