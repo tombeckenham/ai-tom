@@ -1,38 +1,23 @@
 import { fal } from '@fal-ai/client'
 import { BaseImageAdapter } from '@tanstack/ai/adapters'
-
-import { configureFalClient, generateId as utilGenerateId } from '../utils'
-
+import {
+  configureFalClient,
+  getFalApiKeyFromEnv,
+  generateId as utilGenerateId,
+} from '../utils'
 import type { OutputType, Result } from '@fal-ai/client'
-
+import type { FalClientConfig } from '../utils'
 import type {
   GeneratedImage,
   ImageGenerationOptions,
   ImageGenerationResult,
 } from '@tanstack/ai'
-import type { FalImageProviderOptions, FalModel } from '../model-meta'
-
-import type { FalClientConfig } from '../utils'
-
-/** Map common size strings to fal.ai image_size presets */
-const SIZE_TO_PRESET: Record<string, string> = {
-  '1024x1024': 'square_hd',
-  '512x512': 'square',
-  '1024x768': 'landscape_4_3',
-  '768x1024': 'portrait_4_3',
-  '1280x720': 'landscape_16_9',
-  '720x1280': 'portrait_16_9',
-  '1920x1080': 'landscape_16_9',
-  '1080x1920': 'portrait_16_9',
-  '2560x1440': 'landscape_16_9',
-  '1440x2560': 'portrait_16_9',
-  '3840x2160': 'landscape_16_9',
-  '2160x3840': 'portrait_16_9',
-  '4096x2160': 'landscape_16_9',
-  '2160x4096': 'portrait_16_9',
-  '4320x2160': 'landscape_16_9',
-  '2160x4320': 'portrait_16_9',
-}
+import type {
+  FalImageProviderOptions,
+  FalModel,
+  FalModelImageSize,
+  FalModelInput,
+} from '../model-meta'
 
 /**
  * fal.ai image generation adapter with full type inference.
@@ -58,177 +43,82 @@ export class FalImageAdapter<TModel extends FalModel> extends BaseImageAdapter<
   TModel,
   FalImageProviderOptions<TModel>,
   Record<FalModel, FalImageProviderOptions<TModel>>,
-  Record<FalModel, string>
+  Record<FalModel, FalModelImageSize<TModel>>
 > {
   readonly kind = 'image' as const
   readonly name = 'fal' as const
-  readonly model: TModel
 
   constructor(model: TModel, config?: FalClientConfig) {
     super({}, model)
-    this.model = model
 
-    configureFalClient(config)
+    const apiKey = getFalApiKeyFromEnv()
+    if (!apiKey) {
+      throw new Error('API key is required')
+    }
+    configureFalClient({ apiKey, proxyUrl: config?.proxyUrl })
   }
 
   async generateImages(
     options: ImageGenerationOptions<FalImageProviderOptions<TModel>>,
   ): Promise<ImageGenerationResult> {
-    const { prompt, numberOfImages, size, modelOptions } = options
+    const input = this.buildInput(options)
+    const result = await fal.subscribe(this.model, { input })
+    return this.transformResponse(result)
+  }
 
-    // Build the input object - spread modelOptions first, then override with standard options
-    if (!modelOptions) {
-      throw new Error('modelOptions are required')
-    }
-
-    const result = await fal.subscribe(this.model, {
-      input: {
-        ...modelOptions,
-        prompt,
-        num_images: numberOfImages ?? 1,
-      },
-    })
-
-    return this.transformResponse(this.model, result)
+  private buildInput(
+    options: ImageGenerationOptions<FalImageProviderOptions<TModel>>,
+  ): FalModelInput<TModel> {
+    // TB Jan 20206 I can think of no way to use satisfies here because of the union type of FalModelInput with record any
+    // I have validated that satisfies works when the type is known
+    return {
+      ...options.modelOptions,
+      prompt: options.prompt,
+      image_size: options.size,
+      num_images: options.numberOfImages,
+    } as FalModelInput<TModel>
   }
 
   protected override generateId(): string {
     return utilGenerateId(this.name)
   }
 
-  /** Parse size string (WIDTHxHEIGHT) into width and height */
-  private parseSize(size: string): {
-    width: number | null
-    height: number | null
-  } {
-    const match = size.match(/^(\d+)x(\d+)$/)
-    return {
-      width: match?.[1] ? parseInt(match[1], 10) : null,
-      height: match?.[2] ? parseInt(match[2], 10) : null,
-    }
-  }
-
-  /** Maps size to image_size field (preset or {width, height}) */
-  private mapSizeToImageSize(
-    size: string,
-    width: number | null,
-    height: number | null,
-  ): string | { width: number; height: number } {
-    const preset = SIZE_TO_PRESET[size]
-    if (preset) return preset
-    if (width && height) return { width, height }
-    return size
-  }
-
-  /** Calculate aspect ratio from width and height */
-  private calculateAspectRatio(
-    width: number | null,
-    height: number | null,
-  ): string | null {
-    if (!width || !height) return null
-
-    const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b))
-    const divisor = gcd(width, height)
-    return `${width / divisor}:${height / divisor}`
-  }
-
-  /** Determine resolution string from dimensions */
-  private determineResolution(
-    width: number | null,
-    height: number | null,
-  ): string | null {
-    if (!width || !height) return null
-
-    const maxDimension = Math.max(width, height)
-
-    if (maxDimension >= 3840) return '4k'
-    if (maxDimension >= 2560) return '2k'
-    if (maxDimension >= 1920) return '1k'
-    if (maxDimension >= 1080) return '1080p'
-    if (maxDimension >= 720) return '720p'
-    if (maxDimension >= 580) return '580p'
-    if (maxDimension >= 540) return '540p'
-    if (maxDimension >= 480) return '480p'
-    if (maxDimension >= 360) return '360p'
-
-    return null
-  }
-
   private transformResponse(
-    model: string,
     response: Result<OutputType<TModel>>,
   ): ImageGenerationResult {
+    const images: Array<GeneratedImage> = []
     const data = response.data
-    let images: Array<GeneratedImage> = []
 
+    // Handle array of images (most models return { images: [...] })
     if ('images' in data && Array.isArray(data.images)) {
-      images = data.images.map((img: any) => this.parseImage(img))
-    } else if (
-      'image' in data &&
-      data.image &&
-      typeof data.image === 'object'
-    ) {
-      images = [this.parseImage(data.image)]
+      for (const img of data.images) {
+        images.push(this.parseImage(img))
+      }
+    }
+    // Handle single image response (some models return { image: {...} })
+    else if ('image' in data && data.image && typeof data.image === 'object') {
+      images.push(this.parseImage(data.image))
     }
 
     return {
       id: response.requestId || this.generateId(),
-      model,
+      model: this.model,
       images,
     }
   }
 
   private parseImage(img: { url: string }): GeneratedImage {
-    const { url } = img
-    const base64Match = url.match(/^data:image\/[^;]+;base64,(.+)$/)
-    if (base64Match) {
-      return { b64Json: base64Match[1], url }
+    const url = img.url
+    // Check if it's a base64 data URL
+    if (url.startsWith('data:')) {
+      const base64Match = url.match(/^data:image\/[^;]+;base64,(.+)$/)
+      if (base64Match) {
+        return {
+          b64Json: base64Match[1],
+          url,
+        }
+      }
     }
     return { url }
   }
-}
-
-/**
- * Create a fal.ai image adapter with an explicit API key.
- *
- * @example
- * ```typescript
- * const adapter = createFalImage('fal-ai/flux-pro/v1.1-ultra', process.env.FAL_KEY!)
- * ```
- */
-export function createFalImage<TModel extends FalImageModel>(
-  model: TModel,
-  config?: FalClientConfig,
-): FalImageAdapter<TModel> {
-  return new FalImageAdapter(model, config)
-}
-
-/**
- * Create a fal.ai image adapter using config.apiKey or the FAL_KEY environment variable.
- *
- * The model parameter accepts any fal.ai model ID with full type inference.
- * As you type, you'll get autocomplete for all 600+ supported models.
- *
- * @example
- * ```typescript
- * // Full autocomplete as you type the model name
- * const adapter = falImage('fal-ai/flux/dev')
- *
- * // modelOptions are type-safe based on the model
- * const result = await adapter.generateImages({
- *   model: 'fal-ai/flux/dev',
- *   prompt: 'a cat',
- *   modelOptions: {
- *     num_inference_steps: 28,
- *     guidance_scale: 3.5,
- *     seed: 12345,
- *   },
- * })
- * ```
- */
-export function falImage<TModel extends FalImageModel>(
-  model: TModel,
-  config?: FalClientConfig,
-): FalImageAdapter<TModel> {
-  return createFalImage(model, config)
 }
