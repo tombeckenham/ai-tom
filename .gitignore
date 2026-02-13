@@ -58,5 +58,7 @@ test-traces
 playwright-report
 test-results
 
+STATUS_*.md
+
 # Only .claude.settings.json should be committed
 .claude/settings.local.json

@@ -1,5 +1,18 @@
 # @tanstack/ai-grok
 
+## 0.5.0
+
+### Patch Changes
+
+- Updated dependencies [[`5d98472`](https://github.com/TanStack/ai/commit/5d984722e1f84725e3cfda834fbda3d0341ecedd), [`5d98472`](https://github.com/TanStack/ai/commit/5d984722e1f84725e3cfda834fbda3d0341ecedd)]:
+  - @tanstack/ai@0.5.0
+
+## 0.4.1
+
+### Patch Changes
+
+- Add in opus 4.6 and enhance acceptable config options by providers ([#278](https://github.com/TanStack/ai/pull/278))
+
 ## 0.4.0
 
 ### Patch Changes
