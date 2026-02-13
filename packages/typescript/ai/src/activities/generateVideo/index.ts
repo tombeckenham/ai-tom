@@ -57,7 +57,7 @@ function createId(prefix: string): string {
  * The model is extracted from the adapter's model property.
  */
 interface VideoActivityBaseOptions<
-  TAdapter extends VideoAdapter<string, object, any, any>,
+  TAdapter extends VideoAdapter<string, any, any, any>,
 > {
   /** The video adapter to use (must be created with a model) */
   adapter: TAdapter & { kind: typeof kind }
@@ -69,9 +69,9 @@ interface VideoActivityBaseOptions<
  *
  * @experimental Video generation is an experimental feature and may change.
  */
-export interface VideoCreateOptions<
-  TAdapter extends VideoAdapter<string, object, any, any>,
-> extends VideoActivityBaseOptions<TAdapter> {
+export type VideoCreateOptions<
+  TAdapter extends VideoAdapter<string, any, any, any>,
+> = VideoActivityBaseOptions<TAdapter> & {
   /** Request type - create a new job (default if not specified) */
   request?: 'create'
   /** Text description of the desired video */
@@ -80,9 +80,11 @@ export interface VideoCreateOptions<
   size?: VideoSizeForAdapter<TAdapter>
   /** Video duration in seconds */
   duration?: number
-  /** Provider-specific options for video generation */
-  modelOptions?: VideoProviderOptions<TAdapter>
-}
+} & (
+  {} extends VideoProviderOptions<TAdapter>
+    ? { /** Provider-specific options for video generation */ modelOptions?: VideoProviderOptions<TAdapter> }
+    : { /** Provider-specific options for video generation */ modelOptions: VideoProviderOptions<TAdapter> }
+)
 
 /**
  * Options for polling the status of a video generation job.
@@ -90,7 +92,7 @@ export interface VideoCreateOptions<
  * @experimental Video generation is an experimental feature and may change.
  */
 export interface VideoStatusOptions<
-  TAdapter extends VideoAdapter<string, object, any, any>,
+  TAdapter extends VideoAdapter<string, any, any, any>,
 > extends VideoActivityBaseOptions<TAdapter> {
   /** Request type - get job status */
   request: 'status'
@@ -104,7 +106,7 @@ export interface VideoStatusOptions<
  * @experimental Video generation is an experimental feature and may change.
  */
 export interface VideoUrlOptions<
-  TAdapter extends VideoAdapter<string, object, any, any>,
+  TAdapter extends VideoAdapter<string, any, any, any>,
 > extends VideoActivityBaseOptions<TAdapter> {
   /** Request type - get video URL */
   request: 'url'
@@ -119,7 +121,7 @@ export interface VideoUrlOptions<
  * @experimental Video generation is an experimental feature and may change.
  */
 export type VideoActivityOptions<
-  TAdapter extends VideoAdapter<string, object, any, any>,
+  TAdapter extends VideoAdapter<string, any, any, any>,
   TRequest extends 'create' | 'status' | 'url' = 'create',
 > = TRequest extends 'status'
   ? VideoStatusOptions<TAdapter>
@@ -171,7 +173,7 @@ export type VideoActivityResult<
  * ```
  */
 export async function generateVideo<
-  TAdapter extends VideoAdapter<string, object, any, any>,
+  TAdapter extends VideoAdapter<string, any, any, any>,
 >(options: VideoCreateOptions<TAdapter>): Promise<VideoJobResult> {
   const { adapter, prompt, size, duration, modelOptions } = options
   const model = adapter.model
@@ -211,7 +213,7 @@ export async function generateVideo<
  * ```
  */
 export async function getVideoJobStatus<
-  TAdapter extends VideoAdapter<string, object, any, any>,
+  TAdapter extends VideoAdapter<string, any, any, any>,
 >(options: {
   adapter: TAdapter & { kind: typeof kind }
   jobId: string
@@ -311,7 +313,7 @@ export async function getVideoJobStatus<
  * Create typed options for the generateVideo() function without executing.
  */
 export function createVideoOptions<
-  TAdapter extends VideoAdapter<string, object, any, any>,
+  TAdapter extends VideoAdapter<string, any, any, any>,
 >(options: VideoCreateOptions<TAdapter>): VideoCreateOptions<TAdapter> {
   return options
 }

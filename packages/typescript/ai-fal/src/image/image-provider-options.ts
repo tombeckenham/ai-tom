@@ -1,4 +1,4 @@
-import { FalModelImageSize, FalModelImageSizeInput } from '../model-meta'
+import type { FalModelImageSize, FalModelImageSizeInput } from '../model-meta'
 
 export function mapSizeToFalFormat<TModel extends string>(
   size: FalModelImageSize<TModel> | undefined,

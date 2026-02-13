@@ -1,4 +1,4 @@
-import {
+import type {
   FalModelInput,
   FalModelVideoSize,
   FalModelVideoSizeInput,
@@ -18,9 +18,7 @@ export function mapVideoSizeToFalFormat<TModel extends string>(
       FalModelInput<TModel>['aspect_ratio']
     >,
     ...(match?.[2] && {
-      resolution: match?.[2] as NonNullable<
-        FalModelInput<TModel>['resolution']
-      >,
+      resolution: match[2] as NonNullable<FalModelInput<TModel>['resolution']>,
     }),
   } as FalModelVideoSizeInput<TModel>
 }

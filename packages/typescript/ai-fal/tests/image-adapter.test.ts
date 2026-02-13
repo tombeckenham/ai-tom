@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { falImage } from '../src/adapters/image'
 import { generateImage } from '@tanstack/ai'
+
+import { falImage } from '../src/adapters/image'
 
 // Declare mocks at module level
 let mockSubscribe: any

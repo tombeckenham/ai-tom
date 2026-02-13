@@ -58,20 +58,20 @@ export interface VideoAdapter<
    * Create a new video generation job.
    * Returns a job ID that can be used to poll for status and retrieve the video.
    */
-  createVideoJob(
+  createVideoJob: (
     options: VideoGenerationOptions<TProviderOptions, TModelSizeByName[TModel]>,
-  ): Promise<VideoJobResult>
+  ) => Promise<VideoJobResult>
 
   /**
    * Get the current status of a video generation job.
    */
-  getVideoStatus(jobId: string): Promise<VideoStatusResult>
+  getVideoStatus: (jobId: string) => Promise<VideoStatusResult>
 
   /**
    * Get the URL to download/view the generated video.
    * Should only be called after status is 'completed'.
    */
-  getVideoUrl(jobId: string): Promise<VideoUrlResult>
+  getVideoUrl: (jobId: string) => Promise<VideoUrlResult>
 }
 
 /**
@@ -93,7 +93,12 @@ export abstract class BaseVideoAdapter<
   TProviderOptions extends object = Record<string, unknown>,
   TModelProviderOptionsByName extends Record<string, any> = Record<string, any>,
   TModelSizeByName extends Record<string, string> = Record<string, string>,
-> implements VideoAdapter<TModel, TProviderOptions, TModelProviderOptionsByName, TModelSizeByName> {
+> implements VideoAdapter<
+  TModel,
+  TProviderOptions,
+  TModelProviderOptionsByName,
+  TModelSizeByName
+> {
   readonly kind = 'video' as const
   abstract readonly name: string
   readonly model: TModel

@@ -1,6 +1,7 @@
 import { fal } from '@fal-ai/client'
 import { BaseImageAdapter } from '@tanstack/ai/adapters'
 import { configureFalClient, generateId as utilGenerateId } from '../utils'
+import { mapSizeToFalFormat } from '../image/image-provider-options'
 import type { OutputType, Result } from '@fal-ai/client'
 import type { FalClientConfig } from '../utils'
 import type {
@@ -14,7 +15,6 @@ import type {
   FalModelImageSize,
   FalModelInput,
 } from '../model-meta'
-import { mapSizeToFalFormat } from '../image/image-provider-options'
 
 /**
  * fal.ai image generation adapter with full type inference.

@@ -4,10 +4,6 @@
  * These types give you full autocomplete and type safety for any model.
  */
 import type { EndpointTypeMap } from '@fal-ai/client/endpoints'
-import type {
-  ImageGenerationOptions,
-  VideoGenerationOptions,
-} from '@tanstack/ai'
 
 export type { EndpointTypeMap } from '@fal-ai/client/endpoints'
 
@@ -85,12 +81,6 @@ export type FalImageProviderOptions<TModel extends string> = Omit<
   'prompt'
 >
 
-export type FalImageGenerationOptions<TModel extends string> =
-  ImageGenerationOptions<
-    FalImageProviderOptions<TModel>,
-    FalModelImageSize<TModel>
-  >
-
 /**
  * Extract the video size type supported by a specific fal model.
  * Video models typically use aspect_ratio and/or resolution fields.
@@ -129,9 +119,3 @@ export type FalVideoProviderOptions<TModel extends string> =
   TModel extends keyof EndpointTypeMap
     ? Omit<FalModelInput<TModel>, 'prompt'>
     : Record<string, any>
-
-export type FalVideoGenerationOptions<TModel extends string> =
-  VideoGenerationOptions<
-    FalVideoProviderOptions<TModel>,
-    FalModelVideoSize<TModel>
-  >

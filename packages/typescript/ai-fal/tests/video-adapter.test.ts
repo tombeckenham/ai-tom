@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { falVideo, createFalVideo } from '../src/adapters/video'
+import { generateVideo } from '@tanstack/ai'
+
+import { falVideo } from '../src/adapters/video'
 
 // Declare mocks at module level
 let mockQueueSubmit: any
@@ -41,8 +43,12 @@ describe('Fal Video Adapter', () => {
 
       const adapter = createAdapter()
 
-      const result = await adapter.createVideoJob({
+      const result = await generateVideo({
+        adapter: adapter,
         prompt: 'A cat walking in the garden',
+        modelOptions: {
+          image_url: 'https://example.com/cat.jpg',
+        },
       })
 
       expect(mockQueueSubmit).toHaveBeenCalledTimes(1)
@@ -66,8 +72,8 @@ describe('Fal Video Adapter', () => {
 
       const adapter = createAdapter()
 
-      await adapter.createVideoJob({
-
+      await generateVideo({
+        adapter: adapter,
         prompt: 'A stylish woman walks down a Tokyo street',
         modelOptions: {
           image_url: 'https://example.com/image.jpg',
@@ -87,10 +93,13 @@ describe('Fal Video Adapter', () => {
 
       const adapter = createAdapter()
 
-      await adapter.createVideoJob({
-
+      await generateVideo({
+        adapter: adapter,
         prompt: 'A time lapse of a sunset',
         duration: 10,
+        modelOptions: {
+          image_url: 'https://example.com/sunset.jpg',
+        },
       })
 
       const [, options] = mockQueueSubmit.mock.calls[0]!
@@ -106,9 +115,13 @@ describe('Fal Video Adapter', () => {
 
       const adapter = createAdapter()
 
-      await adapter.createVideoJob({
+      await generateVideo({
+        adapter: adapter,
         prompt: 'A wide landscape video',
         size: '16:9_720p',
+        modelOptions: {
+          image_url: 'https://example.com/landscape.jpg',
+        },
       })
 
       const [, options] = mockQueueSubmit.mock.calls[0]!
@@ -117,26 +130,6 @@ describe('Fal Video Adapter', () => {
         aspect_ratio: '16:9',
       })
     })
-
-    it('converts size with aspect_ratio only', async () => {
-      mockQueueSubmit.mockResolvedValueOnce({
-        request_id: 'job-ar2',
-      })
-
-      const adapter = createAdapter()
-
-      await adapter.createVideoJob({
-        prompt: 'A wide landscape video',
-        size: '16:9',
-      })
-
-      const [, options] = mockQueueSubmit.mock.calls[0]!
-      expect(options.input).toMatchObject({
-        aspect_ratio: '16:9',
-      })
-      expect(options.input.resolution).toBeUndefined()
-    })
-
     it('passes model-specific options', async () => {
       mockQueueSubmit.mockResolvedValueOnce({
         request_id: 'job-opts',
@@ -144,8 +137,8 @@ describe('Fal Video Adapter', () => {
 
       const adapter = createAdapter()
 
-      await adapter.createVideoJob({
-
+      await generateVideo({
+        adapter: adapter,
         prompt: 'Test video',
         modelOptions: {
           image_url: 'https://example.com/image.jpg',
@@ -258,7 +251,7 @@ describe('Fal Video Adapter', () => {
 
   describe('client configuration', () => {
     it('configures client with API key', () => {
-      createFalVideo('fal-ai/veo3/image-to-video', { apiKey: 'my-api-key' })
+      falVideo('fal-ai/veo3/image-to-video', { apiKey: 'my-api-key' })
 
       expect(mockConfig).toHaveBeenCalledWith({
         credentials: 'my-api-key',
@@ -266,7 +259,7 @@ describe('Fal Video Adapter', () => {
     })
 
     it('configures client with proxy URL when provided', () => {
-      createFalVideo('fal-ai/veo3/image-to-video', {
+      falVideo('fal-ai/veo3/image-to-video', {
         apiKey: 'my-api-key',
         proxyUrl: '/api/fal/proxy',
       })

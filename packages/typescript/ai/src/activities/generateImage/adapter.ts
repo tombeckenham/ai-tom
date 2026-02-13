@@ -55,9 +55,9 @@ export interface ImageAdapter<
   /**
    * Generate images from a prompt
    */
-  generateImages(
+  generateImages: (
     options: ImageGenerationOptions<TProviderOptions, TModelSizeByName[TModel]>,
-  ): Promise<ImageGenerationResult>
+  ) => Promise<ImageGenerationResult>
 }
 
 /**

@@ -3,9 +3,9 @@ import { Film, Loader2, Shuffle, Upload, X } from 'lucide-react'
 import type { VideoMode } from '@/lib/models'
 
 import {
-  createVideoJob,
-  getVideoStatus,
-  getVideoUrl,
+  createVideoJobFn,
+  getVideoStatusFn,
+  getVideoUrlFn,
 } from '@/lib/server-functions'
 import { VIDEO_MODELS } from '@/lib/models'
 import { getRandomVideoPrompt } from '@/lib/prompts'
@@ -74,7 +74,7 @@ export default function VideoGenerator({
 
   const pollStatus = async (jobId: string, model: string) => {
     try {
-      const status = await getVideoStatus({ data: { jobId, model } })
+      const status = await getVideoStatusFn({ data: { jobId, model } })
 
       if (status.status === 'completed') {
         const interval = pollingRefs.current.get(model)
@@ -82,10 +82,15 @@ export default function VideoGenerator({
           clearInterval(interval)
           pollingRefs.current.delete(model)
         }
-        const urlResult = await getVideoUrl({ data: { jobId, model } })
+        const urlResult = await getVideoUrlFn({ data: { jobId, model } })
+        if (!urlResult.url) {
+          throw new Error('No URL found')
+        }
+        const url = urlResult.url;
+
         setJobStates((prev) => ({
           ...prev,
-          [model]: { status: 'completed', url: urlResult.url },
+          [model]: { status: 'completed', url: url },
         }))
       } else if (status.status === 'processing') {
         setJobStates((prev) => ({
@@ -126,7 +131,7 @@ export default function VideoGenerator({
     }))
 
     try {
-      const result = await createVideoJob({
+      const result = await createVideoJobFn({
         data: {
           prompt,
           model: modelId,
