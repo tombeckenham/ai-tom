@@ -1,14 +1,8 @@
 import { createServerFn } from '@tanstack/react-start'
-import {
-  createFalImage,
-  createFalVideo,
-  FalModelImageSize,
-} from '@tanstack/ai-fal'
+import { falVideo, falImage } from '@tanstack/ai-fal'
+import { generateImage, generateVideo } from '@tanstack/ai'
 
-// Example of the size
-type NanoSize = FalModelImageSize<'fal-ai/nano-banana-pro'>
-
-export const generateImage = createServerFn({ method: 'POST' })
+export const generateImageFn = createServerFn({ method: 'POST' })
   .inputValidator((data: { prompt: string; model: string }) => {
     if (!data.prompt.trim()) throw new Error('Prompt is required')
     if (!data.model) throw new Error('Model is required')
@@ -21,42 +15,43 @@ export const generateImage = createServerFn({ method: 'POST' })
 
     switch (data.model) {
       case 'fal-ai/nano-banana-pro': {
-        const adapter = createFalImage('fal-ai/nano-banana-pro')
-        return adapter.generateImages({
+        return generateImage({
+          adapter: falImage('fal-ai/nano-banana-pro'),
           prompt: data.prompt,
           numberOfImages: 1,
+          size: '16:9_4K',
           modelOptions: {
-            aspect_ratio: '16:9',
-            resolution: '4K',
             output_format: 'jpeg',
           },
         })
       }
       case 'xai/grok-imagine-image': {
-        const adapter = createFalImage('xai/grok-imagine-image')
-        return adapter.generateImages({
+        // NOTE: Newer models are untyped (at the moment)
+        return generateImage({
+          adapter: falImage('xai/grok-imagine-image'),
           prompt: data.prompt,
           numberOfImages: 1,
-          modelOptions: { aspect_ratio: '16:9' },
+          size: '16:9',
         })
       }
       case 'fal-ai/flux-2/klein/9b': {
-        const adapter = createFalImage('fal-ai/flux-2/klein/9b')
-        return adapter.generateImages({
+        // NOTE: Newer models are untyped (at the moment)
+        return generateImage({
+          adapter: falImage('fal-ai/flux-2/klein/9b'),
           prompt: data.prompt,
           numberOfImages: 1,
-          modelOptions: { aspect_ratio: '16:9' },
+          size: '16:9',
         })
       }
       case 'fal-ai/z-image/turbo': {
-        const adapter = createFalImage('fal-ai/z-image/turbo')
-        return adapter.generateImages({
+        return generateImage({
+          adapter: falImage('fal-ai/z-image/turbo'),
           prompt: data.prompt,
           numberOfImages: 1,
+          size: 'landscape_16_9',
           modelOptions: {
             acceleration: 'high',
             enable_prompt_expansion: true,
-            image_size: 'landscape_16_9',
           },
         })
       }
@@ -68,21 +63,21 @@ export const generateImage = createServerFn({ method: 'POST' })
 function createVideoAdapter(model: string) {
   switch (model) {
     case 'fal-ai/kling-video/v2.6/pro/text-to-video':
-      return createFalVideo('fal-ai/kling-video/v2.6/pro/text-to-video')
+      return falVideo('fal-ai/kling-video/v2.6/pro/text-to-video')
     case 'fal-ai/kling-video/v2.6/pro/image-to-video':
-      return createFalVideo('fal-ai/kling-video/v2.6/pro/image-to-video')
+      return falVideo('fal-ai/kling-video/v2.6/pro/image-to-video')
     case 'fal-ai/veo3.1':
-      return createFalVideo('fal-ai/veo3.1')
+      return falVideo('fal-ai/veo3.1')
     case 'fal-ai/veo3.1/image-to-video':
-      return createFalVideo('fal-ai/veo3.1/image-to-video')
+      return falVideo('fal-ai/veo3.1/image-to-video')
     case 'xai/grok-imagine-video/text-to-video':
-      return createFalVideo('xai/grok-imagine-video/text-to-video')
+      return falVideo('xai/grok-imagine-video/text-to-video')
     case 'xai/grok-imagine-video/image-to-video':
-      return createFalVideo('xai/grok-imagine-video/image-to-video')
+      return falVideo('xai/grok-imagine-video/image-to-video')
     case 'fal-ai/ltx-2/text-to-video/fast':
-      return createFalVideo('fal-ai/ltx-2/text-to-video/fast')
+      return falVideo('fal-ai/ltx-2/text-to-video/fast')
     case 'fal-ai/ltx-2/image-to-video/fast':
-      return createFalVideo('fal-ai/ltx-2/image-to-video/fast')
+      return falVideo('fal-ai/ltx-2/image-to-video/fast')
     default:
       throw new Error(`Unknown video model: ${model}`)
   }
@@ -100,11 +95,9 @@ export const createVideoJob = createServerFn({ method: 'POST' })
     switch (data.model) {
       // Text-to-video models
       case 'fal-ai/kling-video/v2.6/pro/text-to-video': {
-        const adapter = createFalVideo(
-          'fal-ai/kling-video/v2.6/pro/text-to-video',
-        )
         // NOTE newer models are untyped
-        return adapter.createVideoJob({
+        return generateVideo({
+          adapter: falVideo('fal-ai/kling-video/v2.6/pro/text-to-video'),
           prompt: data.prompt,
           modelOptions: {
             aspect_ratio: '16:9',
@@ -114,10 +107,10 @@ export const createVideoJob = createServerFn({ method: 'POST' })
         })
       }
       case 'fal-ai/veo3.1': {
-        const adapter = createFalVideo('fal-ai/veo3.1')
         // NOTE pass aspect ratio, resolution, and duration in model options
         // This makes use of existing types and avoids type errors
-        return adapter.createVideoJob({
+        return generateVideo({
+          adapter: falVideo('fal-ai/veo3.1'),
           prompt: data.prompt,
           modelOptions: {
             aspect_ratio: '16:9',
@@ -127,8 +120,8 @@ export const createVideoJob = createServerFn({ method: 'POST' })
         })
       }
       case 'xai/grok-imagine-video/text-to-video': {
-        const adapter = createFalVideo('xai/grok-imagine-video/text-to-video')
-        return adapter.createVideoJob({
+        return generateVideo({
+          adapter: falVideo('xai/grok-imagine-video/text-to-video'),
           prompt: data.prompt,
           modelOptions: {
             aspect_ratio: '16:9',
@@ -138,9 +131,8 @@ export const createVideoJob = createServerFn({ method: 'POST' })
         })
       }
       case 'fal-ai/ltx-2/text-to-video/fast': {
-        const adapter = createFalVideo('fal-ai/ltx-2/text-to-video/fast')
-        // NOTE model options are fully typed
-        return adapter.createVideoJob({
+        return generateVideo({
+          adapter: falVideo('fal-ai/ltx-2/text-to-video/fast'),
           prompt: data.prompt,
           modelOptions: {
             aspect_ratio: '16:9',
@@ -152,25 +144,22 @@ export const createVideoJob = createServerFn({ method: 'POST' })
       case 'fal-ai/kling-video/v2.6/pro/image-to-video': {
         if (!data.imageUrl)
           throw new Error('Image URL is required for image-to-video')
-        const adapter = createFalVideo(
-          'fal-ai/kling-video/v2.6/pro/image-to-video',
-        )
-        // NOTE for newer models model options are Record<string, any>
-        return adapter.createVideoJob({
+        return generateVideo({
+          adapter: falVideo('fal-ai/kling-video/v2.6/pro/image-to-video'),
           prompt: data.prompt,
           modelOptions: {
             start_image_url: data.imageUrl,
             generate_audio: true,
-
             duration: '5',
           },
         })
       }
       case 'fal-ai/veo3.1/image-to-video': {
-        if (!data.imageUrl)
+        if (!data.imageUrl) {
           throw new Error('Image URL is required for image-to-video')
-        const adapter = createFalVideo('fal-ai/veo3.1/image-to-video')
-        return adapter.createVideoJob({
+        }
+        return generateVideo({
+          adapter: falVideo('fal-ai/veo3.1/image-to-video'),
           prompt: data.prompt,
           modelOptions: {
             image_url: data.imageUrl,
@@ -183,8 +172,8 @@ export const createVideoJob = createServerFn({ method: 'POST' })
       case 'xai/grok-imagine-video/image-to-video': {
         if (!data.imageUrl)
           throw new Error('Image URL is required for image-to-video')
-        const adapter = createFalVideo('xai/grok-imagine-video/image-to-video')
-        return adapter.createVideoJob({
+        return generateVideo({
+          adapter: falVideo('xai/grok-imagine-video/image-to-video'),
           prompt: data.prompt,
           modelOptions: {
             image_url: data.imageUrl,
@@ -197,8 +186,8 @@ export const createVideoJob = createServerFn({ method: 'POST' })
       case 'fal-ai/ltx-2/image-to-video/fast': {
         if (!data.imageUrl)
           throw new Error('Image URL is required for image-to-video')
-        const adapter = createFalVideo('fal-ai/ltx-2/image-to-video/fast')
-        return await adapter.createVideoJob({
+        return generateVideo({
+          adapter: falVideo('fal-ai/ltx-2/image-to-video/fast'),
           prompt: data.prompt,
           modelOptions: {
             image_url: data.imageUrl,

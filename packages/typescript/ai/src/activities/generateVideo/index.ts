@@ -30,7 +30,7 @@ export const kind = 'video' as const
  * Extract provider options from a VideoAdapter via ~types.
  */
 export type VideoProviderOptions<TAdapter> =
-  TAdapter extends VideoAdapter<any, any>
+  TAdapter extends VideoAdapter<any, any, any>
     ? TAdapter['~types']['providerOptions']
     : object
 
@@ -47,7 +47,7 @@ function createId(prefix: string): string {
  * The model is extracted from the adapter's model property.
  */
 interface VideoActivityBaseOptions<
-  TAdapter extends VideoAdapter<string, object>,
+  TAdapter extends VideoAdapter<string, object, any>,
 > {
   /** The video adapter to use (must be created with a model) */
   adapter: TAdapter & { kind: typeof kind }
@@ -60,7 +60,7 @@ interface VideoActivityBaseOptions<
  * @experimental Video generation is an experimental feature and may change.
  */
 export interface VideoCreateOptions<
-  TAdapter extends VideoAdapter<string, object>,
+  TAdapter extends VideoAdapter<string, object, any>,
 > extends VideoActivityBaseOptions<TAdapter> {
   /** Request type - create a new job (default if not specified) */
   request?: 'create'
@@ -80,7 +80,7 @@ export interface VideoCreateOptions<
  * @experimental Video generation is an experimental feature and may change.
  */
 export interface VideoStatusOptions<
-  TAdapter extends VideoAdapter<string, object>,
+  TAdapter extends VideoAdapter<string, object, any>,
 > extends VideoActivityBaseOptions<TAdapter> {
   /** Request type - get job status */
   request: 'status'
@@ -94,7 +94,7 @@ export interface VideoStatusOptions<
  * @experimental Video generation is an experimental feature and may change.
  */
 export interface VideoUrlOptions<
-  TAdapter extends VideoAdapter<string, object>,
+  TAdapter extends VideoAdapter<string, object, any>,
 > extends VideoActivityBaseOptions<TAdapter> {
   /** Request type - get video URL */
   request: 'url'
@@ -109,7 +109,7 @@ export interface VideoUrlOptions<
  * @experimental Video generation is an experimental feature and may change.
  */
 export type VideoActivityOptions<
-  TAdapter extends VideoAdapter<string, object>,
+  TAdapter extends VideoAdapter<string, object, any>,
   TRequest extends 'create' | 'status' | 'url' = 'create',
 > = TRequest extends 'status'
   ? VideoStatusOptions<TAdapter>
@@ -161,7 +161,7 @@ export type VideoActivityResult<
  * ```
  */
 export async function generateVideo<
-  TAdapter extends VideoAdapter<string, object>,
+  TAdapter extends VideoAdapter<string, object, any>,
 >(options: VideoCreateOptions<TAdapter>): Promise<VideoJobResult> {
   const { adapter, prompt, size, duration, modelOptions } = options
   const model = adapter.model
@@ -201,7 +201,7 @@ export async function generateVideo<
  * ```
  */
 export async function getVideoJobStatus<
-  TAdapter extends VideoAdapter<string, object>,
+  TAdapter extends VideoAdapter<string, object, any>,
 >(options: {
   adapter: TAdapter & { kind: typeof kind }
   jobId: string
@@ -301,7 +301,7 @@ export async function getVideoJobStatus<
  * Create typed options for the generateVideo() function without executing.
  */
 export function createVideoOptions<
-  TAdapter extends VideoAdapter<string, object>,
+  TAdapter extends VideoAdapter<string, object, any>,
 >(options: VideoCreateOptions<TAdapter>): VideoCreateOptions<TAdapter> {
   return options
 }

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createFalImage } from '../src/adapters/image'
+import { falImage } from '../src/adapters/image'
+import { generateImage } from '@tanstack/ai'
 
 // Declare mocks at module level
 let mockSubscribe: any
@@ -15,8 +16,7 @@ vi.mock('@fal-ai/client', () => {
   }
 })
 
-const createAdapter = () =>
-  createFalImage('fal-ai/flux/dev', { apiKey: 'test-key' })
+const createAdapter = () => falImage('fal-ai/flux/dev', { apiKey: 'test-key' })
 
 function createMockImageResponse(images: Array<{ url: string }>) {
   return {
@@ -43,7 +43,8 @@ describe('Fal Image Adapter', () => {
 
     const adapter = createAdapter()
 
-    const result = await adapter.generateImages({
+    const result = await generateImage({
+      adapter: adapter,
       prompt: 'A futuristic city at sunset',
     })
 
@@ -72,7 +73,8 @@ describe('Fal Image Adapter', () => {
 
     const adapter = createAdapter()
 
-    const result = await adapter.generateImages({
+    const result = await generateImage({
+      adapter,
       prompt: 'A cute robot mascot',
       numberOfImages: 2,
     })
@@ -98,7 +100,8 @@ describe('Fal Image Adapter', () => {
 
     const adapter = createAdapter()
 
-    const result = await adapter.generateImages({
+    const result = await generateImage({
+      adapter,
       prompt: 'A simple test image',
     })
 
@@ -116,7 +119,8 @@ describe('Fal Image Adapter', () => {
 
     const adapter = createAdapter()
 
-    await adapter.generateImages({
+    await generateImage({
+      adapter,
       prompt: 'A wide landscape',
       modelOptions: { image_size: 'landscape_4_3' },
     })
@@ -136,7 +140,8 @@ describe('Fal Image Adapter', () => {
 
     const adapter = createAdapter()
 
-    await adapter.generateImages({
+    await generateImage({
+      adapter,
       prompt: 'A custom size image',
       modelOptions: { image_size: { width: 800, height: 600 } },
     })
@@ -156,7 +161,8 @@ describe('Fal Image Adapter', () => {
 
     const adapter = createAdapter()
 
-    await adapter.generateImages({
+    await generateImage({
+      adapter,
       prompt: 'Test',
       modelOptions: {
         num_inference_steps: 28,
@@ -185,7 +191,8 @@ describe('Fal Image Adapter', () => {
 
     const adapter = createAdapter()
 
-    const result = await adapter.generateImages({
+    const result = await generateImage({
+      adapter,
       prompt: 'Single image test',
     })
 
@@ -199,14 +206,15 @@ describe('Fal Image Adapter', () => {
     const adapter = createAdapter()
 
     await expect(
-      adapter.generateImages({
+      generateImage({
+        adapter,
         prompt: 'Test prompt',
       }),
     ).rejects.toThrow('Model not found')
   })
 
   it('configures client with API key', () => {
-    createFalImage('fal-ai/flux/dev', { apiKey: 'my-api-key' })
+    falImage('fal-ai/flux/dev', { apiKey: 'my-api-key' })
 
     expect(mockConfig).toHaveBeenCalledWith({
       credentials: 'my-api-key',
@@ -214,7 +222,7 @@ describe('Fal Image Adapter', () => {
   })
 
   it('configures client with proxy URL when provided', () => {
-    createFalImage('fal-ai/flux/dev', {
+    falImage('fal-ai/flux/dev', {
       apiKey: 'my-api-key',
       proxyUrl: '/api/fal/proxy',
     })

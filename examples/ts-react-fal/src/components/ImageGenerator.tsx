@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ImageIcon, Loader2, Shuffle } from 'lucide-react'
 import type { ImageGenerationResult } from '@tanstack/ai'
 
-import { generateImage } from '@/lib/server-functions'
+import { generateImageFn } from '@/lib/server-functions'
 import { getRandomImagePrompt } from '@/lib/prompts'
 import { IMAGE_MODELS } from '@/lib/models'
 
@@ -43,10 +43,10 @@ export default function ImageGenerator({
       // Fire all requests in parallel
       const promises = IMAGE_MODELS.map(async (model) => {
         try {
-          const response = await generateImage({
+          const response = await generateImageFn({
             data: { prompt, model: model.id },
           })
-          setResults((prev) => ({
+          setResults((prev) => ({ 
             ...prev,
             [model.id]: { status: 'success', result: response },
           }))
@@ -73,7 +73,7 @@ export default function ImageGenerator({
       setResults({ [selectedModel]: { status: 'loading' } })
 
       try {
-        const response = await generateImage({
+        const response = await generateImageFn({
           data: { prompt, model: selectedModel },
         })
         setResults({ [selectedModel]: { status: 'success', result: response } })

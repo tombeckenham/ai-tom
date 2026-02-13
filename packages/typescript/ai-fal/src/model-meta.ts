@@ -56,9 +56,21 @@ export type FalModelImageSize<TModel extends string> =
       : 'aspect_ratio' extends keyof EndpointTypeMap[TModel]['input']
         ? 'resolution' extends keyof EndpointTypeMap[TModel]['input']
           ? `${NonNullable<FalModelInput<TModel>['aspect_ratio']>}_${NonNullable<FalModelInput<TModel>['resolution']>}`
-          : never
+          : NonNullable<FalModelInput<TModel>['aspect_ratio']>
         : never
-    : undefined
+    : string
+
+export type FalModelImageSizeInput<TModel extends string> =
+  TModel extends keyof EndpointTypeMap
+    ? 'aspect_ratio' extends keyof EndpointTypeMap[TModel]['input']
+      ? 'resolution' extends keyof EndpointTypeMap[TModel]['input']
+        ? {
+            aspect_ratio: FalModelInput<TModel>['aspect_ratio']
+            resolution: FalModelInput<TModel>['resolution']
+          }
+        : { aspect_ratio: NonNullable<FalModelInput<TModel>['aspect_ratio']> }
+      : { image_size: FalModelImageSize<TModel> }
+    : { image_size: string }
 
 /**
  * Provider options for image generation, excluding fields TanStack AI handles.
@@ -73,10 +85,11 @@ export type FalImageProviderOptions<TModel extends string> = Omit<
   'prompt'
 >
 
-export type FalImageGenerationOptions<TModel extends string> = Omit<
-  ImageGenerationOptions<FalImageProviderOptions<TModel>>,
-  'model'
->
+export type FalImageGenerationOptions<TModel extends string> =
+  ImageGenerationOptions<
+    FalImageProviderOptions<TModel>,
+    FalModelImageSize<TModel>
+  >
 
 /**
  * Provider options for video generation, excluding fields TanStack AI handles.

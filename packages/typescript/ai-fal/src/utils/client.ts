@@ -45,8 +45,12 @@ export function configureFalClient(config?: FalClientConfig): void {
       proxyUrl: config.proxyUrl,
     })
   } else {
+    const apiKey = config?.apiKey ?? getFalApiKeyFromEnv()
+    if (!apiKey) {
+      throw new Error('API key is required')
+    }
     fal.config({
-      credentials: config?.apiKey ?? getFalApiKeyFromEnv(),
+      credentials: apiKey,
     })
   }
 }

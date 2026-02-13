@@ -2,18 +2,13 @@
 // Image Adapter
 // ============================================================================
 
-export { FalImageAdapter, createFalImage } from './adapters/image'
-
-export {
-  mapSizeToFalFormat,
-  type FalImageSizePreset,
-} from './image/image-provider-options'
+export { FalImageAdapter, falImage } from './adapters/image'
 
 // ============================================================================
 // Video Adapter (Experimental)
 // ============================================================================
 
-export { FalVideoAdapter, createFalVideo, falVideo } from './adapters/video'
+export { FalVideoAdapter, falVideo } from './adapters/video'
 
 // ============================================================================
 // Model Types (from fal.ai's type system)

@@ -1,15 +1,14 @@
 import { fal } from '@fal-ai/client'
 import { BaseImageAdapter } from '@tanstack/ai/adapters'
-import {
-  configureFalClient,
-  getFalApiKeyFromEnv,
-  generateId as utilGenerateId,
-} from '../utils'
+import { configureFalClient, generateId as utilGenerateId } from '../utils'
 import type { OutputType, Result } from '@fal-ai/client'
 import type { FalClientConfig } from '../utils'
-import type { GeneratedImage, ImageGenerationResult } from '@tanstack/ai'
 import type {
-  FalImageGenerationOptions,
+  GeneratedImage,
+  ImageGenerationOptions,
+  ImageGenerationResult,
+} from '@tanstack/ai'
+import type {
   FalImageProviderOptions,
   FalModel,
   FalModelImageSize,
@@ -40,40 +39,39 @@ import { mapSizeToFalFormat } from '../image/image-provider-options'
 export class FalImageAdapter<TModel extends FalModel> extends BaseImageAdapter<
   TModel,
   FalImageProviderOptions<TModel>,
-  Record<FalModel, FalImageProviderOptions<TModel>>,
-  Record<FalModel, FalModelImageSize<TModel>>
+  Record<TModel, FalImageProviderOptions<TModel>>,
+  Record<TModel, FalModelImageSize<TModel>>
 > {
   readonly kind = 'image' as const
   readonly name = 'fal' as const
 
   constructor(model: TModel, config?: FalClientConfig) {
     super({}, model)
-
-    const apiKey = config?.apiKey ?? getFalApiKeyFromEnv()
-    if (!apiKey) {
-      throw new Error('API key is required')
-    }
-    configureFalClient({ apiKey, proxyUrl: config?.proxyUrl })
+    configureFalClient(config)
   }
 
   async generateImages(
-    options: FalImageGenerationOptions<TModel>,
+    options: ImageGenerationOptions<
+      FalImageProviderOptions<TModel>,
+      FalModelImageSize<TModel>
+    >,
   ): Promise<ImageGenerationResult> {
-    const size = options.size
     const input = this.buildInput(options)
     const result = await fal.subscribe(this.model, { input })
     return this.transformResponse(result)
   }
 
   private buildInput(
-    options: FalImageGenerationOptions<TModel>,
+    options: ImageGenerationOptions<FalImageProviderOptions<TModel>, string>,
   ): FalModelInput<TModel> {
-    // TB Jan 2026 validated that satisfies works when the type is known but not sure if it works with the union type of FalModelInput with record any
-    return {
+    const sizeParams = mapSizeToFalFormat(options.size)
+    const input = {
       ...options.modelOptions,
+      ...sizeParams,
       prompt: options.prompt,
       num_images: options.numberOfImages,
     } as FalModelInput<TModel>
+    return input
   }
 
   protected override generateId(): string {
@@ -125,4 +123,11 @@ export function createFalImage<TModel extends FalModel>(
   config?: FalClientConfig,
 ): FalImageAdapter<TModel> {
   return new FalImageAdapter(model, config)
+}
+
+export function falImage<TModel extends FalModel>(
+  model: TModel,
+  config?: FalClientConfig,
+): FalImageAdapter<TModel> {
+  return createFalImage(model, config)
 }

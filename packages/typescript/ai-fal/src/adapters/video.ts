@@ -73,7 +73,8 @@ function mapFalStatusToVideoStatus(
  */
 export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
   TModel,
-  FalVideoProviderOptions<TModel>
+  FalVideoProviderOptions<TModel>,
+  Record<TModel, FalVideoProviderOptions<TModel>>
 > {
   readonly kind = 'video' as const
   readonly name = 'fal' as const

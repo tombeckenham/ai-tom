@@ -33,6 +33,7 @@ export interface VideoAdapterConfig {
 export interface VideoAdapter<
   TModel extends string = string,
   TProviderOptions extends object = Record<string, unknown>,
+  TModelProviderOptionsByName extends Record<string, any> = Record<string, any>,
 > {
   /** Discriminator for adapter kind - used to determine API shape */
   readonly kind: 'video'
@@ -46,33 +47,34 @@ export interface VideoAdapter<
    */
   '~types': {
     providerOptions: TProviderOptions
+    modelProviderOptionsByName: TModelProviderOptionsByName
   }
 
   /**
    * Create a new video generation job.
    * Returns a job ID that can be used to poll for status and retrieve the video.
    */
-  createVideoJob: (
-    options: VideoGenerationOptions<TProviderOptions>,
-  ) => Promise<VideoJobResult>
+  createVideoJob(
+    options: VideoGenerationOptions<TModelProviderOptionsByName[TModel]>,
+  ): Promise<VideoJobResult>
 
   /**
    * Get the current status of a video generation job.
    */
-  getVideoStatus: (jobId: string) => Promise<VideoStatusResult>
+  getVideoStatus(jobId: string): Promise<VideoStatusResult>
 
   /**
    * Get the URL to download/view the generated video.
    * Should only be called after status is 'completed'.
    */
-  getVideoUrl: (jobId: string) => Promise<VideoUrlResult>
+  getVideoUrl(jobId: string): Promise<VideoUrlResult>
 }
 
 /**
  * A VideoAdapter with any/unknown type parameters.
  * Useful as a constraint in generic functions and interfaces.
  */
-export type AnyVideoAdapter = VideoAdapter<any, any>
+export type AnyVideoAdapter = VideoAdapter<any, any, any>
 
 /**
  * Abstract base class for video generation adapters.
@@ -85,7 +87,8 @@ export type AnyVideoAdapter = VideoAdapter<any, any>
 export abstract class BaseVideoAdapter<
   TModel extends string = string,
   TProviderOptions extends object = Record<string, unknown>,
-> implements VideoAdapter<TModel, TProviderOptions> {
+  TModelProviderOptionsByName extends Record<string, any> = Record<string, any>,
+> implements VideoAdapter<TModel, TProviderOptions, TModelProviderOptionsByName> {
   readonly kind = 'video' as const
   abstract readonly name: string
   readonly model: TModel
@@ -93,6 +96,7 @@ export abstract class BaseVideoAdapter<
   // Type-only property - never assigned at runtime
   declare '~types': {
     providerOptions: TProviderOptions
+    modelProviderOptionsByName: TModelProviderOptionsByName
   }
 
   protected config: VideoAdapterConfig
@@ -103,7 +107,7 @@ export abstract class BaseVideoAdapter<
   }
 
   abstract createVideoJob(
-    options: VideoGenerationOptions<TProviderOptions>,
+    options: VideoGenerationOptions<TModelProviderOptionsByName[TModel]>,
   ): Promise<VideoJobResult>
 
   abstract getVideoStatus(jobId: string): Promise<VideoStatusResult>
