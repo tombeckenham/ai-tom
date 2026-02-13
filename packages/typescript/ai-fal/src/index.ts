@@ -21,6 +21,7 @@ export {
   type FalModelInput,
   type FalModelOutput,
   type FalModelImageSize,
+  type FalModelVideoSize,
 } from './model-meta'
 // ============================================================================
 // Utils

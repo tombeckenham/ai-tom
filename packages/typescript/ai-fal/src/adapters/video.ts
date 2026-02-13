@@ -1,7 +1,9 @@
 import { fal } from '@fal-ai/client'
 import { BaseVideoAdapter } from '@tanstack/ai/adapters'
 import { configureFalClient, generateId as utilGenerateId } from '../utils'
+import { mapVideoSizeToFalFormat } from '../video/video-provider-options'
 import type {
+  VideoGenerationOptions,
   VideoJobResult,
   VideoStatusResult,
   VideoUrlResult,
@@ -9,29 +11,12 @@ import type {
 import type {
   FalModel,
   FalModelInput,
-  FalVideoGenerationOptions,
+  FalModelVideoSize,
   FalVideoProviderOptions,
 } from '../model-meta'
 import type { FalClientConfig } from '../utils'
 
 type FalQueueStatus = 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED'
-
-const HEIGHT_TO_RESOLUTION: Record<number, string> = {
-  240: '240p',
-  360: '360p',
-  480: '480p',
-  512: '512p',
-  520: '520p',
-  540: '540p',
-  576: '576p',
-  580: '580p',
-  720: '720p',
-  768: '768p',
-  1024: '1024p',
-  1080: '1080p',
-  1440: '1440p',
-  2160: '4k',
-}
 
 interface FalStatusResponse {
   status: FalQueueStatus
@@ -74,35 +59,33 @@ function mapFalStatusToVideoStatus(
 export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
   TModel,
   FalVideoProviderOptions<TModel>,
-  Record<TModel, FalVideoProviderOptions<TModel>>
+  Record<TModel, FalVideoProviderOptions<TModel>>,
+  Record<TModel, FalModelVideoSize<TModel>>
 > {
   readonly kind = 'video' as const
   readonly name = 'fal' as const
 
   constructor(model: TModel, config?: FalClientConfig) {
     super({}, model)
-    // Use accessor function to avoid merged type slowdown
-
     configureFalClient(config)
   }
 
   async createVideoJob(
-    options: FalVideoGenerationOptions<TModel>,
+    options: VideoGenerationOptions<
+      FalVideoProviderOptions<TModel>,
+      FalModelVideoSize<TModel>
+    >,
   ): Promise<VideoJobResult> {
     const { prompt, size, duration, modelOptions } = options
-    const sizeParams = size ? this.sizeToResolutionAspectRatio(size) : undefined
+    const sizeParams = mapVideoSizeToFalFormat(size)
 
     const input = {
       ...modelOptions,
+      ...sizeParams,
       prompt,
       ...(duration ? { duration } : {}),
-      ...(sizeParams
-        ? {
-            resolution: sizeParams.resolution,
-            aspect_ratio: sizeParams.aspectRatio,
-          }
-        : {}),
     } as FalModelInput<TModel>
+
     // Submit to queue and get request ID
     const { request_id } = await fal.queue.submit(this.model, {
       input,
@@ -151,32 +134,6 @@ export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
 
   protected override generateId(): string {
     return utilGenerateId(this.name)
-  }
-
-  /**
-   * Convert WIDTHxHEIGHT size format to resolution and aspect ratio.
-   */
-  private sizeToResolutionAspectRatio(
-    size: string,
-  ): { resolution: string; aspectRatio: string } | undefined {
-    const match = size.match(/^(\d+)x(\d+)$/)
-    if (!match || !match[1] || !match[2]) return undefined
-
-    const width = parseInt(match[1], 10)
-    const height = parseInt(match[2], 10)
-
-    // Map height to resolution string
-    const resolution = HEIGHT_TO_RESOLUTION[height]
-    if (!resolution) return undefined
-
-    // Calculate GCD for simplest aspect ratio
-    const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b))
-    const divisor = gcd(width, height)
-
-    return {
-      resolution,
-      aspectRatio: `${width / divisor}:${height / divisor}`,
-    }
   }
 }
 

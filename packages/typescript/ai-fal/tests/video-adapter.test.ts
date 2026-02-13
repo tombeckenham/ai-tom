@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createFalVideo } from '../src/adapters/video'
+import { falVideo, createFalVideo } from '../src/adapters/video'
 
 // Declare mocks at module level
 let mockQueueSubmit: any
@@ -22,7 +22,7 @@ vi.mock('@fal-ai/client', () => {
 })
 
 const createAdapter = () =>
-  createFalVideo('fal-ai/veo3/image-to-video', { apiKey: 'test-key' })
+  falVideo('fal-ai/veo3/image-to-video', { apiKey: 'test-key' })
 
 describe('Fal Video Adapter', () => {
   beforeEach(() => {
@@ -99,7 +99,7 @@ describe('Fal Video Adapter', () => {
       })
     })
 
-    it('converts size to resolution and aspect ratio', async () => {
+    it('converts size with aspect_ratio and resolution', async () => {
       mockQueueSubmit.mockResolvedValueOnce({
         request_id: 'job-ar',
       })
@@ -107,16 +107,34 @@ describe('Fal Video Adapter', () => {
       const adapter = createAdapter()
 
       await adapter.createVideoJob({
-
         prompt: 'A wide landscape video',
-        size: '1920x1080', // 1080p, 16:9
+        size: '16:9_720p',
       })
 
       const [, options] = mockQueueSubmit.mock.calls[0]!
       expect(options.input).toMatchObject({
-        resolution: '1080p',
+        resolution: '720p',
         aspect_ratio: '16:9',
       })
+    })
+
+    it('converts size with aspect_ratio only', async () => {
+      mockQueueSubmit.mockResolvedValueOnce({
+        request_id: 'job-ar2',
+      })
+
+      const adapter = createAdapter()
+
+      await adapter.createVideoJob({
+        prompt: 'A wide landscape video',
+        size: '16:9',
+      })
+
+      const [, options] = mockQueueSubmit.mock.calls[0]!
+      expect(options.input).toMatchObject({
+        aspect_ratio: '16:9',
+      })
+      expect(options.input.resolution).toBeUndefined()
     })
 
     it('passes model-specific options', async () => {

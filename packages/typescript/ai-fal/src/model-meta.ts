@@ -92,6 +92,36 @@ export type FalImageGenerationOptions<TModel extends string> =
   >
 
 /**
+ * Extract the video size type supported by a specific fal model.
+ * Video models typically use aspect_ratio and/or resolution fields.
+ *
+ * Follows the same pattern as FalModelImageSize:
+ * - aspect_ratio + resolution → "16:9_720p"
+ * - aspect_ratio only → "16:9"
+ * - unknown models → string
+ */
+export type FalModelVideoSize<TModel extends string> =
+  TModel extends keyof EndpointTypeMap
+    ? 'aspect_ratio' extends keyof EndpointTypeMap[TModel]['input']
+      ? 'resolution' extends keyof EndpointTypeMap[TModel]['input']
+        ? `${NonNullable<FalModelInput<TModel>['aspect_ratio']>}_${NonNullable<FalModelInput<TModel>['resolution']>}`
+        : NonNullable<FalModelInput<TModel>['aspect_ratio']>
+      : never
+    : string
+
+export type FalModelVideoSizeInput<TModel extends string> =
+  TModel extends keyof EndpointTypeMap
+    ? 'aspect_ratio' extends keyof EndpointTypeMap[TModel]['input']
+      ? 'resolution' extends keyof EndpointTypeMap[TModel]['input']
+        ? {
+            aspect_ratio: FalModelInput<TModel>['aspect_ratio']
+            resolution: FalModelInput<TModel>['resolution']
+          }
+        : { aspect_ratio: NonNullable<FalModelInput<TModel>['aspect_ratio']> }
+      : { aspect_ratio: string }
+    : { aspect_ratio: string }
+
+/**
  * Provider options for video generation, excluding fields TanStack AI handles.
  * Use this for the `modelOptions` parameter in video generation.
  */
@@ -100,7 +130,8 @@ export type FalVideoProviderOptions<TModel extends string> =
     ? Omit<FalModelInput<TModel>, 'prompt'>
     : Record<string, any>
 
-export type FalVideoGenerationOptions<TModel extends string> = Omit<
-  VideoGenerationOptions<FalVideoProviderOptions<TModel>>,
-  'model'
->
+export type FalVideoGenerationOptions<TModel extends string> =
+  VideoGenerationOptions<
+    FalVideoProviderOptions<TModel>,
+    FalModelVideoSize<TModel>
+  >

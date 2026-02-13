@@ -99,9 +99,8 @@ export const createVideoJob = createServerFn({ method: 'POST' })
         return generateVideo({
           adapter: falVideo('fal-ai/kling-video/v2.6/pro/text-to-video'),
           prompt: data.prompt,
+          size: '16:9_1080p',
           modelOptions: {
-            aspect_ratio: '16:9',
-            resolution: '1080p',
             duration: '5',
           },
         })
