@@ -48,9 +48,7 @@ async function main() {
   const existing = await readFile(OUTPUT_PATH, 'utf-8')
   const arrayStartIndex = existing.indexOf(ARRAY_START)
   if (arrayStartIndex === -1) {
-    throw new Error(
-      `Could not find "${ARRAY_START}" in openrouter.models.ts`,
-    )
+    throw new Error(`Could not find "${ARRAY_START}" in openrouter.models.ts`)
   }
   const preamble = existing.slice(0, arrayStartIndex)
 

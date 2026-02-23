@@ -178,9 +178,9 @@ function generateModelMetaString(model: OpenRouterModel): string {
     model.supported_parameters
       ?.map((p) =>
         p === 'tools' ||
-          p === 'reasoning_effort' ||
-          p === 'structured_outputs' ||
-          p === 'parallel_tool_calls'
+        p === 'reasoning_effort' ||
+        p === 'structured_outputs' ||
+        p === 'parallel_tool_calls'
           ? ''
           : `'${p === 'max_tokens' ? 'max_completion_tokens' : p}'`,
       )
