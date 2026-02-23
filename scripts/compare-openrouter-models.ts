@@ -39,8 +39,9 @@ function extractModels(source: string): Map<string, ModelSnapshot> {
     if (!id) continue
 
     const name = block.match(/name:\s*'([^']+)'/)?.[1] ?? ''
-    const context_length =
-      (block.match(/^\s*context_length:\s*([^,]+)\s*,?\s*$/m)?.[1] ?? '').trim()
+    const context_length = (
+      block.match(/^\s*context_length:\s*([^,]+)\s*,?\s*$/m)?.[1] ?? ''
+    ).trim()
     const pricing_prompt = block.match(/prompt:\s*'([^']+)'/)?.[1] ?? ''
     const pricing_completion = block.match(/completion:\s*'([^']+)'/)?.[1] ?? ''
     const modality = block.match(/modality:\s*'([^']+)'/)?.[1] ?? ''
