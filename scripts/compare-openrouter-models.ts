@@ -7,7 +7,13 @@
 
 import { execSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname =
+  typeof import.meta.dirname === 'string'
+    ? import.meta.dirname
+    : dirname(fileURLToPath(import.meta.url))
 
 interface ModelSnapshot {
   id: string
@@ -34,7 +40,7 @@ function extractModels(source: string): Map<string, ModelSnapshot> {
 
     const name = block.match(/name:\s*'([^']+)'/)?.[1] ?? ''
     const context_length =
-      block.match(/^\s*context_length:\s*(.+),?\s*$/m)?.[1] ?? ''
+      (block.match(/^\s*context_length:\s*([^,]+)\s*,?\s*$/m)?.[1] ?? '').trim()
     const pricing_prompt = block.match(/prompt:\s*'([^']+)'/)?.[1] ?? ''
     const pricing_completion = block.match(/completion:\s*'([^']+)'/)?.[1] ?? ''
     const modality = block.match(/modality:\s*'([^']+)'/)?.[1] ?? ''
@@ -89,7 +95,7 @@ const modelsPath = 'scripts/openrouter.models.ts'
 
 // Current branch version
 const currentSource = readFileSync(
-  resolve(import.meta.dirname, '..', modelsPath),
+  resolve(__dirname, '..', modelsPath),
   'utf-8',
 )
 
