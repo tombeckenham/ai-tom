@@ -52,7 +52,7 @@ function setupMockSdkClient(
   nonStreamResponse?: Record<string, unknown>,
 ) {
   mockSend = vi.fn().mockImplementation((params) => {
-    if (params.stream) {
+    if (params.chatGenerationParams?.stream) {
       return Promise.resolve(createAsyncIterable(streamChunks))
     }
     return Promise.resolve(nonStreamResponse)
@@ -131,7 +131,8 @@ describe('OpenRouter adapter option mapping', () => {
 
     expect(mockSend).toHaveBeenCalledTimes(1)
 
-    const [params] = mockSend.mock.calls[0]!
+    const [rawParams] = mockSend.mock.calls[0]!
+    const params = rawParams.chatGenerationParams
 
     expect(params.model).toBe('openai/gpt-4o-mini')
     expect(params.temperature).toBe(0.25)
@@ -349,7 +350,8 @@ describe('OpenRouter adapter option mapping', () => {
     })) {
     }
 
-    const [params] = mockSend.mock.calls[0]!
+    const [rawParams] = mockSend.mock.calls[0]!
+    const params = rawParams.chatGenerationParams
 
     const contentParts = params.messages[0].content
     expect(contentParts[0]).toMatchObject({

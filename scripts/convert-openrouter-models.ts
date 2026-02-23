@@ -52,7 +52,6 @@ function generateChatModelsArray(): string {
   if (modelIds.length === 0) {
     return ''
   }
-  modelIds.push(`"openrouter/auto"`)
   return `export const OPENROUTER_CHAT_MODELS = [\n${modelIds
     .map((id) => `  ${id},`)
     .join('\n')}\n] as const`
@@ -82,10 +81,6 @@ function createPerModelModelOptions(): string {
   const entries = Object.entries(perModelProviderOptions).map(
     ([modelId, typeStr]) => `  [${modelId}]: ${typeStr};`,
   )
-  entries.push(
-    `  "openrouter/auto": OpenRouterCommonOptions & OpenRouterBaseOptions;`,
-  )
-
   return `\nexport type OpenRouterModelOptionsByName  = {\n${entries.join(
     '\n',
   )}\n}`
@@ -97,9 +92,6 @@ function createPerModelInputModalities(): string {
       `  [${modelId}]: ReadonlyArray<${modalitiesStr}>;`,
   )
 
-  entries.push(
-    `  "openrouter/auto": ReadonlyArray<'text' | 'image' | 'audio' | 'video' | 'document'>;`,
-  )
   return `\nexport type OpenRouterModelInputModalitiesByName  = {\n${entries.join(
     '\n',
   )}\n}`
@@ -185,7 +177,10 @@ function generateModelMetaString(model: OpenRouterModel): string {
   const supportedParams =
     model.supported_parameters
       ?.map((p) =>
-        p === 'tools' || p === 'reasoning_effort' || p === 'structured_outputs'
+        p === 'tools' ||
+          p === 'reasoning_effort' ||
+          p === 'structured_outputs' ||
+          p === 'parallel_tool_calls'
           ? ''
           : `'${p === 'max_tokens' ? 'max_completion_tokens' : p}'`,
       )

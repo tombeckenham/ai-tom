@@ -114,7 +114,7 @@ export class OpenRouterTextAdapter<
     try {
       const requestParams = this.mapTextOptionsToSDK(options)
       const stream = await this.client.chat.send(
-        { ...requestParams, stream: true },
+        { chatGenerationParams: { ...requestParams, stream: true } },
         { signal: options.request?.signal },
       )
 
@@ -231,12 +231,14 @@ export class OpenRouterTextAdapter<
     try {
       const result = await this.client.chat.send(
         {
-          ...requestParams,
-          stream: false,
-          tools: [structuredOutputTool],
-          toolChoice: {
-            type: 'function',
-            function: { name: 'structured_output' },
+          chatGenerationParams: {
+            ...requestParams,
+            stream: false,
+            tools: [structuredOutputTool],
+            toolChoice: {
+              type: 'function',
+              function: { name: 'structured_output' },
+            },
           },
         },
         { signal: chatOptions.request?.signal },
