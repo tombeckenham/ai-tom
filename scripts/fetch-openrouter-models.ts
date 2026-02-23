@@ -5,6 +5,16 @@ const OUTPUT_PATH = new URL('./openrouter.models.ts', import.meta.url)
 
 const ARRAY_START = 'export const models: Array<OpenRouterModel> = ['
 
+const VALID_IDENTIFIER = /^[A-Za-z_$][A-Za-z0-9_$]*$/
+
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null && !Array.isArray(v)
+}
+
+function serializeKey(k: string): string {
+  return VALID_IDENTIFIER.test(k) ? k : JSON.stringify(k)
+}
+
 function serializeValue(value: unknown, indent: number): string {
   const pad = '  '.repeat(indent)
   const childPad = '  '.repeat(indent + 1)
@@ -33,11 +43,12 @@ function serializeValue(value: unknown, indent: number): string {
     )
     return `[\n${items.join('\n')}\n${pad}]`
   }
-  if (typeof value === 'object') {
-    const entries = Object.entries(value as Record<string, unknown>)
+  if (isRecord(value)) {
+    const entries = Object.entries(value)
     if (entries.length === 0) return '{}'
     const lines = entries.map(
-      ([k, v]) => `${childPad}${k}: ${serializeValue(v, indent + 1)},`,
+      ([k, v]) =>
+        `${childPad}${serializeKey(k)}: ${serializeValue(v, indent + 1)},`,
     )
     return `{\n${lines.join('\n')}\n${pad}}`
   }
