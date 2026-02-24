@@ -238,6 +238,9 @@ export class OpenRouterTextAdapter<
       )
       const content = result.choices[0]?.message.content
       const rawText = typeof content === 'string' ? content : ''
+      if (!rawText) {
+        throw new Error('Structured output response contained no content')
+      }
       const parsed = JSON.parse(rawText)
       return { data: parsed, rawText }
     } catch (error: unknown) {

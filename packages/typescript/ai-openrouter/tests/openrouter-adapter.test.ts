@@ -993,6 +993,6 @@ describe('OpenRouter structured output', () => {
         },
         outputSchema: { type: 'object' },
       }),
-    ).rejects.toThrow('Failed to parse structured output as JSON')
+    ).rejects.toThrow('Structured output response contained no content')
   })
 })

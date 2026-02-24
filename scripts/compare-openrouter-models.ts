@@ -105,6 +105,7 @@ let mainSource: string
 try {
   mainSource = execSync(`git show main:${modelsPath}`, {
     encoding: 'utf-8',
+    stdio: 'pipe',
   })
 } catch {
   console.error('Could not read main branch version. Are you in a git repo?')
@@ -116,17 +117,15 @@ const mainModels = extractModels(mainSource)
 
 const currentIds = [...currentModels.keys()]
 const mainIds = [...mainModels.keys()]
-const currentSet = new Set(currentIds)
-const mainSet = new Set(mainIds)
 
-const added = currentIds.filter((id) => !mainSet.has(id)).sort()
-const removed = mainIds.filter((id) => !currentSet.has(id)).sort()
+const added = currentIds.filter((id) => !mainModels.has(id)).sort()
+const removed = mainIds.filter((id) => !currentModels.has(id)).sort()
 
 // Find updated models (present in both, but with changed fields)
 const updated: Array<{ id: string; changes: Array<string> }> = []
 if (showUpdated) {
   for (const id of currentIds) {
-    if (!mainSet.has(id)) continue
+    if (!mainModels.has(id)) continue
     const changes = describeChanges(mainModels.get(id)!, currentModels.get(id)!)
     if (changes.length > 0) {
       updated.push({ id, changes })
