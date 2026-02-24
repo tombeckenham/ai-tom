@@ -218,60 +218,36 @@ export class OpenRouterTextAdapter<
 
     const requestParams = this.mapTextOptionsToSDK(chatOptions)
 
-    const structuredOutputTool = {
-      type: 'function' as const,
-      function: {
-        name: 'structured_output',
-        description:
-          'Use this tool to provide your response in the required structured format.',
-        parameters: outputSchema,
-      },
-    }
-
     try {
       const result = await this.client.chat.send(
         {
           chatGenerationParams: {
             ...requestParams,
             stream: false,
-            tools: [structuredOutputTool],
-            toolChoice: {
-              type: 'function',
-              function: { name: 'structured_output' },
+            responseFormat: {
+              type: 'json_schema',
+              jsonSchema: {
+                name: 'structured_output',
+                schema: outputSchema,
+                strict: true,
+              },
             },
           },
         },
         { signal: chatOptions.request?.signal },
       )
-
-      const message = result.choices[0]?.message
-      const toolCall = message?.toolCalls?.[0]
-
-      if (toolCall && toolCall.function.name === 'structured_output') {
-        const parsed = JSON.parse(toolCall.function.arguments || '{}')
-        return {
-          data: parsed,
-          rawText: toolCall.function.arguments || '',
-        }
-      }
-
-      const content = (message?.content as any) || ''
-      let parsed: unknown
-      try {
-        parsed = JSON.parse(content)
-      } catch {
-        throw new Error(
-          `Failed to parse structured output as JSON. Content: ${content.slice(0, 200)}${content.length > 200 ? '...' : ''}`,
-        )
-      }
-
-      return {
-        data: parsed,
-        rawText: content,
-      }
+      const content = result.choices[0]?.message.content
+      const rawText = typeof content === 'string' ? content : ''
+      const parsed = JSON.parse(rawText)
+      return { data: parsed, rawText }
     } catch (error: unknown) {
       if (error instanceof RequestAbortedError) {
         throw new Error('Structured output generation aborted')
+      }
+      if (error instanceof SyntaxError) {
+        throw new Error(
+          `Failed to parse structured output as JSON: ${error.message}`,
+        )
       }
       const err = error as Error
       throw new Error(

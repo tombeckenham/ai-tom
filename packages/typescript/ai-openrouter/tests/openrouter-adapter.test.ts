@@ -382,7 +382,7 @@ describe('OpenRouter adapter option mapping', () => {
     const errorChunk = chunks.find((c) => c.type === 'RUN_ERROR')
     expect(errorChunk).toBeDefined()
 
-    if (errorChunk && errorChunk.type === 'RUN_ERROR') {
+    if (errorChunk) {
       expect(errorChunk.error.message).toBe('Invalid API key')
     }
   })
@@ -746,6 +746,34 @@ describe('OpenRouter AG-UI event emission', () => {
     }
   })
 
+  it('emits RUN_ERROR on inline error chunk', async () => {
+    const streamChunks = [
+      {
+        id: 'chatcmpl-err',
+        model: 'openai/gpt-4o-mini',
+        choices: [] as Array<unknown>,
+        error: { message: 'Rate limit exceeded', code: 429 },
+      },
+    ]
+
+    setupMockSdkClient(streamChunks)
+    const adapter = createAdapter()
+    const chunks: Array<StreamChunk> = []
+
+    for await (const chunk of adapter.chatStream({
+      model: 'openai/gpt-4o-mini',
+      messages: [{ role: 'user', content: 'Hello' }],
+    })) {
+      chunks.push(chunk)
+    }
+
+    const runErrorChunk = chunks.find((c) => c.type === 'RUN_ERROR')
+    expect(runErrorChunk).toBeDefined()
+    if (runErrorChunk?.type === 'RUN_ERROR') {
+      expect(runErrorChunk.error.message).toBe('Rate limit exceeded')
+    }
+  })
+
   it('emits STEP_STARTED and STEP_FINISHED for reasoning content', async () => {
     const streamChunks = [
       {
@@ -819,5 +847,152 @@ describe('OpenRouter AG-UI event emission', () => {
       expect(stepFinishedChunk.stepId).toBeDefined()
       expect(stepFinishedChunk.delta).toBe('Let me think about this...')
     }
+  })
+})
+
+describe('OpenRouter structured output', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('sends responseFormat with json_schema instead of tools', async () => {
+    const nonStreamResponse = {
+      choices: [
+        {
+          message: {
+            content: '{"name":"Alice","age":30}',
+          },
+        },
+      ],
+    }
+
+    setupMockSdkClient([], nonStreamResponse)
+    const adapter = createAdapter()
+
+    const outputSchema = {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        age: { type: 'number' },
+      },
+      required: ['name', 'age'],
+    }
+
+    const result = await adapter.structuredOutput({
+      chatOptions: {
+        model: 'openai/gpt-4o-mini',
+        messages: [{ role: 'user', content: 'Give me a person' }],
+      },
+      outputSchema,
+    })
+
+    expect(result.data).toEqual({ name: 'Alice', age: 30 })
+    expect(result.rawText).toBe('{"name":"Alice","age":30}')
+
+    // Verify SDK was called with responseFormat, not tools
+    const [rawParams] = mockSend.mock.calls[0]!
+    const params = rawParams.chatGenerationParams
+    expect(params.responseFormat).toEqual({
+      type: 'json_schema',
+      jsonSchema: {
+        name: 'structured_output',
+        schema: outputSchema,
+        strict: true,
+      },
+    })
+    expect(params.tools).toBeUndefined()
+    expect(params.toolChoice).toBeUndefined()
+    expect(params.stream).toBe(false)
+  })
+
+  it('parses JSON response content correctly', async () => {
+    const nonStreamResponse = {
+      choices: [
+        {
+          message: {
+            content: '{"items":[1,2,3],"total":3}',
+          },
+        },
+      ],
+    }
+
+    setupMockSdkClient([], nonStreamResponse)
+    const adapter = createAdapter()
+
+    const result = await adapter.structuredOutput({
+      chatOptions: {
+        model: 'openai/gpt-4o-mini',
+        messages: [{ role: 'user', content: 'List items' }],
+      },
+      outputSchema: { type: 'object' },
+    })
+
+    expect(result.data).toEqual({ items: [1, 2, 3], total: 3 })
+  })
+
+  it('throws on malformed JSON response', async () => {
+    const nonStreamResponse = {
+      choices: [
+        {
+          message: {
+            content: 'not valid json{',
+          },
+        },
+      ],
+    }
+
+    setupMockSdkClient([], nonStreamResponse)
+    const adapter = createAdapter()
+
+    await expect(
+      adapter.structuredOutput({
+        chatOptions: {
+          model: 'openai/gpt-4o-mini',
+          messages: [{ role: 'user', content: 'Give me data' }],
+        },
+        outputSchema: { type: 'object' },
+      }),
+    ).rejects.toThrow('Failed to parse structured output as JSON')
+  })
+
+  it('throws on SDK error', async () => {
+    mockSend = vi.fn().mockRejectedValueOnce(new Error('Server error'))
+
+    const adapter = createAdapter()
+
+    await expect(
+      adapter.structuredOutput({
+        chatOptions: {
+          model: 'openai/gpt-4o-mini',
+          messages: [{ role: 'user', content: 'Give me data' }],
+        },
+        outputSchema: { type: 'object' },
+      }),
+    ).rejects.toThrow('Structured output generation failed: Server error')
+  })
+
+  it('handles empty content gracefully', async () => {
+    const nonStreamResponse = {
+      choices: [
+        {
+          message: {
+            content: '',
+          },
+        },
+      ],
+    }
+
+    setupMockSdkClient([], nonStreamResponse)
+    const adapter = createAdapter()
+
+    await expect(
+      adapter.structuredOutput({
+        chatOptions: {
+          model: 'openai/gpt-4o-mini',
+          messages: [{ role: 'user', content: 'Give me data' }],
+        },
+        outputSchema: { type: 'object' },
+      }),
+    ).rejects.toThrow('Failed to parse structured output as JSON')
   })
 })

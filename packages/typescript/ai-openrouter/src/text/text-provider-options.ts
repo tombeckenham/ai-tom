@@ -278,7 +278,17 @@ export interface OpenRouterBaseOptions {
   /**
    * Force the model to respond in a specific format.
    */
-  response_format?: { type: 'json_object' }
+  response_format?:
+    | { type: 'json_object' }
+    | {
+        type: 'json_schema'
+        json_schema: {
+          name: string
+          description?: string
+          schema: Record<string, unknown>
+          strict?: boolean
+        }
+      }
 
   /**
    * Reasoning configuration for models that support chain-of-thought reasoning.
