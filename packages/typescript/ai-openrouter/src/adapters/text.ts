@@ -4,8 +4,10 @@ import { BaseTextAdapter } from '@tanstack/ai/adapters'
 import { convertToolsToProviderFormat } from '../tools'
 import {
   getOpenRouterApiKeyFromEnv,
+  snakeToCamelOptions,
   generateId as utilGenerateId,
 } from '../utils'
+
 import type { SDKOptions } from '@openrouter/sdk'
 import type {
   OPENROUTER_CHAT_MODELS,
@@ -520,7 +522,6 @@ export class OpenRouterTextAdapter<
         content: options.systemPrompts.join('\n'),
       })
     }
-
     const request: ChatGenerationParams = {
       model:
         options.model +
@@ -529,12 +530,11 @@ export class OpenRouterTextAdapter<
       temperature: options.temperature,
       maxTokens: options.maxTokens,
       topP: options.topP,
-      ...modelOptions,
+      ...snakeToCamelOptions(modelOptions ?? {}),
       tools: options.tools
         ? convertToolsToProviderFormat(options.tools)
         : undefined,
     }
-
     return request
   }
 
