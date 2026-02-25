@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { chat } from '@tanstack/ai'
+import { ChatGenerationParams$outboundSchema } from '@openrouter/sdk/models'
 import { createOpenRouterText } from '../src/adapters/text'
 import type { OpenRouterTextModelOptions } from '../src/adapters/text'
 import type { StreamChunk, Tool } from '@tanstack/ai'
@@ -138,6 +139,7 @@ describe('OpenRouter adapter option mapping', () => {
     expect(params.topP).toBe(0.6)
     expect(params.maxTokens).toBe(1024)
     expect(params.stream).toBe(true)
+    // This is the false postive - as it never gets passed to the openrouter endpoint
     expect(params.tool_choice).toBe('auto')
 
     expect(params.messages).toBeDefined()
@@ -146,6 +148,18 @@ describe('OpenRouter adapter option mapping', () => {
     expect(params.tools).toBeDefined()
     expect(Array.isArray(params.tools)).toBe(true)
     expect(params.tools.length).toBeGreaterThan(0)
+
+    // Check how the paramaters are serialized through to the openrouter endpoint
+    // Openrouter runs the params through an outbound Zod schema that expects camelCase
+    const serialized = ChatGenerationParams$outboundSchema.parse(params)
+
+    // keys and remaps them to snake_case for the wire format.
+    expect(serialized).toHaveProperty('model', 'openai/gpt-4o-mini')
+    expect(serialized).toHaveProperty('temperature', 0.25)
+    expect(serialized).toHaveProperty('top_p', 0.6)
+    expect(serialized).toHaveProperty('max_tokens', 1024)
+    expect(serialized).toHaveProperty('stream', true)
+    expect(serialized).toHaveProperty('tool_choice', 'auto')
   })
 
   it('streams chat chunks with content and usage', async () => {
@@ -817,5 +831,59 @@ describe('OpenRouter AG-UI event emission', () => {
       expect(stepFinishedChunk.stepId).toBeDefined()
       expect(stepFinishedChunk.delta).toBe('Let me think about this...')
     }
+  })
+})
+
+describe('OpenRouter modelOptions survive SDK serialization', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('preserves snake_case modelOptions through SDK serialization', async () => {
+    const streamChunks = [
+      {
+        id: 'chatcmpl-case',
+        model: 'openai/gpt-4o-mini',
+        choices: [
+          {
+            delta: { content: 'ok' },
+            finishReason: 'stop',
+          },
+        ],
+        usage: { promptTokens: 1, completionTokens: 1, totalTokens: 2 },
+      },
+    ]
+
+    setupMockSdkClient(streamChunks)
+
+    const adapter = createAdapter()
+    for await (const _ of chat({
+      adapter,
+      messages: [{ role: 'user', content: 'Hello' }],
+      modelOptions: {
+        frequency_penalty: 0.5,
+        presence_penalty: 0.3,
+        tool_choice: 'auto',
+        max_completion_tokens: 4096,
+      },
+    })) {
+      // drain
+    }
+
+    const [rawParams] = mockSend.mock.calls[0]!
+    const params = rawParams
+
+    // Simulate what the real SDK does before sending the HTTP request:
+    // it parses params through an outbound Zod schema that expects camelCase
+    // keys and remaps them to snake_case for the wire format.
+
+    const serialized = ChatGenerationParams$outboundSchema.parse(params)
+    // These should arrive on the wire as snake_case keys with the values
+    // the user provided via modelOptions.
+
+    expect(serialized).toHaveProperty('frequency_penalty', 0.5)
+    expect(serialized).toHaveProperty('presence_penalty', 0.3)
+    expect(serialized).toHaveProperty('tool_choice', 'auto')
+    expect(serialized).toHaveProperty('max_completion_tokens', 4096)
   })
 })
