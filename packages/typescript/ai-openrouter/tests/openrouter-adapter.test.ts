@@ -139,8 +139,8 @@ describe('OpenRouter adapter option mapping', () => {
     expect(params.topP).toBe(0.6)
     expect(params.maxTokens).toBe(1024)
     expect(params.stream).toBe(true)
-    // This is the false postive - as it never gets passed to the openrouter endpoint
-    expect(params.tool_choice).toBe('auto')
+    // Corrected test to verify that the tool_choice parameter is transformed to camelCase
+    expect(params.toolChoice).toBe('auto')
 
     expect(params.messages).toBeDefined()
     expect(Array.isArray(params.messages)).toBe(true)
@@ -159,6 +159,7 @@ describe('OpenRouter adapter option mapping', () => {
     expect(serialized).toHaveProperty('top_p', 0.6)
     expect(serialized).toHaveProperty('max_tokens', 1024)
     expect(serialized).toHaveProperty('stream', true)
+    // Verify that the tool_choice parameter is transformed back to snake_case by the outbound schema
     expect(serialized).toHaveProperty('tool_choice', 'auto')
   })
 
@@ -394,7 +395,7 @@ describe('OpenRouter adapter option mapping', () => {
     const errorChunk = chunks.find((c) => c.type === 'RUN_ERROR')
     expect(errorChunk).toBeDefined()
 
-    if (errorChunk && errorChunk.type === 'RUN_ERROR') {
+    if (errorChunk?.type === 'RUN_ERROR') {
       expect(errorChunk.error.message).toBe('Invalid API key')
     }
   })
