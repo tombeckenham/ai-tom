@@ -157,6 +157,39 @@ const GEMINI_3_PRO_IMAGE = {
     GeminiThinkingAdvancedOptions
 >
 
+const GEMINI_3_1_FLASH_IMAGE = {
+  name: 'gemini-3.1-flash-image-preview',
+  max_input_tokens: 65_536,
+  max_output_tokens: 65_536,
+  knowledge_cutoff: '2025-01-01',
+  supports: {
+    input: ['text', 'image'],
+    output: ['text', 'image'],
+    capabilities: [
+      'batch_api',
+      'image_generation',
+      'search_grounding',
+      'structured_output',
+      'thinking',
+    ],
+  },
+  pricing: {
+    input: {
+      normal: 0.25,
+    },
+    output: {
+      normal: 1.5,
+    },
+  },
+} as const satisfies ModelMeta<
+  GeminiToolConfigOptions &
+    GeminiSafetyOptions &
+    GeminiCommonConfigOptions &
+    GeminiCachedContentOptions &
+    GeminiStructuredOutputOptions &
+    GeminiThinkingOptions
+>
+
 const GEMINI_2_5_PRO = {
   name: 'gemini-2.5-pro',
   max_input_tokens: 1_048_576,
@@ -836,6 +869,7 @@ export type GeminiModels = (typeof GEMINI_MODELS)[number]
 export type GeminiImageModels = (typeof GEMINI_IMAGE_MODELS)[number]
 
 export const GEMINI_IMAGE_MODELS = [
+  GEMINI_3_1_FLASH_IMAGE.name,
   GEMINI_3_PRO_IMAGE.name,
   GEMINI_2_5_FLASH_IMAGE.name,
   GEMINI_2_FLASH_IMAGE.name,
