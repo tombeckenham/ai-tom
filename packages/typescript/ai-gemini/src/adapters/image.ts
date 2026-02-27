@@ -111,12 +111,20 @@ export class GeminiImageAdapter<
   private async generateWithGeminiApi(
     options: ImageGenerationOptions<GeminiImageProviderOptions>,
   ): Promise<ImageGenerationResult> {
-    const { model, prompt, size, modelOptions } = options
+    const { model, prompt, size, numberOfImages, modelOptions } = options
 
     const parsedSize = size ? parseNativeImageSize(size) : undefined
 
+    // The generateContent API has no numberOfImages parameter.
+    // Instead, augment the prompt to request multiple images when needed.
+    const augmentedPrompt =
+      numberOfImages && numberOfImages > 1
+        ? `${prompt} Generate ${numberOfImages} distinct images.`
+        : prompt
+
     const config: GenerateContentConfig = {
-      responseModalities: ['IMAGE'],
+      // Include TEXT so the model can interleave descriptions between images
+      responseModalities: ['TEXT', 'IMAGE'],
       ...(parsedSize && {
         imageConfig: {
           ...(parsedSize.aspectRatio && {
@@ -132,7 +140,7 @@ export class GeminiImageAdapter<
 
     const response = await this.client.models.generateContent({
       model,
-      contents: prompt,
+      contents: augmentedPrompt,
       config,
     })
 

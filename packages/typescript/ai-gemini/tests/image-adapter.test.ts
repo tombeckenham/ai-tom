@@ -270,7 +270,7 @@ describe('Gemini Image Adapter', () => {
         model: 'gemini-3.1-flash-image-preview',
         contents: 'A futuristic city',
         config: {
-          responseModalities: ['IMAGE'],
+          responseModalities: ['TEXT', 'IMAGE'],
           imageConfig: {
             aspectRatio: '16:9',
             imageSize: '4K',
@@ -326,7 +326,7 @@ describe('Gemini Image Adapter', () => {
         model: 'gemini-3.1-flash-image-preview',
         contents: 'A simple sketch',
         config: {
-          responseModalities: ['IMAGE'],
+          responseModalities: ['TEXT', 'IMAGE'],
         },
       })
 
@@ -366,6 +366,154 @@ describe('Gemini Image Adapter', () => {
       })
 
       expect(result.images).toHaveLength(0)
+    })
+
+    it('augments prompt when numberOfImages > 1 for Gemini models', async () => {
+      const mockResponse = {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  inlineData: { mimeType: 'image/png', data: 'img1' },
+                },
+                {
+                  text: 'Here is the second image:',
+                },
+                {
+                  inlineData: { mimeType: 'image/png', data: 'img2' },
+                },
+              ],
+            },
+          },
+        ],
+      }
+
+      const mockGenerateContent = vi.fn().mockResolvedValueOnce(mockResponse)
+
+      const adapter = createGeminiImage(
+        'gemini-3.1-flash-image-preview',
+        'test-api-key',
+      )
+      ;(
+        adapter as unknown as {
+          client: { models: { generateContent: unknown } }
+        }
+      ).client = {
+        models: {
+          generateContent: mockGenerateContent,
+        },
+      }
+
+      const result = await adapter.generateImages({
+        model: 'gemini-3.1-flash-image-preview',
+        prompt: 'A futuristic city',
+        numberOfImages: 3,
+      })
+
+      expect(mockGenerateContent).toHaveBeenCalledWith({
+        model: 'gemini-3.1-flash-image-preview',
+        contents: 'A futuristic city Generate 3 distinct images.',
+        config: {
+          responseModalities: ['TEXT', 'IMAGE'],
+        },
+      })
+
+      // Collects all inlineData parts, skipping text parts
+      expect(result.images).toHaveLength(2)
+      expect(result.images[0].b64Json).toBe('img1')
+      expect(result.images[1].b64Json).toBe('img2')
+    })
+
+    it('does not augment prompt when numberOfImages is 1', async () => {
+      const mockResponse = {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  inlineData: { mimeType: 'image/png', data: 'img1' },
+                },
+              ],
+            },
+          },
+        ],
+      }
+
+      const mockGenerateContent = vi.fn().mockResolvedValueOnce(mockResponse)
+
+      const adapter = createGeminiImage(
+        'gemini-3.1-flash-image-preview',
+        'test-api-key',
+      )
+      ;(
+        adapter as unknown as {
+          client: { models: { generateContent: unknown } }
+        }
+      ).client = {
+        models: {
+          generateContent: mockGenerateContent,
+        },
+      }
+
+      await adapter.generateImages({
+        model: 'gemini-3.1-flash-image-preview',
+        prompt: 'A simple sketch',
+        numberOfImages: 1,
+      })
+
+      expect(mockGenerateContent).toHaveBeenCalledWith({
+        model: 'gemini-3.1-flash-image-preview',
+        contents: 'A simple sketch',
+        config: {
+          responseModalities: ['TEXT', 'IMAGE'],
+        },
+      })
+    })
+
+    it('does not augment prompt when numberOfImages is undefined', async () => {
+      const mockResponse = {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  inlineData: { mimeType: 'image/png', data: 'img1' },
+                },
+              ],
+            },
+          },
+        ],
+      }
+
+      const mockGenerateContent = vi.fn().mockResolvedValueOnce(mockResponse)
+
+      const adapter = createGeminiImage(
+        'gemini-3.1-flash-image-preview',
+        'test-api-key',
+      )
+      ;(
+        adapter as unknown as {
+          client: { models: { generateContent: unknown } }
+        }
+      ).client = {
+        models: {
+          generateContent: mockGenerateContent,
+        },
+      }
+
+      await adapter.generateImages({
+        model: 'gemini-3.1-flash-image-preview',
+        prompt: 'A simple sketch',
+      })
+
+      expect(mockGenerateContent).toHaveBeenCalledWith({
+        model: 'gemini-3.1-flash-image-preview',
+        contents: 'A simple sketch',
+        config: {
+          responseModalities: ['TEXT', 'IMAGE'],
+        },
+      })
     })
   })
 })
