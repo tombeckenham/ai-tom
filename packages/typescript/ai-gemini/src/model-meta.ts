@@ -47,6 +47,44 @@ interface ModelMeta<TProviderOptions = unknown> {
   providerOptions?: TProviderOptions
 }
 
+const GEMINI_3_1_PRO = {
+  name: 'gemini-3.1-pro-preview',
+  max_input_tokens: 1_048_576,
+  max_output_tokens: 65_536,
+  knowledge_cutoff: '2025-01-01',
+  supports: {
+    input: ['text', 'image', 'audio', 'video', 'document'],
+    output: ['text'],
+    capabilities: [
+      'batch_api',
+      'caching',
+      'code_execution',
+      'file_search',
+      'function_calling',
+      'search_grounding',
+      'structured_output',
+      'thinking',
+      'url_context',
+    ],
+  },
+  pricing: {
+    input: {
+      normal: 2.5,
+    },
+    output: {
+      normal: 15,
+    },
+  },
+} as const satisfies ModelMeta<
+  GeminiToolConfigOptions &
+    GeminiSafetyOptions &
+    GeminiCommonConfigOptions &
+    GeminiCachedContentOptions &
+    GeminiStructuredOutputOptions &
+    GeminiThinkingOptions &
+    GeminiThinkingAdvancedOptions
+>
+
 const GEMINI_3_PRO = {
   name: 'gemini-3-pro-preview',
   max_input_tokens: 1_048_576,
@@ -853,6 +891,7 @@ const VEO_2 = {
 } as const */
 
 export const GEMINI_MODELS = [
+  GEMINI_3_1_PRO.name,
   GEMINI_3_PRO.name,
   GEMINI_3_FLASH.name,
   GEMINI_2_5_PRO.name,
@@ -945,6 +984,13 @@ export type GeminiTTSVoice = (typeof GEMINI_TTS_VOICES)[number]
 // Manual type map for per-model provider options
 export type GeminiChatModelProviderOptionsByName = {
   // Models with thinking and structured output support
+  [GEMINI_3_1_PRO.name]: GeminiToolConfigOptions &
+    GeminiSafetyOptions &
+    GeminiCommonConfigOptions &
+    GeminiCachedContentOptions &
+    GeminiStructuredOutputOptions &
+    GeminiThinkingOptions &
+    GeminiThinkingAdvancedOptions
   [GEMINI_3_PRO.name]: GeminiToolConfigOptions &
     GeminiSafetyOptions &
     GeminiCommonConfigOptions &
@@ -1017,6 +1063,7 @@ export type GeminiChatModelProviderOptionsByName = {
  */
 export type GeminiModelInputModalitiesByName = {
   // Models with full multimodal support (text, image, audio, video, document)
+  [GEMINI_3_1_PRO.name]: typeof GEMINI_3_1_PRO.supports.input
   [GEMINI_3_PRO.name]: typeof GEMINI_3_PRO.supports.input
   [GEMINI_3_FLASH.name]: typeof GEMINI_3_FLASH.supports.input
   [GEMINI_2_5_PRO.name]: typeof GEMINI_2_5_PRO.supports.input
