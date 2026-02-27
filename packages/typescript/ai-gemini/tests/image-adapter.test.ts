@@ -283,7 +283,7 @@ describe('Gemini Image Adapter', () => {
       expect(result.images[0].b64Json).toBe('gemini-base64-image')
     })
 
-    it('calls generateContent without imageGenerationConfig when no size provided', async () => {
+    it('calls generateContent without imageConfig when no size provided', async () => {
       const mockResponse = {
         candidates: [
           {

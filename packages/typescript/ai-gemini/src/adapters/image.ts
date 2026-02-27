@@ -155,7 +155,11 @@ export class GeminiImageAdapter<
     const parts = response.candidates?.[0]?.content?.parts ?? []
 
     for (const part of parts) {
-      if (part.inlineData) {
+      if (
+        part.inlineData?.data &&
+        typeof part.inlineData.data === 'string' &&
+        part.inlineData.data.length > 0
+      ) {
         images.push({ b64Json: part.inlineData.data })
       }
     }
