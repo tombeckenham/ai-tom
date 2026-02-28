@@ -1,4 +1,4 @@
-import type { ResolvedProviderConfig, ModelInfo } from '../types'
+import type { ModelInfo, ResolvedProviderConfig } from '../types'
 
 /** Default OpenAI OpenAPI spec URL (official, from Stainless) */
 const OPENAI_SPEC_URL =
@@ -25,13 +25,18 @@ export function resolveOpenAIConfig(
  */
 export async function fetchOpenAIModels(
   config: ResolvedProviderConfig,
+  env?: Record<string, string>,
 ): Promise<Array<ModelInfo>> {
   const apiKey =
-    config.apiKey ?? process.env[config.apiKeyEnvVar]
+    config.apiKey ??
+    env?.[config.apiKeyEnvVar] ??
+    process.env[config.apiKeyEnvVar]
 
   if (!apiKey) {
     console.warn(
-      `[ai-vite] No API key found for OpenAI (checked env: ${config.apiKeyEnvVar}). Skipping model fetch.`,
+      `[ai-vite] No API key found for OpenAI. Set the OPENAI_API_KEY environment variable or add it to .env.local to enable model type generation.\n` +
+        `[ai-vite] Checked: .env files and process.env.${config.apiKeyEnvVar}\n` +
+        `[ai-vite] Skipping model fetch — only OpenAPI types will be generated.`,
     )
     return []
   }
@@ -62,14 +67,7 @@ export async function fetchOpenAIModels(
  * We filter to only those relevant for chat/text generation.
  */
 export function filterChatModels(models: Array<ModelInfo>): Array<ModelInfo> {
-  const chatPrefixes = [
-    'gpt-',
-    'chatgpt-',
-    'o1',
-    'o3',
-    'o4',
-    'codex-',
-  ]
+  const chatPrefixes = ['gpt-', 'chatgpt-', 'o1', 'o3', 'o4', 'codex-']
 
   const excludePrefixes = [
     'gpt-4o-realtime',
@@ -113,7 +111,9 @@ export function generateModelUnionSource(
   lines.push('')
   lines.push('/**')
   lines.push(' * All available OpenAI chat/text model IDs.')
-  lines.push(` * Generated from /v1/models endpoint at ${new Date().toISOString().split('T')[0]}`)
+  lines.push(
+    ` * Generated from /v1/models endpoint at ${new Date().toISOString().split('T')[0]}`,
+  )
   lines.push(' */')
 
   if (chatModels.length > 0) {
@@ -123,7 +123,9 @@ export function generateModelUnionSource(
     }
     lines.push('] as const')
     lines.push('')
-    lines.push('export type OpenAIChatModel = (typeof OPENAI_CHAT_MODELS)[number]')
+    lines.push(
+      'export type OpenAIChatModel = (typeof OPENAI_CHAT_MODELS)[number]',
+    )
   } else {
     lines.push('export const OPENAI_CHAT_MODELS = [] as const')
     lines.push('export type OpenAIChatModel = string')

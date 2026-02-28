@@ -20,7 +20,13 @@ export interface TanStackAIPluginOptions {
   cacheDir?: string
 }
 
-export type ProviderName = 'openai' | 'anthropic' | 'gemini' | 'fal' | 'openrouter' | 'ollama'
+export type ProviderName =
+  | 'openai'
+  | 'anthropic'
+  | 'gemini'
+  | 'fal'
+  | 'openrouter'
+  | 'ollama'
 
 export interface ProviderEntry {
   name: ProviderName | string

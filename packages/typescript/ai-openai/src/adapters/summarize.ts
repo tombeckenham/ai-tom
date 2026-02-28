@@ -31,7 +31,7 @@ export interface OpenAISummarizeProviderOptions {
  * Delegates all API calls to the OpenAITextAdapter.
  */
 export class OpenAISummarizeAdapter<
-  TModel extends OpenAIChatModel,
+  TModel extends string,
 > extends BaseSummarizeAdapter<TModel, OpenAISummarizeProviderOptions> {
   readonly kind = 'summarize' as const
   readonly name = 'openai' as const
@@ -137,7 +137,9 @@ export class OpenAISummarizeAdapter<
  * const adapter = createOpenaiSummarize('gpt-4o-mini', "sk-...");
  * ```
  */
-export function createOpenaiSummarize<TModel extends OpenAIChatModel>(
+export function createOpenaiSummarize<
+  TModel extends OpenAIChatModel | (string & {}),
+>(
   model: TModel,
   apiKey: string,
   config?: Omit<OpenAISummarizeConfig, 'apiKey'>,
@@ -169,7 +171,7 @@ export function createOpenaiSummarize<TModel extends OpenAIChatModel>(
  * });
  * ```
  */
-export function openaiSummarize<TModel extends OpenAIChatModel>(
+export function openaiSummarize<TModel extends OpenAIChatModel | (string & {})>(
   model: TModel,
   config?: Omit<OpenAISummarizeConfig, 'apiKey'>,
 ): OpenAISummarizeAdapter<TModel> {

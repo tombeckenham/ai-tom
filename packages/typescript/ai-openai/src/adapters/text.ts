@@ -11,7 +11,6 @@ import {
   transformNullsToUndefined,
 } from '../utils/schema-converter'
 import type {
-  OPENAI_CHAT_MODELS,
   OpenAIChatModel,
   OpenAIChatModelProviderOptionsByName,
   OpenAIModelInputModalitiesByName,
@@ -81,9 +80,7 @@ type ResolveInputModalities<TModel extends string> =
  * Tree-shakeable adapter for OpenAI chat/text completion functionality.
  * Import only what you need for smaller bundle sizes.
  */
-export class OpenAITextAdapter<
-  TModel extends OpenAIChatModel,
-> extends BaseTextAdapter<
+export class OpenAITextAdapter<TModel extends string> extends BaseTextAdapter<
   TModel,
   ResolveProviderOptions<TModel>,
   ResolveInputModalities<TModel>,
@@ -896,7 +893,7 @@ export class OpenAITextAdapter<
  * ```
  */
 export function createOpenaiChat<
-  TModel extends (typeof OPENAI_CHAT_MODELS)[number],
+  TModel extends OpenAIChatModel | (string & {}),
 >(
   model: TModel,
   apiKey: string,
@@ -929,7 +926,7 @@ export function createOpenaiChat<
  * });
  * ```
  */
-export function openaiText<TModel extends (typeof OPENAI_CHAT_MODELS)[number]>(
+export function openaiText<TModel extends OpenAIChatModel | (string & {})>(
   model: TModel,
   config?: Omit<OpenAITextConfig, 'apiKey'>,
 ): OpenAITextAdapter<TModel> {

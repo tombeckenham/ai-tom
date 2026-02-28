@@ -39,9 +39,7 @@ export interface OpenAIImageConfig extends OpenAIClientConfig {}
  * - Size validation per model
  * - Number of images validation
  */
-export class OpenAIImageAdapter<
-  TModel extends OpenAIImageModel,
-> extends BaseImageAdapter<
+export class OpenAIImageAdapter<TModel extends string> extends BaseImageAdapter<
   TModel,
   OpenAIImageProviderOptions,
   OpenAIImageModelProviderOptionsByName,
@@ -58,7 +56,7 @@ export class OpenAIImageAdapter<
   }
 
   async generateImages(
-    options: ImageGenerationOptions<OpenAIImageProviderOptions>,
+    options: ImageGenerationOptions<OpenAIImageProviderOptions, any>,
   ): Promise<ImageGenerationResult> {
     const { model, prompt, numberOfImages, size } = options
 
@@ -79,7 +77,7 @@ export class OpenAIImageAdapter<
   }
 
   private buildRequest(
-    options: ImageGenerationOptions<OpenAIImageProviderOptions>,
+    options: ImageGenerationOptions<OpenAIImageProviderOptions, any>,
   ): OpenAI_SDK.Images.ImageGenerateParams {
     const { model, prompt, numberOfImages, size, modelOptions } = options
 
@@ -136,7 +134,9 @@ export class OpenAIImageAdapter<
  * });
  * ```
  */
-export function createOpenaiImage<TModel extends OpenAIImageModel>(
+export function createOpenaiImage<
+  TModel extends OpenAIImageModel | (string & {}),
+>(
   model: TModel,
   apiKey: string,
   config?: Omit<OpenAIImageConfig, 'apiKey'>,
@@ -168,7 +168,7 @@ export function createOpenaiImage<TModel extends OpenAIImageModel>(
  * });
  * ```
  */
-export function openaiImage<TModel extends OpenAIImageModel>(
+export function openaiImage<TModel extends OpenAIImageModel | (string & {})>(
   model: TModel,
   config?: Omit<OpenAIImageConfig, 'apiKey'>,
 ): OpenAIImageAdapter<TModel> {
