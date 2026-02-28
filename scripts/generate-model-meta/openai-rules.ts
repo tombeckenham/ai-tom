@@ -19,8 +19,6 @@ export const openaiConfig: ProviderConfig = {
   OpenAIBaseOptions,
   OpenAIMetadataOptions,
   OpenAIReasoningOptions,
-  OpenAIReasoningOptionsWithConcise,
-  OpenAIStreamingOptions,
   OpenAIStructuredOutputOptions,
   OpenAIToolsOptions,
 } from './text/text-provider-options'`,
@@ -30,9 +28,6 @@ export const openaiConfig: ProviderConfig = {
   supports: {
     input: Array<'text' | 'image' | 'audio' | 'video'>
     output: Array<'text' | 'image' | 'audio' | 'video'>
-    endpoints: Array<string>
-    features: Array<string>
-    tools?: Array<string>
   }
   context_window?: number
   max_output_tokens?: number
@@ -48,6 +43,9 @@ export const openaiConfig: ProviderConfig = {
   }
   providerOptions?: TProviderOptions
 }`,
+
+  // OpenAI doesn't support 'document' modality
+  allowedInputModalities: ['text', 'image', 'audio', 'video'],
 
   extractModelName: (model) => model.id.replace('openai/', ''),
 
@@ -89,12 +87,6 @@ export const openaiConfig: ProviderConfig = {
     {
       match: (m) => m.supported_parameters?.includes('tools') ?? false,
       optionInterface: 'OpenAIToolsOptions',
-    },
-
-    // Models that support streaming
-    {
-      match: (m) => m.supported_parameters?.includes('stream') ?? false,
-      optionInterface: 'OpenAIStreamingOptions',
     },
 
     // All models get metadata options

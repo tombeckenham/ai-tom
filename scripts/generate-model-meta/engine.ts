@@ -63,8 +63,16 @@ function generateConstDeclaration(
   lines.push(`const ${constName} = {`)
   lines.push(`  name: '${modelName}',`)
 
+  // Provider-specific extra fields (e.g., Anthropic needs 'id')
+  if (config.extraConstFields) {
+    for (const field of config.extraConstFields(model, modelName)) {
+      lines.push(`  ${field}`)
+    }
+  }
+
+  const contextField = config.contextWindowField ?? 'context_window'
   if (model.context_length) {
-    lines.push(`  context_window: ${model.context_length},`)
+    lines.push(`  ${contextField}: ${model.context_length},`)
   }
   if (model.top_provider.max_completion_tokens) {
     lines.push(
@@ -88,21 +96,28 @@ function generateConstDeclaration(
   lines.push(
     `    input: [${inputModalities.map((m) => `'${m}'`).join(', ')}],`,
   )
-  lines.push(
-    `    output: [${outputModalities.map((m) => `'${m}'`).join(', ')}],`,
-  )
-
-  // Add supported_parameters for providers that use them
-  if (model.supported_parameters && model.supported_parameters.length > 0) {
+  if (config.emitOutputModalities !== false) {
     lines.push(
-      `    supports: [${model.supported_parameters.map((p) => `'${p}'`).join(', ')}],`,
+      `    output: [${outputModalities.map((m) => `'${m}'`).join(', ')}],`,
     )
   }
+
+  // Provider-specific extra fields in supports block
+  if (config.extraSupportsFields) {
+    for (const field of config.extraSupportsFields(model)) {
+      lines.push(`    ${field}`)
+    }
+  }
+
   lines.push(`  },`)
 
-  lines.push(`} as const satisfies ModelMeta<`)
-  lines.push(`  ${providerOptions}`)
-  lines.push(`>`)
+  if (config.isModelMetaGeneric === false) {
+    lines.push(`} as const satisfies ModelMeta`)
+  } else {
+    lines.push(`} as const satisfies ModelMeta<`)
+    lines.push(`  ${providerOptions}`)
+    lines.push(`>`)
+  }
 
   return lines.join('\n')
 }
@@ -129,9 +144,13 @@ export function processModels(
 
     const constName = toConstName(modelName)
 
+    const allowed = config.allowedInputModalities
     const inputModalities = model.architecture.input_modalities
       .map(mapModality)
-      .filter((m): m is InputModality => m !== null)
+      .filter(
+        (m): m is InputModality =>
+          m !== null && (!allowed || allowed.includes(m)),
+      )
     const outputModalities = model.architecture.output_modalities
       .map(mapModality)
       .filter((m): m is OutputModality => m !== null)

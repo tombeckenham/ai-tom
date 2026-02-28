@@ -7,6 +7,12 @@ import {
   generateModelUnionSource,
   resolveOpenAIConfig,
 } from './providers/openai'
+import {
+  fetchOpenRouterModels,
+  generateAugmentationDts,
+  generateRuntimeMeta,
+  getAugmentationConfig,
+} from './model-meta-augmentation'
 import type { Plugin, ResolvedConfig } from 'vite'
 import type {
   ProviderEntry,
@@ -21,6 +27,65 @@ export type {
   ProviderName,
   ProviderEntry,
 } from './types'
+
+export type { AugmentationConfig, CapabilityRule } from './model-meta-augmentation'
+
+/**
+ * Try to load known model names from the library's shipped model-meta exports.
+ * Returns an empty set if the package isn't installed or can't be loaded.
+ */
+async function loadKnownModelNames(
+  providerName: string,
+): Promise<Set<string>> {
+  const moduleMap: Record<string, { pkg: string; chatModels: string; imageModels?: string }> = {
+    openai: {
+      pkg: '@tanstack/ai-openai',
+      chatModels: 'OPENAI_CHAT_MODELS',
+      imageModels: 'OPENAI_IMAGE_MODELS',
+    },
+    anthropic: {
+      pkg: '@tanstack/ai-anthropic',
+      chatModels: 'ANTHROPIC_CHAT_MODELS',
+    },
+    gemini: {
+      pkg: '@tanstack/ai-gemini',
+      chatModels: 'GEMINI_MODELS',
+      imageModels: 'GEMINI_IMAGE_MODELS',
+    },
+    grok: {
+      pkg: '@tanstack/ai-grok',
+      chatModels: 'GROK_CHAT_MODELS',
+      imageModels: 'GROK_IMAGE_MODELS',
+    },
+  }
+
+  const info = moduleMap[providerName]
+  if (!info) return new Set()
+
+  try {
+    const mod = await import(info.pkg)
+    const names = new Set<string>()
+    const chatModels = mod[info.chatModels] as ReadonlyArray<string> | undefined
+    if (chatModels) {
+      for (const name of chatModels) names.add(name)
+    }
+    if (info.imageModels) {
+      const imageModels = mod[info.imageModels] as ReadonlyArray<string> | undefined
+      if (imageModels) {
+        for (const name of imageModels) names.add(name)
+      }
+    }
+    console.log(
+      `[ai-vite] Loaded ${names.size} known models from ${info.pkg}`,
+    )
+    return names
+  } catch {
+    console.log(
+      `[ai-vite] Could not load ${info.pkg} — all models will be included in augmentation`,
+    )
+    return new Set()
+  }
+}
 
 /**
  * Resolve a provider name or entry into a full config.
@@ -104,6 +169,72 @@ export async function generate(
   for (const provider of options.providers) {
     const config = resolveProvider(provider)
     await generateForProvider(config, outputDir, cacheDir, generatedFiles, env)
+  }
+
+  // Step 4: Generate model-meta augmentation and runtime metadata from OpenRouter
+  const providerNames = options.providers.map((p) =>
+    typeof p === 'string' ? p : p.name,
+  )
+  const augmentableProviders = providerNames.filter(
+    (name) => getAugmentationConfig(name) !== undefined,
+  )
+
+  if (augmentableProviders.length > 0) {
+    try {
+      const openRouterModels = await fetchOpenRouterModels(cacheDir)
+
+      for (const providerName of augmentableProviders) {
+        const augConfig = getAugmentationConfig(providerName)!
+        const providerOutputDir = path.join(outputDir, providerName)
+
+        // Try to load known model names from the library's shipped types
+        const knownModels = await loadKnownModelNames(providerName)
+
+        // Generate augmentation .d.ts for models not in the library
+        const augSource = generateAugmentationDts(
+          augConfig,
+          openRouterModels,
+          knownModels,
+        )
+        if (augSource) {
+          const augPath = path.join(
+            providerOutputDir,
+            'model-meta-augmentation.d.ts',
+          )
+          writeGeneratedFile(augPath, augSource)
+          generatedFiles.push(augPath)
+          console.log(
+            `[ai-vite] Generated model-meta augmentation for ${providerName}`,
+          )
+        } else {
+          console.log(
+            `[ai-vite] No new models to augment for ${providerName}`,
+          )
+        }
+
+        // Generate runtime metadata
+        const metaExportName = `${providerName.toUpperCase()}_RUNTIME_MODEL_META`
+        const metaSource = generateRuntimeMeta(
+          augConfig,
+          openRouterModels,
+          metaExportName,
+        )
+        const metaPath = path.join(
+          providerOutputDir,
+          'model-runtime-meta.gen.ts',
+        )
+        writeGeneratedFile(metaPath, metaSource)
+        generatedFiles.push(metaPath)
+      }
+    } catch (err) {
+      console.warn(
+        `[ai-vite] Could not fetch OpenRouter models for augmentation:`,
+        (err as Error).message,
+      )
+      console.warn(
+        `[ai-vite] Skipping model-meta augmentation. Previously generated files may still be valid.`,
+      )
+    }
   }
 
   // Generate index.ts re-exports

@@ -36,6 +36,21 @@ export interface ProviderConfig {
   inputModalitiesTypeName: string
   /** Name for the runtime metadata export (e.g., 'OPENAI_MODEL_META') */
   runtimeMetaName: string
+  /** Generate additional fields for each model const (e.g., Anthropic needs 'id') */
+  extraConstFields?: (
+    model: OpenRouterModel,
+    modelName: string,
+  ) => Array<string>
+  /** Whether to emit 'output' modalities in the supports block (default: true) */
+  emitOutputModalities?: boolean
+  /** Field name for context window in the ModelMeta (default: 'context_window') */
+  contextWindowField?: string
+  /** Generate extra fields inside the supports block (e.g., OpenAI's endpoints/features) */
+  extraSupportsFields?: (model: OpenRouterModel) => Array<string>
+  /** Whether the ModelMeta interface is generic with TProviderOptions (default: true) */
+  isModelMetaGeneric?: boolean
+  /** Override input modality mapping (e.g., to exclude 'document' for providers that don't support it) */
+  allowedInputModalities?: Array<InputModality>
 }
 
 export type InputModality = 'text' | 'image' | 'audio' | 'video' | 'document'

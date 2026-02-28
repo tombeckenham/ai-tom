@@ -59,6 +59,13 @@ export const anthropicConfig: ProviderConfig = {
     return model.id.replace('anthropic/', '')
   },
 
+  extraConstFields: (model, modelName) => [
+    `id: '${modelName}',`,
+  ],
+
+  // Anthropic's ModelMeta supports block doesn't include output modalities
+  emitOutputModalities: false,
+
   filter: (model) => {
     // Only include Claude models
     const id = model.id.replace('anthropic/', '')
