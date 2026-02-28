@@ -47,7 +47,7 @@ export const MOONDREAM_MODELS = [
 // export type MoondreamChatModels = (typeof MOONDREAM_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type MoondreamChatModelProviderOptionsByName = {
+export interface MoondreamChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [MOONDREAM_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageImages>
@@ -55,7 +55,7 @@ export type MoondreamChatModelProviderOptionsByName = {
     OllamaChatRequestMessages<OllamaMessageImages>
 }
 
-export type MoondreamModelInputModalitiesByName = {
+export interface MoondreamModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [MOONDREAM_LATEST.name]: typeof MOONDREAM_LATEST.supports.input
   [MOONDREAM_1_8b.name]: typeof MOONDREAM_1_8b.supports.input

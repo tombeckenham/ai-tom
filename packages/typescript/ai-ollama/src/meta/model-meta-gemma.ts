@@ -60,14 +60,14 @@ export const GEMMA_MODELS = [
 // export type GemmaChatModels = (typeof GEMMA_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type GemmaChatModelProviderOptionsByName = {
+export interface GemmaChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [GEMMA_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [GEMMA_2b.name]: OllamaChatRequest & OllamaChatRequestMessages
   [GEMMA_7b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type GemmaModelInputModalitiesByName = {
+export interface GemmaModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [GEMMA_LATEST.name]: typeof GEMMA_LATEST.supports.input
   [GEMMA_2b.name]: typeof GEMMA_2b.supports.input

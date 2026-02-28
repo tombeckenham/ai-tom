@@ -52,7 +52,7 @@ export const MISTRAL_LARGE_MODELS = [
 // export type MistralLargeChatModels = (typeof MISTRAL_LARGE_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type MistralLargeChatModelProviderOptionsByName = {
+export interface MistralLargeChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [MISTRAL_LARGE_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageTools> &
@@ -62,7 +62,7 @@ export type MistralLargeChatModelProviderOptionsByName = {
     OllamaChatRequestTools
 }
 
-export type MistralLargeModelInputModalitiesByName = {
+export interface MistralLargeModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [MISTRAL_LARGE_LATEST.name]: typeof MISTRAL_LARGE_LATEST.supports.input
   [MISTRAL_LARGE_123b.name]: typeof MISTRAL_LARGE_123b.supports.input

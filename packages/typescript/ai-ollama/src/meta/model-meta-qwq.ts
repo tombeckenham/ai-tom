@@ -49,7 +49,7 @@ export const QWQ_MODELS = [QWQ_LATEST.name, QWQ_32b.name] as const
 // export type QwqChatModels = (typeof QWQ_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type QwqChatModelProviderOptionsByName = {
+export interface QwqChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [QWQ_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageTools> &
@@ -59,7 +59,7 @@ export type QwqChatModelProviderOptionsByName = {
     OllamaChatRequestTools
 }
 
-export type QwqModelInputModalitiesByName = {
+export interface QwqModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [QWQ_LATEST.name]: typeof QWQ_LATEST.supports.input
   [QWQ_32b.name]: typeof QWQ_32b.supports.input

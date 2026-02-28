@@ -75,7 +75,7 @@ export const LLAVA_MODELS = [
 // export type LlavaChatModels = (typeof LLAVA_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type LlavaChatModelProviderOptionsByName = {
+export interface LlavaChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [LLAVA_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageImages>
@@ -90,7 +90,7 @@ export type LlavaChatModelProviderOptionsByName = {
     OllamaChatRequestMessages<OllamaMessageImages>
 }
 
-export type LlavaModelInputModalitiesByName = {
+export interface LlavaModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [LLAVA_LATEST.name]: typeof LLAVA_LATEST.supports.input
   [LLAVA_7b.name]: typeof LLAVA_7b.supports.input

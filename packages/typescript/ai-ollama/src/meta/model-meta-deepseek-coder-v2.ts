@@ -60,14 +60,14 @@ export const DEEPSEEK_CODER_V2_MODELS = [
 // export type DeepseekCoderV2ChatModels = (typeof DEEPSEEK_CODER_V2_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type DeepseekCoderV2ChatModelProviderOptionsByName = {
+export interface DeepseekCoderV2ChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [DEEPSEEK_CODER_V2_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [DEEPSEEK_CODER_V2_16b.name]: OllamaChatRequest & OllamaChatRequestMessages
   [DEEPSEEK_CODER_V2_236b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type DeepseekCoderV2ModelInputModalitiesByName = {
+export interface DeepseekCoderV2ModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [DEEPSEEK_CODER_V2_LATEST.name]: typeof DEEPSEEK_CODER_V2_LATEST.supports.input
   [DEEPSEEK_CODER_V2_16b.name]: typeof DEEPSEEK_CODER_V2_16b.supports.input

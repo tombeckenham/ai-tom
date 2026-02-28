@@ -52,7 +52,7 @@ export const MISTRAL_NEMO_MODELS = [
 // export type MistralNemoChatModels = (typeof MISTRAL_NEMO_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type MistralNemoChatModelProviderOptionsByName = {
+export interface MistralNemoChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [MISTRAL_NEMO_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageTools> &
@@ -62,7 +62,7 @@ export type MistralNemoChatModelProviderOptionsByName = {
     OllamaChatRequestTools
 }
 
-export type MistralNemoModelInputModalitiesByName = {
+export interface MistralNemoModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [MISTRAL_NEMO_LATEST.name]: typeof MISTRAL_NEMO_LATEST.supports.input
   [MISTRAL_NEMO_12b.name]: typeof MISTRAL_NEMO_12b.supports.input

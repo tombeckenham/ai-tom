@@ -45,7 +45,7 @@ export type {
   GrokChatModel,
   GrokImageModel,
 } from './model-meta'
-export { GROK_CHAT_MODELS, GROK_IMAGE_MODELS } from './model-meta'
+export { GROK_CHAT_MODELS, GROK_IMAGE_MODELS, GROK_MODEL_META } from './model-meta'
 export type {
   GrokTextMetadata,
   GrokImageMetadata,

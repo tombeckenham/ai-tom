@@ -819,6 +819,31 @@ const VEO_2 = {
   [VEO_2.name]: VEO_2,
 } as const */
 
+/**
+ * Runtime model metadata map.
+ * Provides access to model capabilities, context windows, pricing, and modalities at runtime.
+ */
+export const GEMINI_MODEL_META = {
+  [GEMINI_3_PRO.name]: GEMINI_3_PRO,
+  [GEMINI_3_FLASH.name]: GEMINI_3_FLASH,
+  [GEMINI_3_PRO_IMAGE.name]: GEMINI_3_PRO_IMAGE,
+  [GEMINI_2_5_PRO.name]: GEMINI_2_5_PRO,
+  [GEMINI_2_5_PRO_TTS.name]: GEMINI_2_5_PRO_TTS,
+  [GEMINI_2_5_FLASH.name]: GEMINI_2_5_FLASH,
+  [GEMINI_2_5_FLASH_PREVIEW.name]: GEMINI_2_5_FLASH_PREVIEW,
+  [GEMINI_2_5_FLASH_IMAGE.name]: GEMINI_2_5_FLASH_IMAGE,
+  [GEMINI_2_5_FLASH_TTS.name]: GEMINI_2_5_FLASH_TTS,
+  [GEMINI_2_5_FLASH_LITE.name]: GEMINI_2_5_FLASH_LITE,
+  [GEMINI_2_5_FLASH_LITE_PREVIEW.name]: GEMINI_2_5_FLASH_LITE_PREVIEW,
+  [GEMINI_2_FLASH.name]: GEMINI_2_FLASH,
+  [GEMINI_2_FLASH_IMAGE.name]: GEMINI_2_FLASH_IMAGE,
+  [GEMINI_2_FLASH_LITE.name]: GEMINI_2_FLASH_LITE,
+  [IMAGEN_4_GENERATE.name]: IMAGEN_4_GENERATE,
+  [IMAGEN_4_GENERATE_ULTRA.name]: IMAGEN_4_GENERATE_ULTRA,
+  [IMAGEN_4_GENERATE_FAST.name]: IMAGEN_4_GENERATE_FAST,
+  [IMAGEN_3.name]: IMAGEN_3,
+} as const
+
 export const GEMINI_MODELS = [
   GEMINI_3_PRO.name,
   GEMINI_3_FLASH.name,
@@ -909,7 +934,7 @@ export type GeminiTTSVoice = (typeof GEMINI_TTS_VOICES)[number]
 ] as const */
 
 // Manual type map for per-model provider options
-export type GeminiChatModelProviderOptionsByName = {
+export interface GeminiChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [GEMINI_3_PRO.name]: GeminiToolConfigOptions &
     GeminiSafetyOptions &
@@ -981,7 +1006,7 @@ export type GeminiChatModelProviderOptionsByName = {
  * @see https://ai.google.dev/gemini-api/docs/audio
  * @see https://ai.google.dev/gemini-api/docs/document-processing
  */
-export type GeminiModelInputModalitiesByName = {
+export interface GeminiModelInputModalitiesByName {
   // Models with full multimodal support (text, image, audio, video, document)
   [GEMINI_3_PRO.name]: typeof GEMINI_3_PRO.supports.input
   [GEMINI_3_FLASH.name]: typeof GEMINI_3_FLASH.supports.input

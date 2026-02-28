@@ -74,7 +74,7 @@ export const SHIELDGEMMA_MODELS = [
 // export type ShieldgemmaChatModels = (typeof SHIELDGEMMA_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type ShieldgemmaChatModelProviderOptionsByName = {
+export interface ShieldgemmaChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [SHIELDGEMMA_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [SHIELDGEMMA_2b.name]: OllamaChatRequest & OllamaChatRequestMessages
@@ -82,7 +82,7 @@ export type ShieldgemmaChatModelProviderOptionsByName = {
   [SHIELDGEMMA_27b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type ShieldgemmaModelInputModalitiesByName = {
+export interface ShieldgemmaModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [SHIELDGEMMA_LATEST.name]: typeof SHIELDGEMMA_LATEST.supports.input
   [SHIELDGEMMA_2b.name]: typeof SHIELDGEMMA_2b.supports.input

@@ -52,7 +52,7 @@ export const DEVSTRAL_MODELS = [
 // export type DevstralChatModels = (typeof DEVSTRAL_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type DevstralChatModelProviderOptionsByName = {
+export interface DevstralChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [DEVSTRAL_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageTools> &
@@ -62,7 +62,7 @@ export type DevstralChatModelProviderOptionsByName = {
     OllamaChatRequestTools
 }
 
-export type DevstralModelInputModalitiesByName = {
+export interface DevstralModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [DEVSTRAL_LATEST.name]: typeof DEVSTRAL_LATEST.supports.input
   [DEVSTRAL_24b.name]: typeof DEVSTRAL_24b.supports.input

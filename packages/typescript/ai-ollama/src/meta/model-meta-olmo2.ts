@@ -60,14 +60,14 @@ export const OLMO2_MODELS = [
 // export type Olmo2ChatModels = (typeof OLMO2_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type Olmo2ChatModelProviderOptionsByName = {
+export interface Olmo2ChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [OLMO2_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [OLMO2_7b.name]: OllamaChatRequest & OllamaChatRequestMessages
   [OLMO2_13b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type Olmo2ModelInputModalitiesByName = {
+export interface Olmo2ModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [OLMO2_LATEST.name]: typeof OLMO2_LATEST.supports.input
   [OLMO2_7b.name]: typeof OLMO2_7b.supports.input

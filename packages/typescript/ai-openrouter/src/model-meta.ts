@@ -12123,7 +12123,7 @@ const ANTHROPIC_CLAUDE_3_5_HAIKU_20241022 = {
   },
 } as const
 
-export type OpenRouterModelOptionsByName = {
+export interface OpenRouterModelOptionsByName {
   [NOUSRESEARCH_HERMES_3_LLAMA_3_1_405B_FREE.id]: OpenRouterCommonOptions &
     Pick<
       OpenRouterBaseOptions,
@@ -16963,7 +16963,7 @@ export type OpenRouterModelOptionsByName = {
   'openrouter/auto': OpenRouterCommonOptions & OpenRouterBaseOptions
 }
 
-export type OpenRouterModelInputModalitiesByName = {
+export interface OpenRouterModelInputModalitiesByName {
   [NOUSRESEARCH_HERMES_3_LLAMA_3_1_405B_FREE.id]: ReadonlyArray<'text'>
   [META_LLAMA_LLAMA_3_3_70B_INSTRUCT_FREE.id]: ReadonlyArray<'text'>
   [QWEN_QWEN3_CODER_FREE.id]: ReadonlyArray<'text'>

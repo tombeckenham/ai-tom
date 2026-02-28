@@ -60,14 +60,14 @@ export const TULU3_MODELS = [
 // export type Tulu3ChatModels = (typeof TULU3_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type Tulu3ChatModelProviderOptionsByName = {
+export interface Tulu3ChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [TULU3_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [TULU3_8b.name]: OllamaChatRequest & OllamaChatRequestMessages
   [TULU3_70b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type Tulu3ModelInputModalitiesByName = {
+export interface Tulu3ModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [TULU3_LATEST.name]: typeof TULU3_LATEST.supports.input
   [TULU3_8b.name]: typeof TULU3_8b.supports.input

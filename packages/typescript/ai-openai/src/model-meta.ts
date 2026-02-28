@@ -1645,6 +1645,57 @@ const TTS_1_HD = {
   OpenAIBaseOptions & OpenAIStreamingOptions & OpenAIMetadataOptions
 > */
 
+/**
+ * Runtime model metadata map.
+ * Provides access to model capabilities, context windows, pricing, and modalities at runtime.
+ */
+export const OPENAI_MODEL_META = {
+  [GPT5_2.name]: GPT5_2,
+  [GPT5_2_PRO.name]: GPT5_2_PRO,
+  [GPT5_2_CHAT.name]: GPT5_2_CHAT,
+  [GPT5_1.name]: GPT5_1,
+  [GPT5_1_CODEX.name]: GPT5_1_CODEX,
+  [GPT5.name]: GPT5,
+  [GPT5_MINI.name]: GPT5_MINI,
+  [GPT5_NANO.name]: GPT5_NANO,
+  [GPT5_PRO.name]: GPT5_PRO,
+  [GPT5_CODEX.name]: GPT5_CODEX,
+  [O3.name]: O3,
+  [O3_PRO.name]: O3_PRO,
+  [O3_MINI.name]: O3_MINI,
+  [O4_MINI.name]: O4_MINI,
+  [O3_DEEP_RESEARCH.name]: O3_DEEP_RESEARCH,
+  [O4_MINI_DEEP_RESEARCH.name]: O4_MINI_DEEP_RESEARCH,
+  [GPT4_1.name]: GPT4_1,
+  [GPT4_1_MINI.name]: GPT4_1_MINI,
+  [GPT4_1_NANO.name]: GPT4_1_NANO,
+  [GPT_4.name]: GPT_4,
+  [GPT_4_TURBO.name]: GPT_4_TURBO,
+  [GPT_4O.name]: GPT_4O,
+  [GPT_4O_MINI.name]: GPT_4O_MINI,
+  [GPT_3_5_TURBO.name]: GPT_3_5_TURBO,
+  [GPT_AUDIO.name]: GPT_AUDIO,
+  [GPT_AUDIO_MINI.name]: GPT_AUDIO_MINI,
+  [GPT_4O_AUDIO.name]: GPT_4O_AUDIO,
+  [GPT_4O_MINI_AUDIO.name]: GPT_4O_MINI_AUDIO,
+  [GPT_5_1_CHAT.name]: GPT_5_1_CHAT,
+  [GPT_5_CHAT.name]: GPT_5_CHAT,
+  [CHATGPT_40.name]: CHATGPT_40,
+  [GPT_5_1_CODEX_MINI.name]: GPT_5_1_CODEX_MINI,
+  [CODEX_MINI_LATEST.name]: CODEX_MINI_LATEST,
+  [GPT_4O_SEARCH_PREVIEW.name]: GPT_4O_SEARCH_PREVIEW,
+  [GPT_4O_MINI_SEARCH_PREVIEW.name]: GPT_4O_MINI_SEARCH_PREVIEW,
+  [COMPUTER_USE_PREVIEW.name]: COMPUTER_USE_PREVIEW,
+  [O1.name]: O1,
+  [O1_PRO.name]: O1_PRO,
+  [GPT_IMAGE_1.name]: GPT_IMAGE_1,
+  [GPT_IMAGE_1_MINI.name]: GPT_IMAGE_1_MINI,
+  [DALL_E_3.name]: DALL_E_3,
+  [DALL_E_2.name]: DALL_E_2,
+  [SORA2.name]: SORA2,
+  [SORA2_PRO.name]: SORA2_PRO,
+} as const
+
 // Chat/text completion models (based on endpoints: "chat" or "chat-completions")
 export const OPENAI_CHAT_MODELS = [
   // Frontier models
@@ -1771,7 +1822,7 @@ export type OpenAITranscriptionModel =
  *
  * Manually defined to ensure accurate type narrowing per model.
  */
-export type OpenAIChatModelProviderOptionsByName = {
+export interface OpenAIChatModelProviderOptionsByName {
   [GPT5_2.name]: OpenAIBaseOptions &
     OpenAIReasoningOptions &
     OpenAIStructuredOutputOptions &
@@ -1957,7 +2008,7 @@ export type OpenAIChatModelProviderOptionsByName = {
  * constants are not exported and typeof references don't work in .d.ts files
  * when consumed by external packages.
  */
-export type OpenAIModelInputModalitiesByName = {
+export interface OpenAIModelInputModalitiesByName {
   [GPT5_2.name]: typeof GPT5_2.supports.input
   [GPT5_2_PRO.name]: typeof GPT5_2_PRO.supports.input
   [GPT5_2_CHAT.name]: typeof GPT5_2_CHAT.supports.input

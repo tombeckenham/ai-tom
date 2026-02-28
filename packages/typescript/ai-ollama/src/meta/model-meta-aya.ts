@@ -56,14 +56,14 @@ export const AYA_MODELS = [AYA_LATEST.name, AYA_8b.name, AYA_35b.name] as const
 // export type AyaChatModels = (typeof AYA_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type AyaChatModelProviderOptionsByName = {
+export interface AyaChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [AYA_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [AYA_8b.name]: OllamaChatRequest & OllamaChatRequestMessages
   [AYA_35b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type AyaModelInputModalitiesByName = {
+export interface AyaModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [AYA_LATEST.name]: typeof AYA_LATEST.supports.input
   [AYA_8b.name]: typeof AYA_8b.supports.input

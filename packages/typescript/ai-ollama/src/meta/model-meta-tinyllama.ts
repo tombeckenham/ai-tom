@@ -46,13 +46,13 @@ export const TINYLLAMA_MODELS = [
 // export type TinyllamaChatModels = (typeof TINYLLAMA_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type TinyllamaChatModelProviderOptionsByName = {
+export interface TinyllamaChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [TINYLLAMA_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [TINYLLAMA_1_1b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type TinyllamaModelInputModalitiesByName = {
+export interface TinyllamaModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [TINYLLAMA_LATEST.name]: typeof TINYLLAMA_LATEST.supports.input
   [TINYLLAMA_1_1b.name]: typeof TINYLLAMA_1_1b.supports.input

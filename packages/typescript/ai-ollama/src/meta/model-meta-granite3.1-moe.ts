@@ -68,7 +68,7 @@ export const GRANITE3_1_MOE_MODELS = [
 // export type Granite3_1MoeChatModels = (typeof GRANITE3_1_MOE_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type Granite3_1MoeChatModelProviderOptionsByName = {
+export interface Granite3_1MoeChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [GRANITE3_1_MOE_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageTools> &
@@ -81,7 +81,7 @@ export type Granite3_1MoeChatModelProviderOptionsByName = {
     OllamaChatRequestTools
 }
 
-export type Granite3_1MoeModelInputModalitiesByName = {
+export interface Granite3_1MoeModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [GRANITE3_1_MOE_LATEST.name]: typeof GRANITE3_1_MOE_LATEST.supports.input
   [GRANITE3_1_MOE_1b.name]: typeof GRANITE3_1_MOE_1b.supports.input

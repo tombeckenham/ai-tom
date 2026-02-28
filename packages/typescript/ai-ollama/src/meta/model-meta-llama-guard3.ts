@@ -60,14 +60,14 @@ export const LLAMA_GUARD3_MODELS = [
 // export type LlamaGuard3ChatModels = (typeof LLAMA_GUARD3_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type LlamaGuard3ChatModelProviderOptionsByName = {
+export interface LlamaGuard3ChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [LLAMA_GUARD3_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [LLAMA_GUARD3_1b.name]: OllamaChatRequest & OllamaChatRequestMessages
   [LLAMA_GUARD3_8b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type LlamaGuard3ModelInputModalitiesByName = {
+export interface LlamaGuard3ModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [LLAMA_GUARD3_LATEST.name]: typeof LLAMA_GUARD3_LATEST.supports.input
   [LLAMA_GUARD3_1b.name]: typeof LLAMA_GUARD3_1b.supports.input

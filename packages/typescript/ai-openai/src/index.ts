@@ -90,6 +90,7 @@ export {
   OPENAI_TRANSCRIPTION_MODELS,
   OPENAI_VIDEO_MODELS,
   OPENAI_CHAT_MODELS,
+  OPENAI_MODEL_META,
 } from './model-meta'
 export type {
   OpenAITextMetadata,

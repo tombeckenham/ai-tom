@@ -43,13 +43,13 @@ export const MARCO_O1_MODELS = [MARCO_O1_LATEST.name, MARCO_O1_7b.name] as const
 // export type MarcoO1ChatModels = (typeof MARCO_O1_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type MarcoO1ChatModelProviderOptionsByName = {
+export interface MarcoO1ChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [MARCO_O1_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [MARCO_O1_7b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type MarcoO1ModelInputModalitiesByName = {
+export interface MarcoO1ModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [MARCO_O1_LATEST.name]: typeof MARCO_O1_LATEST.supports.input
   [MARCO_O1_7b.name]: typeof MARCO_O1_7b.supports.input

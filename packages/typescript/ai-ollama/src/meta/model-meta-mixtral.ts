@@ -68,7 +68,7 @@ export const MIXTRAL_MODELS = [
 // export type MixtralChatModels = (typeof MIXTRAL_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type MixtralChatModelProviderOptionsByName = {
+export interface MixtralChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [MIXTRAL_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageTools> &
@@ -81,7 +81,7 @@ export type MixtralChatModelProviderOptionsByName = {
     OllamaChatRequestTools
 }
 
-export type MixtralModelInputModalitiesByName = {
+export interface MixtralModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [MIXTRAL_LATEST.name]: typeof MIXTRAL_LATEST.supports.input
   [MIXTRAL_8X7b.name]: typeof MIXTRAL_8X7b.supports.input

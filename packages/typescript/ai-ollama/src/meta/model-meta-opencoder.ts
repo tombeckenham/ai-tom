@@ -60,14 +60,14 @@ export const OPENCODER_MODELS = [
 // export type OpencoderChatModels = (typeof OPENCODER_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type OpencoderChatModelProviderOptionsByName = {
+export interface OpencoderChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [OPENCODER_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [OPENCODER_1_5b.name]: OllamaChatRequest & OllamaChatRequestMessages
   [OPENCODER_8b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type OpencoderModelInputModalitiesByName = {
+export interface OpencoderModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [OPENCODER_LATEST.name]: typeof OPENCODER_LATEST.supports.input
   [OPENCODER_1_5b.name]: typeof OPENCODER_1_5b.supports.input

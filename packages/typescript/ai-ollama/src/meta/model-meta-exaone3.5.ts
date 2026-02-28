@@ -74,7 +74,7 @@ export const EXAONE3_5MODELS = [
 // export type AyaChatModels = (typeof EXAONE3_5MODELS)[number]
 
 // Manual type map for per-model provider options
-export type Exaone3_5ChatModelProviderOptionsByName = {
+export interface Exaone3_5ChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [EXAONE3_5_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [EXAONE3_5_2_4b.name]: OllamaChatRequest & OllamaChatRequestMessages
@@ -82,7 +82,7 @@ export type Exaone3_5ChatModelProviderOptionsByName = {
   [EXAONE3_5_32b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type Exaone3_5ModelInputModalitiesByName = {
+export interface Exaone3_5ModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [EXAONE3_5_LATEST.name]: typeof EXAONE3_5_LATEST.supports.input
   [EXAONE3_5_2_4b.name]: typeof EXAONE3_5_2_4b.supports.input

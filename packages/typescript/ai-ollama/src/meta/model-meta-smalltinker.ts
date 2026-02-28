@@ -46,13 +46,13 @@ export const SMALLTINKER_MODELS = [
 // export type SmalltinkerChatModels = (typeof SMALLTINKER_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type SmalltinkerChatModelProviderOptionsByName = {
+export interface SmalltinkerChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [SMALLTINKER_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [SMALLTINKER_3b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type SmalltinkerModelInputModalitiesByName = {
+export interface SmalltinkerModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [SMALLTINKER_LATEST.name]: typeof SMALLTINKER_LATEST.supports.input
   [SMALLTINKER_3b.name]: typeof SMALLTINKER_3b.supports.input

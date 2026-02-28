@@ -88,7 +88,7 @@ export const CODELLAMA_MODELS = [
 // export type CodellamaChatModels = (typeof CODELLAMA_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type CodellamaChatModelProviderOptionsByName = {
+export interface CodellamaChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [CODELLAMA_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [CODELLAMA_7b.name]: OllamaChatRequest & OllamaChatRequestMessages
@@ -97,7 +97,7 @@ export type CodellamaChatModelProviderOptionsByName = {
   [CODELLAMA_70b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type CodellamaModelInputModalitiesByName = {
+export interface CodellamaModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [CODELLAMA_LATEST.name]: typeof CODELLAMA_LATEST.supports.input
   [CODELLAMA_7b.name]: typeof CODELLAMA_7b.supports.input

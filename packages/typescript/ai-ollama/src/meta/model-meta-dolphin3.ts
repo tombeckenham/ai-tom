@@ -43,13 +43,13 @@ export const DOLPHIN3_MODELS = [DOLPHIN3_LATEST.name, DOLPHIN3_8b.name] as const
 // export type Dolphin3ChatModels = (typeof DOLPHIN3_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type Dolphin3ChatModelProviderOptionsByName = {
+export interface Dolphin3ChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [DOLPHIN3_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [DOLPHIN3_8b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type Dolphin3ModelInputModalitiesByName = {
+export interface Dolphin3ModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [DOLPHIN3_LATEST.name]: typeof DOLPHIN3_LATEST.supports.input
   [DOLPHIN3_8b.name]: typeof DOLPHIN3_8b.supports.input

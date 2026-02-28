@@ -210,6 +210,23 @@ const GROK_2_IMAGE = {
 } as const satisfies ModelMeta
 
 /**
+ * Runtime model metadata map.
+ * Provides access to model capabilities, context windows, pricing, and modalities at runtime.
+ */
+export const GROK_MODEL_META = {
+  [GROK_4_1_FAST_REASONING.name]: GROK_4_1_FAST_REASONING,
+  [GROK_4_1_FAST_NON_REASONING.name]: GROK_4_1_FAST_NON_REASONING,
+  [GROK_CODE_FAST_1.name]: GROK_CODE_FAST_1,
+  [GROK_4_FAST_REASONING.name]: GROK_4_FAST_REASONING,
+  [GROK_4_FAST_NON_REASONING.name]: GROK_4_FAST_NON_REASONING,
+  [GROK_4.name]: GROK_4,
+  [GROK_3.name]: GROK_3,
+  [GROK_3_MINI.name]: GROK_3_MINI,
+  [GROK_2_VISION.name]: GROK_2_VISION,
+  [GROK_2_IMAGE.name]: GROK_2_IMAGE,
+} as const
+
+/**
  * Grok Chat Models
  * Based on xAI's available models as of 2025
  */
@@ -237,7 +254,7 @@ export type GrokImageModel = (typeof GROK_IMAGE_MODELS)[number]
  * Type-only map from Grok chat model name to its supported input modalities.
  * Used for type inference when constructing multimodal messages.
  */
-export type GrokModelInputModalitiesByName = {
+export interface GrokModelInputModalitiesByName {
   [GROK_4_1_FAST_REASONING.name]: typeof GROK_4_1_FAST_REASONING.supports.input
   [GROK_4_1_FAST_NON_REASONING.name]: typeof GROK_4_1_FAST_NON_REASONING.supports.input
   [GROK_CODE_FAST_1.name]: typeof GROK_CODE_FAST_1.supports.input
@@ -253,8 +270,16 @@ export type GrokModelInputModalitiesByName = {
  * Type-only map from Grok chat model name to its provider options type.
  * Since Grok uses OpenAI-compatible API, we reuse OpenAI provider options.
  */
-export type GrokChatModelProviderOptionsByName = {
-  [K in (typeof GROK_CHAT_MODELS)[number]]: GrokProviderOptions
+export interface GrokChatModelProviderOptionsByName {
+  [GROK_4_1_FAST_REASONING.name]: GrokProviderOptions
+  [GROK_4_1_FAST_NON_REASONING.name]: GrokProviderOptions
+  [GROK_CODE_FAST_1.name]: GrokProviderOptions
+  [GROK_4_FAST_REASONING.name]: GrokProviderOptions
+  [GROK_4_FAST_NON_REASONING.name]: GrokProviderOptions
+  [GROK_4.name]: GrokProviderOptions
+  [GROK_3.name]: GrokProviderOptions
+  [GROK_3_MINI.name]: GrokProviderOptions
+  [GROK_2_VISION.name]: GrokProviderOptions
 }
 
 /**

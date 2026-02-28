@@ -60,14 +60,14 @@ export const GRANITE3_DENSE_MODELS = [
 // export type Granite3Dense3ChatModels = (typeof GRANITE3_DENSE_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type Granite3DenseChatModelProviderOptionsByName = {
+export interface Granite3DenseChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [GRANITE3_DENSE_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [GRANITE3_DENSE_2b.name]: OllamaChatRequest & OllamaChatRequestMessages
   [GRANITE3_DENSE_8b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type Granite3DenseModelInputModalitiesByName = {
+export interface Granite3DenseModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [GRANITE3_DENSE_LATEST.name]: typeof GRANITE3_DENSE_LATEST.supports.input
   [GRANITE3_DENSE_2b.name]: typeof GRANITE3_DENSE_2b.supports.input

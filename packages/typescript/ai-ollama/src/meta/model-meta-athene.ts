@@ -52,7 +52,7 @@ export const ATHENE_MODELS = [
 // export type AtheneChatModels = (typeof ATHENE_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type AtheneChatModelProviderOptionsByName = {
+export interface AtheneChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [ATHENE_V2_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageTools> &
@@ -62,7 +62,7 @@ export type AtheneChatModelProviderOptionsByName = {
     OllamaChatRequestTools
 }
 
-export type AtheneModelInputModalitiesByName = {
+export interface AtheneModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [ATHENE_V2_LATEST.name]: typeof ATHENE_V2_LATEST.supports.input
   [ATHENE_V2_72b.name]: typeof ATHENE_V2_72b.supports.input

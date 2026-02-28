@@ -103,7 +103,7 @@ export const GEMMA3_MODELS = [
 // export type Gemma3ChatModels = (typeof GEMMA3_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type Gemma3ChatModelProviderOptionsByName = {
+export interface Gemma3ChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [GEMMA3_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageImages>
@@ -119,7 +119,7 @@ export type Gemma3ChatModelProviderOptionsByName = {
     OllamaChatRequestMessages<OllamaMessageImages>
 }
 
-export type Gemma3ModelInputModalitiesByName = {
+export interface Gemma3ModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [GEMMA3_LATEST.name]: typeof GEMMA3_LATEST.supports.input
   [GEMMA3_270m.name]: typeof GEMMA3_270m.supports.input

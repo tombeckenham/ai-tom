@@ -88,7 +88,7 @@ export const FALCON3_MODELS = [
 // export type Falcon3ChatModels = (typeof FALCON3_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type Falcon3ChatModelProviderOptionsByName = {
+export interface Falcon3ChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [FALCON3_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [FALCON3_1b.name]: OllamaChatRequest & OllamaChatRequestMessages
@@ -97,7 +97,7 @@ export type Falcon3ChatModelProviderOptionsByName = {
   [FALCON3_10b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type Falcon3ModelInputModalitiesByName = {
+export interface Falcon3ModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [FALCON3_LATEST.name]: typeof FALCON3_LATEST.supports.input
   [FALCON3_1b.name]: typeof FALCON3_1b.supports.input

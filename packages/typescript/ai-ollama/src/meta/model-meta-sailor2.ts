@@ -72,7 +72,7 @@ export const SAILOR2_MODELS = [
 // export type Sailor2ChatModels = (typeof SAILOR2_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type Sailor2ChatModelProviderOptionsByName = {
+export interface Sailor2ChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [SAILOR2_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [SAILOR2_1b.name]: OllamaChatRequest & OllamaChatRequestMessages
@@ -80,7 +80,7 @@ export type Sailor2ChatModelProviderOptionsByName = {
   [SAILOR2_20b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type Sailor2ModelInputModalitiesByName = {
+export interface Sailor2ModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [SAILOR2_LATEST.name]: typeof SAILOR2_LATEST.supports.input
   [SAILOR2_1b.name]: typeof SAILOR2_1b.supports.input

@@ -392,6 +392,23 @@ const CLAUDE_HAIKU_3 = {
   ? TMessageCapabilities
   : unknown */
 
+/**
+ * Runtime model metadata map.
+ * Provides access to model capabilities, context windows, pricing, and modalities at runtime.
+ */
+export const ANTHROPIC_MODEL_META = {
+  [CLAUDE_OPUS_4_6.id]: CLAUDE_OPUS_4_6,
+  [CLAUDE_OPUS_4_5.id]: CLAUDE_OPUS_4_5,
+  [CLAUDE_SONNET_4_5.id]: CLAUDE_SONNET_4_5,
+  [CLAUDE_HAIKU_4_5.id]: CLAUDE_HAIKU_4_5,
+  [CLAUDE_OPUS_4_1.id]: CLAUDE_OPUS_4_1,
+  [CLAUDE_SONNET_4.id]: CLAUDE_SONNET_4,
+  [CLAUDE_SONNET_3_7.id]: CLAUDE_SONNET_3_7,
+  [CLAUDE_OPUS_4.id]: CLAUDE_OPUS_4,
+  [CLAUDE_HAIKU_3_5.id]: CLAUDE_HAIKU_3_5,
+  [CLAUDE_HAIKU_3.id]: CLAUDE_HAIKU_3,
+} as const
+
 export const ANTHROPIC_MODELS = [
   CLAUDE_OPUS_4_6.id,
   CLAUDE_OPUS_4_5.id,
@@ -414,7 +431,7 @@ export const ANTHROPIC_MODELS = [
 export type AnthropicChatModel = (typeof ANTHROPIC_MODELS)[number]
 // Manual type map for per-model provider options
 // Models are differentiated by extended_thinking and priority_tier support
-export type AnthropicChatModelProviderOptionsByName = {
+export interface AnthropicChatModelProviderOptionsByName {
   // Models with both extended_thinking and priority_tier
   [CLAUDE_OPUS_4_6.id]: AnthropicContainerOptions &
     AnthropicContextManagementOptions &
@@ -510,7 +527,7 @@ export type AnthropicChatModelProviderOptionsByName = {
  * @see https://docs.anthropic.com/claude/docs/vision
  * @see https://docs.anthropic.com/claude/docs/pdf-support
  */
-export type AnthropicModelInputModalitiesByName = {
+export interface AnthropicModelInputModalitiesByName {
   [CLAUDE_OPUS_4_6.id]: typeof CLAUDE_OPUS_4_6.supports.input
   [CLAUDE_OPUS_4_5.id]: typeof CLAUDE_OPUS_4_5.supports.input
   [CLAUDE_SONNET_4_5.id]: typeof CLAUDE_SONNET_4_5.supports.input

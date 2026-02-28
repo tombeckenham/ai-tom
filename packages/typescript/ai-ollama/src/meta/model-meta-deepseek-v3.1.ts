@@ -73,7 +73,7 @@ export const DEEPSEEK_V3_1_MODELS = [
 // export type DeepseekV3_1ChatModels = (typeof DEEPSEEK_V3_1__MODELS)[number]
 
 // Manual type map for per-model provider options
-export type Deepseekv3_1ChatModelProviderOptionsByName = {
+export interface Deepseekv3_1ChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [DEEPSEEK_V3_1_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageTools> &
@@ -89,7 +89,7 @@ export type Deepseekv3_1ChatModelProviderOptionsByName = {
     OllamaChatRequestThinking
 }
 
-export type Deepseekv3_1ModelInputModalitiesByName = {
+export interface Deepseekv3_1ModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [DEEPSEEK_V3_1_LATEST.name]: typeof DEEPSEEK_V3_1_LATEST.supports.input
   [DEEPSEEK_V3_1_671b.name]: typeof DEEPSEEK_V3_1_671b.supports.input

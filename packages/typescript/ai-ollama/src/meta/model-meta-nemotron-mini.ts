@@ -52,7 +52,7 @@ export const NEMOTRON_MINI_MODELS = [
 // export type NemotronMiniChatModels = (typeof NEMOTRON_MINI_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type NemotronMiniChatModelProviderOptionsByName = {
+export interface NemotronMiniChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [NEMOTRON_MINI_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageTools> &
@@ -62,7 +62,7 @@ export type NemotronMiniChatModelProviderOptionsByName = {
     OllamaChatRequestTools
 }
 
-export type NemotronMiniModelInputModalitiesByName = {
+export interface NemotronMiniModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [NEMOTRON_MINI_LATEST.name]: typeof NEMOTRON_MINI_LATEST.supports.input
   [NEMOTRON_MINI_4b.name]: typeof NEMOTRON_MINI_4b.supports.input

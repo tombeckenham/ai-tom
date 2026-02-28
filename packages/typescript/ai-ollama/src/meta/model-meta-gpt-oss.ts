@@ -73,7 +73,7 @@ export const GPT_OSS_MODELS = [
 // export type GptOssChatModels = (typeof GPT_OSS_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type GptOssChatModelProviderOptionsByName = {
+export interface GptOssChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [OPT_OSS_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageTools & OllamaMessageThinking> &
@@ -89,7 +89,7 @@ export type GptOssChatModelProviderOptionsByName = {
     OllamaChatRequestThinking_OpenAI
 }
 
-export type GptOssModelInputModalitiesByName = {
+export interface GptOssModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [OPT_OSS_LATEST.name]: typeof OPT_OSS_LATEST.supports.input
   [OPT_OSS_20b.name]: typeof OPT_OSS_20b.supports.input

@@ -74,7 +74,7 @@ export const SMOLLM_MODELS = [
 // export type SmollmChatModels = (typeof SMOLLM_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type SmollmChatModelProviderOptionsByName = {
+export interface SmollmChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [SMOLLM_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [SMOLLM_135m.name]: OllamaChatRequest & OllamaChatRequestMessages
@@ -82,7 +82,7 @@ export type SmollmChatModelProviderOptionsByName = {
   [SMOLLM_1_7b.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type SmollmModelInputModalitiesByName = {
+export interface SmollmModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [SMOLLM_LATEST.name]: typeof SMOLLM_LATEST.supports.input
   [SMOLLM_135m.name]: typeof SMOLLM_135m.supports.input

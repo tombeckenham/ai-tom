@@ -60,14 +60,14 @@ export const OPENHERMES_MODELS = [
 // export type OpenhermesChatModels = (typeof OPENHERMES_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type OpenhermesChatModelProviderOptionsByName = {
+export interface OpenhermesChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [OPENHERMES_LATEST.name]: OllamaChatRequest & OllamaChatRequestMessages
   [OPENHERMES_V2.name]: OllamaChatRequest & OllamaChatRequestMessages
   [OPENHERMES_V2_5.name]: OllamaChatRequest & OllamaChatRequestMessages
 }
 
-export type OpenhermesModelInputModalitiesByName = {
+export interface OpenhermesModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [OPENHERMES_LATEST.name]: typeof OPENHERMES_LATEST.supports.input
   [OPENHERMES_V2.name]: typeof OPENHERMES_V2.supports.input

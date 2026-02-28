@@ -23,6 +23,10 @@
     ".": {
       "types": "./dist/esm/index.d.ts",
       "import": "./dist/esm/index.js"
+    },
+    "./model-meta": {
+      "types": "./dist/esm/model-meta.d.ts",
+      "import": "./dist/esm/model-meta.js"
     }
   },
   "files": [

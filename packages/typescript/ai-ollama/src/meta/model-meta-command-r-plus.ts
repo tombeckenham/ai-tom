@@ -52,7 +52,7 @@ export const COMMAND_R_PLUS_MODELS = [
 // export type CommandRChatModels = (typeof COMMAND_R_PLUS_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type CommandRPlusChatModelProviderOptionsByName = {
+export interface CommandRPlusChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [COMMAND_R_PLUS_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageTools> &
@@ -62,7 +62,7 @@ export type CommandRPlusChatModelProviderOptionsByName = {
     OllamaChatRequestTools
 }
 
-export type CommandRPlusModelInputModalitiesByName = {
+export interface CommandRPlusModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [COMMAND_R_PLUS_LATEST.name]: typeof COMMAND_R_PLUS_LATEST.supports.input
   [COMMAND_R_PLUS_104b.name]: typeof COMMAND_R_PLUS_104b.supports.input

@@ -100,7 +100,7 @@ export const QWEN2_MODELS = [
 // export type Qwen2ChatModels = (typeof QWEN2_MODELS)[number]
 
 // Manual type map for per-model provider options
-export type Qwen2ChatModelProviderOptionsByName = {
+export interface Qwen2ChatModelProviderOptionsByName {
   // Models with thinking and structured output support
   [QWEN2_LATEST.name]: OllamaChatRequest &
     OllamaChatRequestMessages<OllamaMessageTools> &
@@ -119,7 +119,7 @@ export type Qwen2ChatModelProviderOptionsByName = {
     OllamaChatRequestTools
 }
 
-export type Qwen2ModelInputModalitiesByName = {
+export interface Qwen2ModelInputModalitiesByName {
   // Models with text, image, audio, video (no document)
   [QWEN2_LATEST.name]: typeof QWEN2_LATEST.supports.input
   [QWEN2_0_5b.name]: typeof QWEN2_0_5b.supports.input
