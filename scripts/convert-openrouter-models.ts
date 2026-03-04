@@ -46,6 +46,8 @@ function snakeToCamel(s: string): string {
 
 const API_PARAM_OVERRIDES: Record<string, string> = {
   max_tokens: 'maxCompletionTokens',
+  structured_outputs: 'responseFormat',
+  reasoning_effort: 'reasoning',
 }
 
 function mapApiParam(p: string): string {
@@ -54,9 +56,14 @@ function mapApiParam(p: string): string {
 
 const SKIPPED_PARAMS = new Set([
   'tools',
-  'reasoning_effort',
-  'structured_outputs',
   'parallel_tool_calls',
+  'top_k',
+  'min_p',
+  'top_a',
+  'repetition_penalty',
+  'include_reasoning',
+  'web_search_options',
+  'verbosity',
 ])
 
 const perModelProviderOptions: Record<string, string> = {}

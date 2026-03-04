@@ -22,10 +22,7 @@ import type {
   StreamChunk,
   TextOptions,
 } from '@tanstack/ai'
-import type {
-  ExternalTextProviderOptions,
-  InternalTextProviderOptions,
-} from '../text/text-provider-options'
+import type { ExternalTextProviderOptions } from '../text/text-provider-options'
 import type {
   OpenRouterImageMetadata,
   OpenRouterMessageMetadataByModality,
@@ -489,9 +486,7 @@ export class OpenRouterTextAdapter<
   private mapTextOptionsToSDK(
     options: TextOptions<ResolveProviderOptions<TModel>>,
   ): ChatGenerationParams {
-    const modelOptions = options.modelOptions as
-      | Omit<InternalTextProviderOptions, 'model' | 'messages' | 'tools'>
-      | undefined
+    const modelOptions = options.modelOptions
 
     const messages = this.convertMessages(options.messages)
 
@@ -503,14 +498,18 @@ export class OpenRouterTextAdapter<
     }
 
     const request: ChatGenerationParams = {
+      ...modelOptions,
       model:
         options.model +
         (modelOptions?.variant ? `:${modelOptions.variant}` : ''),
       messages,
-      temperature: options.temperature,
-      maxTokens: options.maxTokens,
-      topP: options.topP,
-      ...modelOptions,
+      ...(options.temperature !== undefined && {
+        temperature: options.temperature,
+      }),
+      ...(options.maxTokens !== undefined && {
+        maxCompletionTokens: options.maxTokens,
+      }),
+      ...(options.topP !== undefined && { topP: options.topP }),
       tools: options.tools
         ? convertToolsToProviderFormat(options.tools)
         : undefined,

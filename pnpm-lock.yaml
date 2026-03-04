@@ -749,8 +749,8 @@ importers:
   packages/typescript/ai-fal:
     dependencies:
       '@fal-ai/client':
-        specifier: ^1.9.1
-        version: 1.9.1
+        specifier: ^1.9.4
+        version: 1.9.4
     devDependencies:
       '@tanstack/ai':
         specifier: workspace:*
@@ -2387,8 +2387,8 @@ packages:
     resolution: {integrity: sha512-C3mrr3b5dRVlKPJdfrAXS8+dq+rq8Qm5SNRazca0JKgw1HQERFmrVb0towvMmw5uu8hHKNiQasMaR/tydf3Zsg==}
     engines: {node: ^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0, npm: '>=10'}
 
-  '@fal-ai/client@1.9.1':
-    resolution: {integrity: sha512-Z6+n9/2sKlDam1wWDfRWmMkLS09e2WhTU9w+2eWL7PuoGmHK43IhwKirk4b3kPC/QPp1g+ymfvhrSiS1SpDr6g==}
+  '@fal-ai/client@1.9.4':
+    resolution: {integrity: sha512-mDjF2QDq+oficSSxzmErNkseQeRXnvUBEhJy39n4PPe7jRPZeSqM2SNb27SW50rDtCtay+stwFU8zRZehlt1Qg==}
     engines: {node: '>=18.0.0'}
 
   '@gerrit0/mini-shiki@3.19.0':
@@ -10094,7 +10094,7 @@ snapshots:
 
   '@faker-js/faker@10.1.0': {}
 
-  '@fal-ai/client@1.9.1':
+  '@fal-ai/client@1.9.4':
     dependencies:
       '@msgpack/msgpack': 3.1.3
       eventsource-parser: 1.1.2

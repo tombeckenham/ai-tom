@@ -3,6 +3,7 @@ import { chat } from '@tanstack/ai'
 import { createOpenRouterText } from '../src/adapters/text'
 import type { OpenRouterTextModelOptions } from '../src/adapters/text'
 import type { StreamChunk, Tool } from '@tanstack/ai'
+import { ChatGenerationParams$outboundSchema } from '@openrouter/sdk/models'
 // Declare mockSend at module level
 let mockSend: any
 
@@ -137,7 +138,7 @@ describe('OpenRouter adapter option mapping', () => {
     expect(params.model).toBe('openai/gpt-4o-mini')
     expect(params.temperature).toBe(0.25)
     expect(params.topP).toBe(0.6)
-    expect(params.maxTokens).toBe(1024)
+    expect(params.maxCompletionTokens).toBe(1024)
     expect(params.stream).toBe(true)
     expect(params.toolChoice).toBe('auto')
 
@@ -147,6 +148,18 @@ describe('OpenRouter adapter option mapping', () => {
     expect(params.tools).toBeDefined()
     expect(Array.isArray(params.tools)).toBe(true)
     expect(params.tools.length).toBeGreaterThan(0)
+
+    // Check how the paramaters are serialized through to the openrouter endpoint
+    // Openrouter runs the params through an outbound Zod schema that expects camelCase
+    const serialized = ChatGenerationParams$outboundSchema.parse(params)
+
+    // keys and remaps them to snake_case for the wire format.
+    expect(serialized).toHaveProperty('model', 'openai/gpt-4o-mini')
+    expect(serialized).toHaveProperty('temperature', 0.25)
+    expect(serialized).toHaveProperty('top_p', 0.6)
+    expect(serialized).toHaveProperty('max_completion_tokens', 1024)
+    expect(serialized).toHaveProperty('stream', true)
+    expect(serialized).toHaveProperty('tool_choice', 'auto')
   })
 
   it('streams chat chunks with content and usage', async () => {
@@ -1053,15 +1066,17 @@ describe('OpenRouter modelOptions pass-through', () => {
     expect(params.responseFormat).toEqual({ type: 'json_object' })
   })
 
-  it('forwards API-only params (topK, repetitionPenalty, minP, topA) to the SDK request', async () => {
+  it('forwards common options (provider, plugins, etc.) to the SDK request', async () => {
     setupMockSdkClient(minimalStreamChunks)
     const adapter = createAdapter()
 
     const modelOptions: OpenRouterTextModelOptions = {
-      topK: 40,
-      repetitionPenalty: 1.1,
-      minP: 0.05,
-      topA: 0.3,
+      provider: { order: ['openai'], allowFallbacks: false },
+      plugins: [{ id: 'web', maxResults: 5 }],
+      user: 'test-user-123',
+      metadata: { env: 'test' },
+      debug: { echoUpstreamBody: true },
+      sessionId: 'session-abc',
     }
 
     for await (const _ of chat({
@@ -1074,10 +1089,42 @@ describe('OpenRouter modelOptions pass-through', () => {
 
     const [rawParams] = mockSend.mock.calls[0]!
     const params = rawParams.chatGenerationParams
-    expect(params.topK).toBe(40)
-    expect(params.repetitionPenalty).toBe(1.1)
-    expect(params.minP).toBe(0.05)
-    expect(params.topA).toBe(0.3)
+    expect(params.provider).toEqual({
+      order: ['openai'],
+      allowFallbacks: false,
+    })
+    expect(params.plugins).toEqual([{ id: 'web', maxResults: 5 }])
+    expect(params.user).toBe('test-user-123')
+    expect(params.metadata).toEqual({ env: 'test' })
+    expect(params.debug).toEqual({ echoUpstreamBody: true })
+    expect(params.sessionId).toBe('session-abc')
+  })
+
+  it('does not allow modelOptions to override top-level temperature/topP/maxTokens', async () => {
+    setupMockSdkClient(minimalStreamChunks)
+    const adapter = createAdapter()
+
+    for await (const _ of chat({
+      adapter,
+      messages: [{ role: 'user', content: 'test' }],
+      temperature: 0.5,
+      topP: 0.8,
+      maxTokens: 500,
+      modelOptions: {
+        temperature: 0.9,
+        topP: 0.1,
+        maxCompletionTokens: 9999,
+      } as OpenRouterTextModelOptions,
+    })) {
+      // consume
+    }
+
+    const [rawParams] = mockSend.mock.calls[0]!
+    const params = rawParams.chatGenerationParams
+    // Top-level values should win because modelOptions has those keys Omitted
+    expect(params.temperature).toBe(0.5)
+    expect(params.topP).toBe(0.8)
+    expect(params.maxCompletionTokens).toBe(500)
   })
 
   it('appends variant to model name instead of passing it as a separate property', async () => {
