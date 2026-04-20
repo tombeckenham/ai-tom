@@ -90,6 +90,32 @@ describe('ElevenLabs Transcription Adapter', () => {
     })
   })
 
+  it('decodes data-URI base64 strings without corrupting bytes', async () => {
+    // Regression: `FileReader.readAsDataURL` produces
+    // `data:audio/mp3;base64,<payload>` — the adapter must strip the prefix
+    // before decoding or Buffer.from drops the header into the byte stream.
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ text: 'ok', audio_duration_secs: 0.1, words: [] }),
+        { headers: { 'content-type': 'application/json' } },
+      ),
+    )
+
+    const payload = Buffer.from('hello world').toString('base64')
+    const dataUri = `data:audio/mp3;base64,${payload}`
+
+    const adapter = elevenlabsTranscription('scribe_v2')
+    await generateTranscription({ adapter, audio: dataUri })
+
+    const [, init] = fetchMock.mock.calls[0]!
+    const body = (init as RequestInit).body as FormData
+    const file = body.get('file') as Blob | null
+    expect(file).toBeInstanceOf(Blob)
+    expect(file!.type).toBe('audio/mp3')
+    const decoded = Buffer.from(await file!.arrayBuffer()).toString()
+    expect(decoded).toBe('hello world')
+  })
+
   it('forwards http URLs as cloud_storage_url', async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(

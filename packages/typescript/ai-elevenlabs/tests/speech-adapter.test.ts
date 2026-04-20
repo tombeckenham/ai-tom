@@ -77,6 +77,36 @@ describe('ElevenLabs Speech Adapter', () => {
     expect(body.language_code).toBe('en')
   })
 
+  it('sends enable_logging and optimize_streaming_latency as query params', async () => {
+    // Regression: ElevenLabs treats these as URL query parameters. Sending
+    // them in the JSON body (the previous behavior) silently dropped them —
+    // most critically `enableLogging: false` did not actually opt out of
+    // provider-side logging.
+    fetchMock.mockResolvedValueOnce(
+      new Response(new Uint8Array([0]), {
+        headers: { 'content-type': 'audio/mpeg' },
+      }),
+    )
+
+    const adapter = elevenlabsSpeech('eleven_v3')
+    await generateSpeech({
+      adapter,
+      text: 'hi',
+      voice: 'v',
+      modelOptions: {
+        enableLogging: false,
+        optimizeStreamingLatency: 3,
+      },
+    })
+
+    const [url, init] = fetchMock.mock.calls[0]!
+    expect(url).toContain('enable_logging=false')
+    expect(url).toContain('optimize_streaming_latency=3')
+    const body = JSON.parse((init as RequestInit).body as string)
+    expect(body.enable_logging).toBeUndefined()
+    expect(body.optimize_streaming_latency).toBeUndefined()
+  })
+
   it('surfaces ElevenLabs errors', async () => {
     fetchMock.mockResolvedValueOnce(
       new Response('{"detail":"bad voice"}', {

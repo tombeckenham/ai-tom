@@ -177,16 +177,33 @@ function appendAudio(
   return true
 }
 
-function base64ToBlob(base64: string): Blob {
-  if (typeof Buffer !== 'undefined') {
-    return new Blob([Buffer.from(base64, 'base64')])
+function base64ToBlob(input: string): Blob {
+  // Accept raw base64 or a data URI like `data:audio/mp3;base64,<payload>`.
+  // `FileReader.readAsDataURL` always produces the data-URI form, and the
+  // documented ai-solid / ai-vue transcription hooks rely on that output.
+  let payload = input
+  let mimeType: string | undefined
+  if (input.startsWith('data:')) {
+    const commaIdx = input.indexOf(',')
+    if (commaIdx !== -1) {
+      const header = input.slice(5, commaIdx)
+      mimeType = header.split(';')[0] || undefined
+      payload = input.slice(commaIdx + 1)
+    }
   }
-  const binary = atob(base64)
+
+  if (typeof Buffer !== 'undefined') {
+    return new Blob(
+      [Buffer.from(payload, 'base64')],
+      mimeType ? { type: mimeType } : {},
+    )
+  }
+  const binary = atob(payload)
   const bytes = new Uint8Array(binary.length)
   for (let i = 0; i < binary.length; i += 1) {
     bytes[i] = binary.charCodeAt(i)
   }
-  return new Blob([bytes])
+  return new Blob([bytes], mimeType ? { type: mimeType } : {})
 }
 
 function appendProviderOptions(

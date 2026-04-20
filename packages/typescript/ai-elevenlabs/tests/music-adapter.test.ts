@@ -49,6 +49,9 @@ describe('ElevenLabs Music Adapter', () => {
   })
 
   it('uses compositionPlan instead of prompt when provided', async () => {
+    // Regression: the adapter must deep-convert camelCase keys to the
+    // snake_case shape the ElevenLabs API expects — unknown camelCase keys
+    // were silently ignored, defaulting every composition plan.
     fetchMock.mockResolvedValueOnce(
       new Response(new Uint8Array([1]), {
         headers: { 'content-type': 'audio/mpeg' },
@@ -62,8 +65,15 @@ describe('ElevenLabs Music Adapter', () => {
       duration: 5,
       modelOptions: {
         compositionPlan: {
-          globalStyles: ['jazz'],
-          sections: [{ sectionName: 'intro', durationMs: 5000 }],
+          positiveGlobalStyles: ['jazz'],
+          negativeGlobalStyles: ['acoustic'],
+          sections: [
+            {
+              sectionName: 'intro',
+              durationMs: 5000,
+              positiveLocalStyles: ['horns'],
+            },
+          ],
         },
         forceInstrumental: true,
       },
@@ -71,7 +81,17 @@ describe('ElevenLabs Music Adapter', () => {
 
     const [, init] = fetchMock.mock.calls[0]!
     const body = JSON.parse((init as RequestInit).body as string)
-    expect(body.composition_plan).toMatchObject({ globalStyles: ['jazz'] })
+    expect(body.composition_plan).toEqual({
+      positive_global_styles: ['jazz'],
+      negative_global_styles: ['acoustic'],
+      sections: [
+        {
+          section_name: 'intro',
+          duration_ms: 5000,
+          positive_local_styles: ['horns'],
+        },
+      ],
+    })
     expect(body.prompt).toBeUndefined()
     expect(body.music_length_ms).toBeUndefined()
     expect(body.force_instrumental).toBe(true)

@@ -121,9 +121,24 @@ export class ElevenLabsSpeechAdapter<
       mapCommonFormat(options.format) ??
       'mp3_44100_128'
 
+    const query = new URLSearchParams({ output_format: outputFormat })
+    // enable_logging and optimize_streaming_latency are URL query params on the
+    // `/v1/text-to-speech/{voice_id}` endpoint. Unknown body fields are
+    // silently ignored, so sending them in the JSON body was a no-op — most
+    // critically `enableLogging: false` did not actually opt out of logging.
+    if (options.modelOptions?.enableLogging != null) {
+      query.set('enable_logging', String(options.modelOptions.enableLogging))
+    }
+    if (options.modelOptions?.optimizeStreamingLatency != null) {
+      query.set(
+        'optimize_streaming_latency',
+        String(options.modelOptions.optimizeStreamingLatency),
+      )
+    }
+
     const url = `${resolveBaseUrl(config)}/v1/text-to-speech/${encodeURIComponent(
       voiceId,
-    )}?output_format=${encodeURIComponent(outputFormat)}`
+    )}?${query.toString()}`
 
     const body = buildBody(options, this.model)
 
@@ -174,12 +189,6 @@ function buildBody(
   if (modelOptions?.applyLanguageTextNormalization != null) {
     body.apply_language_text_normalization =
       modelOptions.applyLanguageTextNormalization
-  }
-  if (modelOptions?.enableLogging != null) {
-    body.enable_logging = modelOptions.enableLogging
-  }
-  if (modelOptions?.optimizeStreamingLatency != null) {
-    body.optimize_streaming_latency = modelOptions.optimizeStreamingLatency
   }
 
   return body

@@ -23,13 +23,22 @@ import type {
  *
  * Mutually exclusive with `prompt` on the generate request.
  *
+ * Keys are camelCase on the TanStack side and converted to snake_case when
+ * the request body is built. The ElevenLabs API distinguishes positive vs
+ * negative global styles; both are exposed here.
+ *
  * @see https://elevenlabs.io/docs/api-reference/music/compose
  */
 export interface ElevenLabsMusicCompositionPlan {
   /**
-   * Global styles, mood, instruments, tempo etc. describing the whole song.
+   * Positive global style descriptors (mood, instruments, tempo, etc.) that
+   * should apply to the whole song.
    */
-  globalStyles?: Array<string>
+  positiveGlobalStyles?: Array<string>
+  /**
+   * Negative global style descriptors — styles to avoid across the song.
+   */
+  negativeGlobalStyles?: Array<string>
   /**
    * Section definitions (verse, chorus, bridge…) with local style hints
    * and optional lyrics.
@@ -102,7 +111,8 @@ export interface ElevenLabsMusicConfig extends ElevenLabsClientConfig {}
  *   prompt: '',
  *   modelOptions: {
  *     compositionPlan: {
- *       globalStyles: ['synthwave', '120 bpm'],
+ *       positiveGlobalStyles: ['synthwave', '120 bpm'],
+ *       negativeGlobalStyles: ['acoustic'],
  *       sections: [
  *         { sectionName: 'intro', durationMs: 8000 },
  *         { sectionName: 'chorus', durationMs: 16000, lines: ['...'] },
@@ -166,7 +176,7 @@ function buildBody(
   }
 
   if (modelOptions?.compositionPlan) {
-    body.composition_plan = modelOptions.compositionPlan
+    body.composition_plan = toSnakeCaseKeys(modelOptions.compositionPlan)
   } else {
     body.prompt = prompt
     if (duration != null) {
@@ -189,6 +199,31 @@ function buildBody(
   }
 
   return body
+}
+
+/**
+ * Recursively convert camelCase object keys to snake_case. The ElevenLabs
+ * `/v1/music` endpoint rejects (or silently ignores) camelCase composition
+ * plan fields, so we normalize the entire nested structure before sending.
+ * Array contents are walked but not transformed (they are strings or plain
+ * objects whose keys also need conversion).
+ */
+function toSnakeCaseKeys(input: unknown): unknown {
+  if (Array.isArray(input)) {
+    return input.map((item) => toSnakeCaseKeys(item))
+  }
+  if (input && typeof input === 'object') {
+    const result: Record<string, unknown> = {}
+    for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
+      result[camelToSnake(key)] = toSnakeCaseKeys(value)
+    }
+    return result
+  }
+  return input
+}
+
+function camelToSnake(key: string): string {
+  return key.replace(/[A-Z]/g, (match) => `_${match.toLowerCase()}`)
 }
 
 /**
