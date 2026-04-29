@@ -34,6 +34,7 @@ const MEDIA_FEATURES = new Set<Feature>([
   'transcription',
   'video-gen',
   'audio-gen',
+  'sound-effects',
 ])
 
 const addToCartClient = addToCartToolDef.client((args) => ({
@@ -120,12 +121,14 @@ function MediaFeature({
         />
       )
     case 'audio-gen':
+    case 'sound-effects':
       return (
         <AudioGenUI
           provider={provider}
           mode={mode}
           testId={testId}
           aimockPort={aimockPort}
+          feature={feature}
         />
       )
     default:

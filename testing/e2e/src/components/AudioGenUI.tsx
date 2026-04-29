@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import type { AudioGenerationResult } from '@tanstack/ai'
 import { generateAudioFn } from '@/lib/server-functions'
-import type { Mode, Provider } from '@/lib/types'
+import type { Feature, Mode, Provider } from '@/lib/types'
 
 interface AudioGenUIProps {
   provider: Provider
   mode: Mode
   testId?: string
   aimockPort?: number
+  feature?: Feature
 }
 
 async function fetchAudioViaRoute(payload: {
@@ -15,6 +16,7 @@ async function fetchAudioViaRoute(payload: {
   provider: Provider
   testId?: string
   aimockPort?: number
+  feature?: Feature
 }): Promise<AudioGenerationResult> {
   const response = await fetch('/api/audio', {
     method: 'POST',
@@ -33,6 +35,7 @@ export function AudioGenUI({
   mode,
   testId,
   aimockPort,
+  feature,
 }: AudioGenUIProps) {
   const [prompt, setPrompt] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -44,7 +47,7 @@ export function AudioGenUI({
     setIsLoading(true)
     setError(null)
     try {
-      const payload = { prompt, provider, testId, aimockPort }
+      const payload = { prompt, provider, testId, aimockPort, feature }
       const next =
         mode === 'fetcher'
           ? await generateAudioFn({ data: payload })

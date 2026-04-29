@@ -20,6 +20,7 @@ const defaultModels: Record<Provider, string> = {
   groq: 'llama-3.3-70b-versatile',
   grok: 'grok-3',
   openrouter: 'openai/gpt-4o',
+  elevenlabs: '',
 }
 
 export function createTextAdapter(
@@ -92,6 +93,9 @@ export function createTextAdapter(
             : openaiUrl,
         }),
       }),
+    elevenlabs: () => {
+      throw new Error('elevenlabs has no text adapter')
+    },
   }
 
   return factories[provider]()

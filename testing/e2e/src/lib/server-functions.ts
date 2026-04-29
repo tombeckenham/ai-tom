@@ -14,7 +14,7 @@ import {
   createTranscriptionAdapter,
   createVideoAdapter,
 } from '@/lib/media-providers'
-import type { Provider } from '@/lib/types'
+import type { Feature, Provider } from '@/lib/types'
 
 export const generateImageFn = createServerFn({ method: 'POST' })
   .inputValidator(
@@ -108,6 +108,7 @@ export const generateAudioFn = createServerFn({ method: 'POST' })
       duration?: number
       aimockPort?: number
       testId?: string
+      feature?: Feature
     }) => {
       if (!data.prompt.trim()) throw new Error('Prompt is required')
       if (!data.provider) throw new Error('Provider is required')
@@ -120,6 +121,7 @@ export const generateAudioFn = createServerFn({ method: 'POST' })
       data.provider,
       data.aimockPort,
       data.testId,
+      data.feature,
     )
     return generateAudio({
       adapter,

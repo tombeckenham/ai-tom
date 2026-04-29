@@ -8,6 +8,7 @@ export const providers: Provider[] = [
   'groq',
   'grok',
   'openrouter',
+  'elevenlabs',
 ]
 
 const supportMatrix: Record<Feature, Set<Provider>> = {
@@ -124,7 +125,8 @@ const supportMatrix: Record<Feature, Set<Provider>> = {
   tts: new Set(['openai']),
   transcription: new Set(['openai']),
   'video-gen': new Set(['openai']),
-  'audio-gen': new Set(['gemini']),
+  'audio-gen': new Set(['gemini', 'elevenlabs']),
+  'sound-effects': new Set(['elevenlabs']),
 }
 
 export function isSupported(provider: Provider, feature: Feature): boolean {

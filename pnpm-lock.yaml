@@ -6,6 +6,7 @@ settings:
 
 overrides:
   abbrev: ^3.0.0
+  '@copilotkit/aimock': link:../../CopilotKit/aimock
 
 patchedDependencies:
   '@changesets/assemble-release-plan@6.0.9':
@@ -1531,8 +1532,8 @@ importers:
   testing/e2e:
     dependencies:
       '@copilotkit/aimock':
-        specifier: latest
-        version: 1.14.0
+        specifier: link:../../../../CopilotKit/aimock
+        version: link:../../../../CopilotKit/aimock
       '@tailwindcss/vite':
         specifier: ^4.1.18
         version: 4.1.18(vite@7.3.1(@types/node@24.10.3)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
@@ -1545,6 +1546,9 @@ importers:
       '@tanstack/ai-client':
         specifier: workspace:*
         version: link:../../packages/typescript/ai-client
+      '@tanstack/ai-elevenlabs':
+        specifier: workspace:*
+        version: link:../../packages/typescript/ai-elevenlabs
       '@tanstack/ai-gemini':
         specifier: workspace:*
         version: link:../../packages/typescript/ai-gemini
@@ -2046,11 +2050,6 @@ packages:
 
   '@cloudflare/workers-types@4.20260317.1':
     resolution: {integrity: sha512-+G4eVwyCpm8Au1ex8vQBCuA9wnwqetz4tPNRoB/53qvktERWBRMQnrtvC1k584yRE3emMThtuY0gWshvSJ++PQ==}
-
-  '@copilotkit/aimock@1.14.0':
-    resolution: {integrity: sha512-1NqwWEameArC7HWT7UHBlkq3pNlCA0eHBocaeL6mS5CULolT9XFL27tC9jJ+OSmREzLwkKbFYaAl2SssaXexVA==}
-    engines: {node: '>=20.15.0'}
-    hasBin: true
 
   '@crazydos/vue-markdown@1.1.4':
     resolution: {integrity: sha512-0I1QMP59LJ3aEjE7bolgvPU4JAFt+pykdDo5674CbsCwFo7OVFos50+MPhGdWflCz1mac5t152lB1qvV/tR/rw==}
@@ -11270,8 +11269,6 @@ snapshots:
     optional: true
 
   '@cloudflare/workers-types@4.20260317.1': {}
-
-  '@copilotkit/aimock@1.14.0': {}
 
   '@crazydos/vue-markdown@1.1.4(vue@3.5.25(typescript@5.9.3))':
     dependencies:
