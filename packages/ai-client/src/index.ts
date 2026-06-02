@@ -1,4 +1,5 @@
 export { ChatClient } from './chat-client'
+export type { ChatClientSnapshot } from './chat-client'
 export { RealtimeClient } from './realtime-client'
 export { GenerationClient } from './generation-client'
 export { VideoGenerationClient } from './video-generation-client'

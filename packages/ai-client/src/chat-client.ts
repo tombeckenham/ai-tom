@@ -6,6 +6,7 @@ import {
   normalizeToUIMessage,
   parseWithStandardSchema,
 } from '@tanstack/ai/client'
+import { Store } from '@tanstack/store'
 import { createNoOpChatDevtoolsBridge } from './devtools-noop'
 import {
   fetcherToConnectionAdapter,
@@ -72,6 +73,24 @@ type ClientToolResult = {
   output: any
   state?: 'output-available' | 'output-error'
   errorText?: string
+}
+
+/**
+ * Immutable projection of the client's reactive state, held in a
+ * `@tanstack/store` Store. The same information the `onXChange` callbacks
+ * report, but as one value a framework binding can subscribe to and select
+ * from (`useStore(client.store, s => s.messages)`).
+ */
+export interface ChatClientSnapshot<
+  TTools extends ReadonlyArray<AnyClientTool> = any,
+> {
+  messages: Array<UIMessage<TTools>>
+  isLoading: boolean
+  error: Error | undefined
+  status: ChatClientState
+  isSubscribed: boolean
+  connectionStatus: ConnectionStatus
+  sessionGenerating: boolean
 }
 
 function resolveTransport(transport: {
@@ -145,6 +164,14 @@ export class ChatClient<
   private sessionGenerating = false
   private readonly activeRunIds = new Set<string>()
   private devtoolsMounted = false
+
+  /**
+   * The client's reactive state as a `@tanstack/store` Store. Seeded in the
+   * constructor and kept in sync by the `setX` mutators via `syncStore()`.
+   * Consume from React with `useStore(client.store)` (or a selector);
+   * Solid/Vue/Svelte have equivalent `@tanstack/*-store` bindings.
+   */
+  readonly store: Store<ChatClientSnapshot<TTools>>
 
   private readonly callbacksRef: {
     current: {
@@ -236,6 +263,7 @@ export class ChatClient<
         onMessagesChange: (messages: Array<UIMessage>) => {
           this.persistor?.notifyMessagesChanged(messages)
           this.callbacksRef.current.onMessagesChange(messages)
+          this.syncStore()
         },
         onStreamStart: () => {
           this.setStatus('streaming')
@@ -432,6 +460,10 @@ export class ChatClient<
       },
     })
 
+    // Seed the Store now that all backing state exists, so `client.store` is
+    // valid before the first subscriber attaches.
+    this.store = new Store(this.readStoreSnapshot())
+
     this.persistor?.hydrateAsync(persistedMessages)
   }
 
@@ -497,24 +529,28 @@ export class ChatClient<
     this.isLoading = isLoading
     this.callbacksRef.current.onLoadingChange(isLoading)
     this.events.loadingChanged(isLoading)
+    this.syncStore()
   }
 
   private setStatus(status: ChatClientState): void {
     this.status = status
     this.callbacksRef.current.onStatusChange(status)
     this.devtoolsBridge.emitSnapshot()
+    this.syncStore()
   }
 
   private setIsSubscribed(isSubscribed: boolean): void {
     this.isSubscribed = isSubscribed
     this.callbacksRef.current.onSubscriptionChange(isSubscribed)
     this.devtoolsBridge.emitSnapshot()
+    this.syncStore()
   }
 
   private setConnectionStatus(status: ConnectionStatus): void {
     this.connectionStatus = status
     this.callbacksRef.current.onConnectionStatusChange(status)
     this.devtoolsBridge.emitSnapshot()
+    this.syncStore()
   }
 
   private setSessionGenerating(isGenerating: boolean): void {
@@ -522,6 +558,7 @@ export class ChatClient<
     this.sessionGenerating = isGenerating
     this.callbacksRef.current.onSessionGeneratingChange(isGenerating)
     this.devtoolsBridge.emitSnapshot()
+    this.syncStore()
   }
 
   private resetSessionGenerating(): void {
@@ -534,6 +571,26 @@ export class ChatClient<
     this.error = error
     this.callbacksRef.current.onErrorChange(error)
     this.events.errorChanged(error?.message || null)
+    this.syncStore()
+  }
+
+  private readStoreSnapshot(): ChatClientSnapshot<TTools> {
+    return {
+      messages: this.getMessages(),
+      isLoading: this.isLoading,
+      error: this.error,
+      status: this.status,
+      isSubscribed: this.isSubscribed,
+      connectionStatus: this.connectionStatus,
+      sessionGenerating: this.sessionGenerating,
+    }
+  }
+
+  // Project current state into the Store. `setState` shallow-compares nothing —
+  // it always notifies — but each field above is read fresh, so subscribers see
+  // a consistent snapshot. Only reached after the constructor seeds `store`.
+  private syncStore(): void {
+    this.store.setState(() => this.readStoreSnapshot())
   }
 
   private buildDevtoolsBridgeOptions(
