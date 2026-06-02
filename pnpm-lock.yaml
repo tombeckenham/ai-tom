@@ -1037,6 +1037,9 @@ importers:
       '@tanstack/ai-event-client':
         specifier: workspace:*
         version: link:../ai-event-client
+      '@tanstack/store':
+        specifier: ^0.8.0
+        version: 0.8.0
     devDependencies:
       '@standard-schema/spec':
         specifier: ^1.1.0
@@ -1454,6 +1457,9 @@ importers:
       '@tanstack/ai-client':
         specifier: workspace:*
         version: link:../ai-client
+      '@tanstack/react-store':
+        specifier: ^0.8.0
+        version: 0.8.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
     devDependencies:
       '@standard-schema/spec':
         specifier: ^1.1.0
