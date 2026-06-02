@@ -74,6 +74,36 @@ type ClientToolResult = {
   errorText?: string
 }
 
+/**
+ * Immutable projection of the client's reactive state. The same information the
+ * `onXChange` callbacks report, but bundled so a framework binding can diff one
+ * value. The object's identity changes only when the client pushes a change.
+ */
+export interface ChatClientSnapshot<
+  TTools extends ReadonlyArray<AnyClientTool> = any,
+> {
+  messages: Array<UIMessage<TTools>>
+  isLoading: boolean
+  error: Error | undefined
+  status: ChatClientState
+  isSubscribed: boolean
+  connectionStatus: ConnectionStatus
+  sessionGenerating: boolean
+}
+
+/**
+ * Framework-agnostic external-store handle. Pass straight to React's
+ * `useSyncExternalStore(store.subscribe, store.getSnapshot)`, or adapt for Solid
+ * / Vue / Svelte — one subscribe/getSnapshot pair instead of seven `onXChange`
+ * wirings per framework.
+ */
+export interface ChatClientStore<
+  TTools extends ReadonlyArray<AnyClientTool> = any,
+> {
+  subscribe: (listener: () => void) => () => void
+  getSnapshot: () => ChatClientSnapshot<TTools>
+}
+
 function resolveTransport(transport: {
   connection?: ConnectionAdapter
   fetcher?: ChatFetcher
@@ -145,6 +175,26 @@ export class ChatClient<
   private sessionGenerating = false
   private readonly activeRunIds = new Set<string>()
   private devtoolsMounted = false
+
+  // External-store plumbing. `storeListeners` is declared before `store` so the
+  // field initializer below can close over it.
+  private readonly storeListeners = new Set<() => void>()
+  private storeSnapshot!: ChatClientSnapshot<TTools>
+
+  /**
+   * The client exposed as a React/TanStack external store. Backed by the same
+   * state the `onXChange` callbacks report, but as one subscribe/getSnapshot
+   * pair, so a framework hook needs no per-field wiring. See `useChat`.
+   */
+  readonly store: ChatClientStore<TTools> = {
+    subscribe: (listener) => {
+      this.storeListeners.add(listener)
+      return () => {
+        this.storeListeners.delete(listener)
+      }
+    },
+    getSnapshot: () => this.storeSnapshot,
+  }
 
   private readonly callbacksRef: {
     current: {
@@ -236,6 +286,7 @@ export class ChatClient<
         onMessagesChange: (messages: Array<UIMessage>) => {
           this.persistor?.notifyMessagesChanged(messages)
           this.callbacksRef.current.onMessagesChange(messages)
+          this.emitStoreChange()
         },
         onStreamStart: () => {
           this.setStatus('streaming')
@@ -432,6 +483,10 @@ export class ChatClient<
       },
     })
 
+    // Seed the external-store snapshot now that all backing state exists, so
+    // `store.getSnapshot()` is valid before the first subscriber attaches.
+    this.storeSnapshot = this.readStoreSnapshot()
+
     this.persistor?.hydrateAsync(persistedMessages)
   }
 
@@ -497,24 +552,28 @@ export class ChatClient<
     this.isLoading = isLoading
     this.callbacksRef.current.onLoadingChange(isLoading)
     this.events.loadingChanged(isLoading)
+    this.emitStoreChange()
   }
 
   private setStatus(status: ChatClientState): void {
     this.status = status
     this.callbacksRef.current.onStatusChange(status)
     this.devtoolsBridge.emitSnapshot()
+    this.emitStoreChange()
   }
 
   private setIsSubscribed(isSubscribed: boolean): void {
     this.isSubscribed = isSubscribed
     this.callbacksRef.current.onSubscriptionChange(isSubscribed)
     this.devtoolsBridge.emitSnapshot()
+    this.emitStoreChange()
   }
 
   private setConnectionStatus(status: ConnectionStatus): void {
     this.connectionStatus = status
     this.callbacksRef.current.onConnectionStatusChange(status)
     this.devtoolsBridge.emitSnapshot()
+    this.emitStoreChange()
   }
 
   private setSessionGenerating(isGenerating: boolean): void {
@@ -522,6 +581,7 @@ export class ChatClient<
     this.sessionGenerating = isGenerating
     this.callbacksRef.current.onSessionGeneratingChange(isGenerating)
     this.devtoolsBridge.emitSnapshot()
+    this.emitStoreChange()
   }
 
   private resetSessionGenerating(): void {
@@ -534,6 +594,27 @@ export class ChatClient<
     this.error = error
     this.callbacksRef.current.onErrorChange(error)
     this.events.errorChanged(error?.message || null)
+    this.emitStoreChange()
+  }
+
+  private readStoreSnapshot(): ChatClientSnapshot<TTools> {
+    return {
+      messages: this.getMessages(),
+      isLoading: this.isLoading,
+      error: this.error,
+      status: this.status,
+      isSubscribed: this.isSubscribed,
+      connectionStatus: this.connectionStatus,
+      sessionGenerating: this.sessionGenerating,
+    }
+  }
+
+  // Rebuild the cached snapshot and wake external-store subscribers. Only ever
+  // reached after the constructor seeds `storeSnapshot` (no state mutation runs
+  // before then), so the snapshot is always present.
+  private emitStoreChange(): void {
+    this.storeSnapshot = this.readStoreSnapshot()
+    this.storeListeners.forEach((listener) => listener())
   }
 
   private buildDevtoolsBridgeOptions(
