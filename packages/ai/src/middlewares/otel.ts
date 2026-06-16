@@ -4,6 +4,10 @@ import {
   context as otelContext,
   trace as otelTrace,
 } from '@opentelemetry/api'
+import {
+  MAX_TOKENS_KEYS,
+  NESTED_MAX_TOKENS_KEY,
+} from '../utilities/sampling-keys'
 import type {
   AttributeValue,
   Exception,
@@ -16,6 +20,7 @@ import type {
   ChatMiddleware,
   ChatMiddlewareContext,
 } from '../activities/chat/middleware/types'
+import type { TokenUsage } from '../types'
 
 /**
  * Scope (role) of an OTel span emitted by this middleware.
@@ -160,6 +165,72 @@ function messageEventName(role: string): string {
     default:
       return `gen_ai.${role}.message`
   }
+}
+
+/**
+ * Return the first candidate that is a finite `number`, or `undefined`. Used to
+ * pick a sampling attribute from among the several provider-native spellings.
+ */
+function firstNumber(...candidates: Array<unknown>): number | undefined {
+  for (const candidate of candidates) {
+    if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+      return candidate
+    }
+  }
+  return undefined
+}
+
+/**
+ * Build the full set of `gen_ai.usage.*` span attributes from a `TokenUsage`.
+ *
+ * Beyond input/output tokens, this emits provider-reported cost, total tokens,
+ * cache and reasoning breakdowns, and duration-based billing — every field is
+ * guarded so spans stay clean when a provider doesn't report it. Cache and
+ * reasoning use the official GenAI semconv names; `gen_ai.usage.cost` and
+ * `gen_ai.usage.total_tokens` are de-facto extensions consumed by backends
+ * like PostHog (which otherwise re-derive cost from their own price tables,
+ * losing cache discounts and gateway markup). Fields with no semconv or
+ * de-facto convention (`costDetails`, `durationSeconds`) are
+ * TanStack-namespaced. Deliberately not emitted: `unitsBilled`,
+ * `providerUsageDetails`, and the per-modality token breakdowns — those are
+ * media-oriented; media-activity observability is tracked in #720.
+ */
+function usageAttributes(usage: TokenUsage): Record<string, AttributeValue> {
+  const attrs: Record<string, AttributeValue> = {
+    'gen_ai.usage.input_tokens': usage.promptTokens,
+    'gen_ai.usage.output_tokens': usage.completionTokens,
+  }
+  const optional: Array<[key: string, value: unknown]> = [
+    ['gen_ai.usage.total_tokens', usage.totalTokens],
+    ['gen_ai.usage.cost', usage.cost],
+    [
+      'gen_ai.usage.cache_read.input_tokens',
+      usage.promptTokensDetails?.cachedTokens,
+    ],
+    [
+      'gen_ai.usage.cache_creation.input_tokens',
+      usage.promptTokensDetails?.cacheWriteTokens,
+    ],
+    [
+      'gen_ai.usage.reasoning.output_tokens',
+      usage.completionTokensDetails?.reasoningTokens,
+    ],
+    ['tanstack.ai.usage.duration_seconds', usage.durationSeconds],
+    ['tanstack.ai.usage.upstream_cost', usage.costDetails?.upstreamCost],
+    [
+      'tanstack.ai.usage.upstream_input_cost',
+      usage.costDetails?.upstreamInputCost,
+    ],
+    [
+      'tanstack.ai.usage.upstream_output_cost',
+      usage.costDetails?.upstreamOutputCost,
+    ],
+  ]
+  for (const [key, value] of optional) {
+    const num = firstNumber(value)
+    if (num !== undefined) attrs[key] = num
+  }
+  return attrs
 }
 
 function errorMessage(err: unknown): string | undefined {
@@ -333,12 +404,37 @@ export function otelMiddleware(options: OtelMiddlewareOptions): ChatMiddleware {
           'gen_ai.request.model': ctx.model,
           'tanstack.ai.iteration': ctx.iteration,
         }
-        if (config.temperature !== undefined)
-          baseAttrs['gen_ai.request.temperature'] = config.temperature
-        if (config.topP !== undefined)
-          baseAttrs['gen_ai.request.top_p'] = config.topP
-        if (config.maxTokens !== undefined)
-          baseAttrs['gen_ai.request.max_tokens'] = config.maxTokens
+        // Sampling options now live in provider-native `modelOptions`, and
+        // providers spell them differently (e.g. `max_output_tokens`,
+        // `max_completion_tokens`, `maxOutputTokens`, `num_predict`). Read the
+        // first numeric value among the known spellings — including Ollama's
+        // nested `options` — so gen_ai attributes populate across providers.
+        const sampling = config.modelOptions ?? {}
+        const nestedOptions =
+          sampling['options'] && typeof sampling['options'] === 'object'
+            ? (sampling['options'] as Record<string, unknown>)
+            : undefined
+        const samplingTemperature = firstNumber(
+          sampling['temperature'],
+          nestedOptions?.['temperature'],
+        )
+        const samplingTopP = firstNumber(
+          sampling['top_p'],
+          sampling['topP'],
+          nestedOptions?.['top_p'],
+        )
+        // Spellings come from the shared `MAX_TOKENS_KEYS` table so this stays
+        // in lockstep with the summarize wrapper's caller-limit detection.
+        const samplingMaxTokens = firstNumber(
+          ...MAX_TOKENS_KEYS.map((k) => sampling[k]),
+          nestedOptions?.[NESTED_MAX_TOKENS_KEY],
+        )
+        if (samplingTemperature !== undefined)
+          baseAttrs['gen_ai.request.temperature'] = samplingTemperature
+        if (samplingTopP !== undefined)
+          baseAttrs['gen_ai.request.top_p'] = samplingTopP
+        if (samplingMaxTokens !== undefined)
+          baseAttrs['gen_ai.request.max_tokens'] = samplingMaxTokens
 
         const baseOptions: SpanOptions = {
           kind: SpanKind.CLIENT,
@@ -482,10 +578,7 @@ export function otelMiddleware(options: OtelMiddlewareOptions): ChatMiddleware {
         // `runOnUsage` when `chunk.usage` is present, and `onUsage` is the
         // canonical place for the metric. Recording in both would double-count.
         if (chunk.usage) {
-          span.setAttributes({
-            'gen_ai.usage.input_tokens': chunk.usage.promptTokens,
-            'gen_ai.usage.output_tokens': chunk.usage.completionTokens,
-          })
+          span.setAttributes(usageAttributes(chunk.usage))
         }
 
         if (captureContent && state.assistantTextBuffer.length > 0) {
@@ -542,10 +635,7 @@ export function otelMiddleware(options: OtelMiddlewareOptions): ChatMiddleware {
         }
 
         const span = state.currentIterationSpan ?? state.rootSpan
-        span.setAttributes({
-          'gen_ai.usage.input_tokens': usage.promptTokens,
-          'gen_ai.usage.output_tokens': usage.completionTokens,
-        })
+        span.setAttributes(usageAttributes(usage))
       })
     },
 
@@ -863,10 +953,7 @@ export function otelMiddleware(options: OtelMiddlewareOptions): ChatMiddleware {
         }
 
         if (info.usage) {
-          state.rootSpan.setAttributes({
-            'gen_ai.usage.input_tokens': info.usage.promptTokens,
-            'gen_ai.usage.output_tokens': info.usage.completionTokens,
-          })
+          state.rootSpan.setAttributes(usageAttributes(info.usage))
         }
         if (info.finishReason) {
           state.rootSpan.setAttribute('gen_ai.response.finish_reasons', [

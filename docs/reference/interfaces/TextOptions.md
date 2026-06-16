@@ -5,7 +5,7 @@ title: TextOptions
 
 # Interface: TextOptions\<TProviderOptionsSuperset, TProviderOptionsForModel, TContext\>
 
-Defined in: [packages/ai/src/types.ts:786](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L786)
+Defined in: [packages/ai/src/types.ts:793](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L793)
 
 Options passed into the SDK and further piped to the AI provider.
 
@@ -31,7 +31,7 @@ Options passed into the SDK and further piped to the AI provider.
 optional abortController: AbortController;
 ```
 
-Defined in: [packages/ai/src/types.ts:912](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L912)
+Defined in: [packages/ai/src/types.ts:884](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L884)
 
 AbortController for request cancellation.
 
@@ -58,7 +58,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/AbortController
 optional agentLoopStrategy: AgentLoopStrategy;
 ```
 
-Defined in: [packages/ai/src/types.ts:814](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L814)
+Defined in: [packages/ai/src/types.ts:821](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L821)
 
 ***
 
@@ -68,7 +68,7 @@ Defined in: [packages/ai/src/types.ts:814](https://github.com/TanStack/ai/blob/m
 optional context: TContext;
 ```
 
-Defined in: [packages/ai/src/types.ts:798](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L798)
+Defined in: [packages/ai/src/types.ts:805](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L805)
 
 Runtime context provided by the caller and passed to middleware and
 server-side tool implementations.
@@ -81,7 +81,7 @@ server-side tool implementations.
 optional conversationId: string;
 ```
 
-Defined in: [packages/ai/src/types.ts:898](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L898)
+Defined in: [packages/ai/src/types.ts:870](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L870)
 
 #### Deprecated
 
@@ -102,28 +102,11 @@ Will be removed in a future major release.
 logger: InternalLogger;
 ```
 
-Defined in: [packages/ai/src/types.ts:919](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L919)
+Defined in: [packages/ai/src/types.ts:891](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L891)
 
 Internal logger threaded from the chat entry point. Adapter implementations
 must call `logger.request()` before SDK calls, `logger.provider()` for each
 chunk received, and `logger.errors()` in catch blocks.
-
-***
-
-### maxTokens?
-
-```ts
-optional maxTokens: number;
-```
-
-Defined in: [packages/ai/src/types.ts:849](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L849)
-
-The maximum number of tokens to generate in the response.
-
-Provider usage:
-- OpenAI: `max_output_tokens` (number) - includes visible output and reasoning tokens
-- Anthropic: `max_tokens` (number, required) - range x >= 1
-- Gemini: `generationConfig.maxOutputTokens` (number)
 
 ***
 
@@ -136,7 +119,7 @@ messages: ModelMessage<
   | null>[];
 ```
 
-Defined in: [packages/ai/src/types.ts:792](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L792)
+Defined in: [packages/ai/src/types.ts:799](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L799)
 
 ***
 
@@ -146,7 +129,7 @@ Defined in: [packages/ai/src/types.ts:792](https://github.com/TanStack/ai/blob/m
 optional metadata: Record<string, any>;
 ```
 
-Defined in: [packages/ai/src/types.ts:860](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L860)
+Defined in: [packages/ai/src/types.ts:832](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L832)
 
 Additional metadata to attach to the request.
 Can be used for tracking, debugging, or passing custom information.
@@ -165,7 +148,7 @@ Provider usage:
 model: string;
 ```
 
-Defined in: [packages/ai/src/types.ts:791](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L791)
+Defined in: [packages/ai/src/types.ts:798](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L798)
 
 ***
 
@@ -175,7 +158,7 @@ Defined in: [packages/ai/src/types.ts:791](https://github.com/TanStack/ai/blob/m
 optional modelOptions: TProviderOptionsForModel;
 ```
 
-Defined in: [packages/ai/src/types.ts:861](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L861)
+Defined in: [packages/ai/src/types.ts:833](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L833)
 
 ***
 
@@ -185,7 +168,7 @@ Defined in: [packages/ai/src/types.ts:861](https://github.com/TanStack/ai/blob/m
 optional outputSchema: SchemaInput;
 ```
 
-Defined in: [packages/ai/src/types.ts:887](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L887)
+Defined in: [packages/ai/src/types.ts:859](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L859)
 
 Schema for structured output.
 
@@ -217,7 +200,7 @@ Schema for structured output.
 optional parentRunId: string;
 ```
 
-Defined in: [packages/ai/src/types.ts:936](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L936)
+Defined in: [packages/ai/src/types.ts:908](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L908)
 
 Parent run ID for AG-UI protocol nested run correlation.
 Surfaced for observability/middleware; not consumed by the LLM call.
@@ -230,7 +213,7 @@ Surfaced for observability/middleware; not consumed by the LLM call.
 optional request: Request | RequestInit;
 ```
 
-Defined in: [packages/ai/src/types.ts:862](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L862)
+Defined in: [packages/ai/src/types.ts:834](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L834)
 
 ***
 
@@ -240,7 +223,7 @@ Defined in: [packages/ai/src/types.ts:862](https://github.com/TanStack/ai/blob/m
 optional runId: string;
 ```
 
-Defined in: [packages/ai/src/types.ts:931](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L931)
+Defined in: [packages/ai/src/types.ts:903](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L903)
 
 Run ID for AG-UI protocol run correlation.
 When provided, this will be used in RunStartedEvent and RunFinishedEvent.
@@ -254,7 +237,7 @@ If not provided, a unique ID will be generated.
 optional systemPrompts: SystemPrompt[];
 ```
 
-Defined in: [packages/ai/src/types.ts:813](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L813)
+Defined in: [packages/ai/src/types.ts:820](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L820)
 
 System prompts to include with the request.
 
@@ -273,34 +256,13 @@ SystemPrompt
 
 ***
 
-### temperature?
-
-```ts
-optional temperature: number;
-```
-
-Defined in: [packages/ai/src/types.ts:827](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L827)
-
-Controls the randomness of the output.
-Higher values (e.g., 0.8) make output more random, lower values (e.g., 0.2) make it more focused and deterministic.
-Range: [0.0, 2.0]
-
-Note: Generally recommended to use either temperature or topP, but not both.
-
-Provider usage:
-- OpenAI: `temperature` (number) - in text.top_p field
-- Anthropic: `temperature` (number) - ranges from 0.0 to 1.0, default 1.0
-- Gemini: `generationConfig.temperature` (number) - ranges from 0.0 to 2.0
-
-***
-
 ### threadId?
 
 ```ts
 optional threadId: string;
 ```
 
-Defined in: [packages/ai/src/types.ts:925](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L925)
+Defined in: [packages/ai/src/types.ts:897](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L897)
 
 Thread ID for AG-UI protocol run correlation.
 When provided, this will be used in RunStartedEvent and RunFinishedEvent.
@@ -313,25 +275,4 @@ When provided, this will be used in RunStartedEvent and RunFinishedEvent.
 optional tools: AnyTool[];
 ```
 
-Defined in: [packages/ai/src/types.ts:793](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L793)
-
-***
-
-### topP?
-
-```ts
-optional topP: number;
-```
-
-Defined in: [packages/ai/src/types.ts:840](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L840)
-
-Nucleus sampling parameter. An alternative to temperature sampling.
-The model considers the results of tokens with topP probability mass.
-For example, 0.1 means only tokens comprising the top 10% probability mass are considered.
-
-Note: Generally recommended to use either temperature or topP, but not both.
-
-Provider usage:
-- OpenAI: `text.top_p` (number)
-- Anthropic: `top_p` (number | null)
-- Gemini: `generationConfig.topP` (number)
+Defined in: [packages/ai/src/types.ts:800](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L800)

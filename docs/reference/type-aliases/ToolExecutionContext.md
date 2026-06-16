@@ -9,12 +9,22 @@ title: ToolExecutionContext
 type ToolExecutionContext<TContext> = RuntimeContextField<TContext> & object;
 ```
 
-Defined in: [packages/ai/src/types.ts:489](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L489)
+Defined in: [packages/ai/src/types.ts:490](https://github.com/TanStack/ai/blob/main/packages/ai/src/types.ts#L490)
 
 Context passed to tool execute functions, providing capabilities like
 emitting custom events during execution.
 
 ## Type Declaration
+
+### abortSignal?
+
+```ts
+optional abortSignal: AbortSignal;
+```
+
+Abort signal for the current chat run. Aborts when the run's
+`abortController` fires (or middleware aborts). Long-running tools —
+e.g. MCP `callTool` — should forward this to cancel in-flight work.
 
 ### emitCustomEvent()
 

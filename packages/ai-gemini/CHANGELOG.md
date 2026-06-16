@@ -1,5 +1,85 @@
 # @tanstack/ai-gemini
 
+## 0.16.2
+
+### Patch Changes
+
+- Updated dependencies [[`07aaf8b`](https://github.com/TanStack/ai/commit/07aaf8b9e5a8e699be25f936cc9cd651a46c16c5)]:
+  - @tanstack/ai@0.31.0
+
+## 0.16.1
+
+### Patch Changes
+
+- [#769](https://github.com/TanStack/ai/pull/769) [`1d1bb52`](https://github.com/TanStack/ai/commit/1d1bb5219a38d9718cc926148e93fc27d5d2305b) - Add repository metadata (`homepage`, `bugs`, `funding`), fix `repository.directory` to point at each package, and include an MIT `LICENSE` file in every published package.
+
+- Updated dependencies [[`7103348`](https://github.com/TanStack/ai/commit/71033488212bff05dcccc857e721ab9262ebc2a6), [`1d1bb52`](https://github.com/TanStack/ai/commit/1d1bb5219a38d9718cc926148e93fc27d5d2305b)]:
+  - @tanstack/ai@0.30.0
+  - @tanstack/ai-utils@0.2.2
+
+## 0.16.0
+
+### Minor Changes
+
+- [#714](https://github.com/TanStack/ai/pull/714) [`efa76c8`](https://github.com/TanStack/ai/commit/efa76c8cdac37f402a0b35d74538ed2ae477e45c) - Sync Gemini model metadata with Google's current published model list ([#620](https://github.com/TanStack/ai/issues/620), [#621](https://github.com/TanStack/ai/issues/621)).
+
+  **Added**
+  - `gemini-3.1-flash-lite` (stable GA) — joins the existing `gemini-3.1-flash-lite-preview` entry and qualifies for the native combined tools + `responseSchema` streaming path (`GEMINI_COMBINED_TOOLS_AND_SCHEMA_MODELS`).
+
+  **Removed (retired by Google — these ids now 404 against the Gemini API or are no longer published)**
+  - `gemini-3-pro-preview` (verified 404; superseded by `gemini-3.1-pro-preview`)
+  - `gemini-2.5-flash-preview-09-2025` (superseded by stable `gemini-2.5-flash`)
+  - `gemini-2.5-flash-lite-preview-09-2025` (superseded by stable `gemini-2.5-flash-lite`)
+  - `gemini-2.0-flash` and `gemini-2.0-flash-lite` (2.0 line retired from Google's published list)
+  - `gemini-2.0-flash-preview-image-generation` (image; superseded by `gemini-2.5-flash-image`)
+
+  **Fixed**
+  - `gemini-3.5-flash` was missing from `GeminiChatModelToolCapabilitiesByName`, leaving its provider-tool typing broken.
+
+  If you were passing a removed id to `geminiText()` / `geminiSummarize()`, switch to the listed successor (e.g. `gemini-2.0-flash` → `gemini-2.5-flash`).
+
+### Patch Changes
+
+- Updated dependencies [[`ff267a5`](https://github.com/TanStack/ai/commit/ff267a5536327b006979f9f28ce2df7cc27f6e23), [`570c08a`](https://github.com/TanStack/ai/commit/570c08a8d1a35746c3d31a63188249cba2d2475a), [`22c9b42`](https://github.com/TanStack/ai/commit/22c9b42baec74914b720e440f29bd02be04eb164), [`215b6b4`](https://github.com/TanStack/ai/commit/215b6b401aa95d1d38da342aa09603cb1d616929), [`7d44569`](https://github.com/TanStack/ai/commit/7d445693ea079d7a85498a4465179ddd5f548cb0)]:
+  - @tanstack/ai@0.29.0
+
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies [[`496e814`](https://github.com/TanStack/ai/commit/496e8143435746965b10e0bbd12f26ebf04ae2a6), [`c0af426`](https://github.com/TanStack/ai/commit/c0af4262d269be67c69d6f878d9618f25fdeee19), [`00e0c93`](https://github.com/TanStack/ai/commit/00e0c932e6cb5e31f75f4b5e94486d7eb02b9ce1), [`496e814`](https://github.com/TanStack/ai/commit/496e8143435746965b10e0bbd12f26ebf04ae2a6)]:
+  - @tanstack/ai@0.28.0
+
+## 0.15.0
+
+### Minor Changes
+
+- [#660](https://github.com/TanStack/ai/pull/660) [`6df32b5`](https://github.com/TanStack/ai/commit/6df32b53026673d159e6df0892ce89effcb5c7b8) - **BREAKING:** Sampling options (`temperature`, `topP`, `maxTokens`) have moved off the root of `chat()` / `ai()` / `generate()` and into provider-native `modelOptions`. There is no longer a generic root-level sampling surface — each provider accepts its own native keys, fully typed per model:
+  - OpenAI (Responses): `modelOptions: { temperature, top_p, max_output_tokens }`
+  - Anthropic: `modelOptions: { temperature, top_p, max_tokens }`
+  - Gemini: `modelOptions: { temperature, topP, maxOutputTokens }`
+  - Grok: `modelOptions: { temperature, top_p, max_tokens }`
+  - Groq: `modelOptions: { temperature, top_p, max_completion_tokens }`
+  - Ollama: `modelOptions: { options: { temperature, top_p, num_predict } }` (nested)
+  - OpenRouter (chat): `modelOptions: { temperature, topP, maxCompletionTokens }`
+
+  Middleware no longer sees `temperature`/`topP`/`maxTokens` as first-class fields on `ChatMiddlewareConfig`; mutate `config.modelOptions` (with the provider-native keys above) instead. `metadata` is unaffected and stays at the root.
+
+  The public `OllamaTextProviderOptions` type export has also been removed from `@tanstack/ai-ollama`. `modelOptions` is now typed per model — use the exported `OllamaChatModelOptionsByName` map (indexed by model name) or the underlying `ChatRequest` from the `ollama` SDK for arbitrary model strings.
+
+  Migrate automatically with the codemod, which resolves the provider from the adapter and rewrites the keys for you:
+
+  ```bash
+  pnpm codemod:move-sampling-to-model-options "src/**/*.{ts,tsx}"
+  ```
+
+  See the [Sampling Options migration guide](https://tanstack.com/ai/latest/docs/migration/sampling-options-to-model-options) for details.
+
+### Patch Changes
+
+- Updated dependencies [[`6df32b5`](https://github.com/TanStack/ai/commit/6df32b53026673d159e6df0892ce89effcb5c7b8)]:
+  - @tanstack/ai@0.27.0
+
 ## 0.14.1
 
 ### Patch Changes

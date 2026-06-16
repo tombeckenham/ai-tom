@@ -70,9 +70,9 @@ describe('otelMiddleware — iteration span lifecycle', () => {
 
     await runToIterationStart(mw, ctx, {
       messages: [{ role: 'user', content: 'hi' }],
-      temperature: 0.7,
-      topP: 0.9,
-      maxTokens: 512,
+      // Provider-native spellings: OpenAI Responses uses snake_case `top_p`
+      // and `max_output_tokens`, not the camelCase `topP` / `maxTokens`.
+      modelOptions: { temperature: 0.7, top_p: 0.9, max_output_tokens: 512 },
     })
 
     const [rootSpan, iterSpan] = spans
@@ -81,6 +81,12 @@ describe('otelMiddleware — iteration span lifecycle', () => {
     expect(iterSpan!.name).toBe('chat gpt-4o #0')
     expect(iterSpan!.kind).toBe(SpanKind.CLIENT)
     expect(iterSpan!.ended).toBe(false)
+    // Sampling options are sourced from provider-native modelOptions, whose
+    // key spellings vary per provider. The middleware reads a union of known
+    // spellings so the gen_ai semantic attributes populate regardless.
+    expect(iterSpan!.attributes['gen_ai.request.temperature']).toBe(0.7)
+    expect(iterSpan!.attributes['gen_ai.request.top_p']).toBe(0.9)
+    expect(iterSpan!.attributes['gen_ai.request.max_tokens']).toBe(512)
 
     await mw.onChunk?.(ctx, { ...ev.runFinished('stop'), model: 'gpt-4o' })
     // The iteration span stays open across RUN_FINISHED so tool spans can
@@ -98,6 +104,45 @@ describe('otelMiddleware — iteration span lifecycle', () => {
     })
     expect(iterSpan!.ended).toBe(true)
     expect(rootSpan!.ended).toBe(true)
+  })
+
+  it('reads sampling attributes from Ollama-nested modelOptions.options', async () => {
+    const { tracer, spans } = createFakeTracer()
+    const mw = otelMiddleware({ tracer })
+    const ctx = makeCtx()
+    ctx.phase = 'init'
+
+    await runToIterationStart(mw, ctx, {
+      messages: [{ role: 'user', content: 'hi' }],
+      // Ollama nests sampling under `options` and caps output via `num_predict`.
+      modelOptions: {
+        options: { temperature: 0.2, top_p: 0.8, num_predict: 256 },
+      },
+    })
+
+    const iterSpan = spans[1]
+    expect(iterSpan!.attributes['gen_ai.request.temperature']).toBe(0.2)
+    expect(iterSpan!.attributes['gen_ai.request.top_p']).toBe(0.8)
+    expect(iterSpan!.attributes['gen_ai.request.max_tokens']).toBe(256)
+  })
+
+  it('reads camelCase sampling spellings (Gemini/OpenRouter)', async () => {
+    const { tracer, spans } = createFakeTracer()
+    const mw = otelMiddleware({ tracer })
+    const ctx = makeCtx()
+    ctx.phase = 'init'
+
+    await runToIterationStart(mw, ctx, {
+      messages: [{ role: 'user', content: 'hi' }],
+      // Gemini uses `topP` / `maxOutputTokens`; OpenRouter uses
+      // `maxCompletionTokens`.
+      modelOptions: { temperature: 0.5, topP: 0.95, maxOutputTokens: 1024 },
+    })
+
+    const iterSpan = spans[1]
+    expect(iterSpan!.attributes['gen_ai.request.temperature']).toBe(0.5)
+    expect(iterSpan!.attributes['gen_ai.request.top_p']).toBe(0.95)
+    expect(iterSpan!.attributes['gen_ai.request.max_tokens']).toBe(1024)
   })
 
   it('opens a fresh iteration span for each onConfig(beforeModel) and closes the previous one', async () => {
@@ -259,6 +304,147 @@ describe('otelMiddleware — duration histogram and rollup', () => {
     expect(root.attributes['gen_ai.usage.output_tokens']).toBe(50)
     expect(root.attributes['tanstack.ai.iterations']).toBe(1)
     expect(root.ended).toBe(true)
+  })
+})
+
+describe('otelMiddleware — full usage emission', () => {
+  // Everything `TokenUsage` carries beyond input/output tokens: cost,
+  // totals, cache/reasoning breakdowns, duration-based billing, and the
+  // upstream cost split. Backends like PostHog consume `gen_ai.usage.cost`
+  // directly; without it they re-derive cost from their own price tables
+  // and lose cache discounts / gateway markup (OpenRouter).
+  const fullUsage = {
+    promptTokens: 100,
+    completionTokens: 50,
+    totalTokens: 165,
+    promptTokensDetails: { cachedTokens: 80, cacheWriteTokens: 10 },
+    completionTokensDetails: { reasoningTokens: 15 },
+    durationSeconds: 2.5,
+    cost: 0.0123,
+    costDetails: {
+      upstreamCost: 0.01,
+      upstreamInputCost: 0.004,
+      upstreamOutputCost: 0.006,
+    },
+  }
+
+  const expectFullUsageAttrs = (span: FakeSpan) => {
+    expect(span.attributes['gen_ai.usage.input_tokens']).toBe(100)
+    expect(span.attributes['gen_ai.usage.output_tokens']).toBe(50)
+    expect(span.attributes['gen_ai.usage.total_tokens']).toBe(165)
+    expect(span.attributes['gen_ai.usage.cost']).toBe(0.0123)
+    expect(span.attributes['gen_ai.usage.cache_read.input_tokens']).toBe(80)
+    expect(span.attributes['gen_ai.usage.cache_creation.input_tokens']).toBe(10)
+    expect(span.attributes['gen_ai.usage.reasoning.output_tokens']).toBe(15)
+    expect(span.attributes['tanstack.ai.usage.duration_seconds']).toBe(2.5)
+    expect(span.attributes['tanstack.ai.usage.upstream_cost']).toBe(0.01)
+    expect(span.attributes['tanstack.ai.usage.upstream_input_cost']).toBe(0.004)
+    expect(span.attributes['tanstack.ai.usage.upstream_output_cost']).toBe(
+      0.006,
+    )
+  }
+
+  it('emits cost, totals, and detail breakdowns from RUN_FINISHED chunk.usage', async () => {
+    const { tracer, spans } = createFakeTracer()
+    const mw = otelMiddleware({ tracer })
+    const ctx = makeCtx()
+
+    await runToIterationStart(mw, ctx)
+    await mw.onChunk?.(ctx, {
+      ...ev.runFinished('stop'),
+      model: 'gpt-4o',
+      usage: fullUsage,
+    })
+
+    expectFullUsageAttrs(spans[1]!)
+  })
+
+  it('emits cost, totals, and detail breakdowns from onUsage', async () => {
+    const { tracer, spans } = createFakeTracer()
+    const mw = otelMiddleware({ tracer })
+    const ctx = makeCtx()
+
+    await runToIterationStart(mw, ctx)
+    await mw.onUsage?.(ctx, fullUsage)
+
+    expectFullUsageAttrs(spans[1]!)
+  })
+
+  it('rolls up cost, totals, and detail breakdowns onto the root span on onFinish', async () => {
+    const { tracer, spans } = createFakeTracer()
+    const mw = otelMiddleware({ tracer })
+    const ctx = makeCtx()
+
+    await runToIterationStart(mw, ctx)
+    await mw.onChunk?.(ctx, { ...ev.runFinished('stop'), model: 'gpt-4o' })
+    await mw.onFinish?.(ctx, {
+      finishReason: 'stop',
+      duration: 1250,
+      content: '',
+      usage: fullUsage,
+    })
+
+    expectFullUsageAttrs(spans[0]!)
+  })
+
+  it('omits optional usage attributes when the provider does not report them', async () => {
+    const { tracer, spans } = createFakeTracer()
+    const mw = otelMiddleware({ tracer })
+    const ctx = makeCtx()
+
+    await runToIterationStart(mw, ctx)
+    await mw.onUsage?.(ctx, {
+      promptTokens: 100,
+      completionTokens: 50,
+      totalTokens: 150,
+    })
+
+    const span = spans[1]!
+    expect(span.attributes['gen_ai.usage.input_tokens']).toBe(100)
+    expect(span.attributes['gen_ai.usage.output_tokens']).toBe(50)
+    expect(span.attributes['gen_ai.usage.total_tokens']).toBe(150)
+    expect(span.attributes['gen_ai.usage.cost']).toBeUndefined()
+    expect(
+      span.attributes['gen_ai.usage.cache_read.input_tokens'],
+    ).toBeUndefined()
+    expect(
+      span.attributes['gen_ai.usage.cache_creation.input_tokens'],
+    ).toBeUndefined()
+    expect(
+      span.attributes['gen_ai.usage.reasoning.output_tokens'],
+    ).toBeUndefined()
+    expect(
+      span.attributes['tanstack.ai.usage.duration_seconds'],
+    ).toBeUndefined()
+    expect(span.attributes['tanstack.ai.usage.upstream_cost']).toBeUndefined()
+    expect(
+      span.attributes['tanstack.ai.usage.upstream_input_cost'],
+    ).toBeUndefined()
+    expect(
+      span.attributes['tanstack.ai.usage.upstream_output_cost'],
+    ).toBeUndefined()
+  })
+
+  it('emits zero-valued usage fields instead of dropping them', async () => {
+    // cost 0 is a real report (OpenRouter free models), and the OpenRouter
+    // extractor deliberately preserves it. Pin that the presence guard is
+    // `!== undefined`, not truthiness — a truthy guard would drop zeros.
+    const { tracer, spans } = createFakeTracer()
+    const mw = otelMiddleware({ tracer })
+    const ctx = makeCtx()
+
+    await runToIterationStart(mw, ctx)
+    await mw.onUsage?.(ctx, {
+      promptTokens: 100,
+      completionTokens: 50,
+      totalTokens: 150,
+      cost: 0,
+      promptTokensDetails: { cachedTokens: 0 },
+    })
+
+    const span = spans[1]!
+    expect(span.attributes['gen_ai.usage.cost']).toBe(0)
+    expect(span.attributes['gen_ai.usage.cache_read.input_tokens']).toBe(0)
   })
 })
 

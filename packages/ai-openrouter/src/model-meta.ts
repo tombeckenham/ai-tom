@@ -628,6 +628,35 @@ const ANTHROPIC_CLAUDE_3_5_HAIKU = {
     image: 0,
   },
 } as const
+const ANTHROPIC_CLAUDE_FABLE_5 = {
+  id: 'anthropic/claude-fable-5',
+  name: 'Anthropic: Claude Fable 5',
+  supports: {
+    input: ['text', 'image', 'document'],
+    output: ['text'],
+    supports: [
+      'maxCompletionTokens',
+      'reasoning',
+      'responseFormat',
+      'stop',
+      'toolChoice',
+    ],
+  },
+  context_window: 1000000,
+  max_output_tokens: 128000,
+  pricing: {
+    text: {
+      input: {
+        normal: 10,
+        cached: 13.5,
+      },
+      output: {
+        normal: 50,
+      },
+    },
+    image: 0,
+  },
+} as const
 const ANTHROPIC_CLAUDE_HAIKU_4_5 = {
   id: 'anthropic/claude-haiku-4.5',
   name: 'Anthropic: Claude Haiku 4.5',
@@ -1213,38 +1242,6 @@ const ARCEE_AI_VIRTUOSO_LARGE = {
     image: 0,
   },
 } as const
-const BAIDU_ERNIE_4_5_300B_A47B = {
-  id: 'baidu/ernie-4.5-300b-a47b',
-  name: 'Baidu: ERNIE 4.5 300B A47B ',
-  supports: {
-    input: ['text'],
-    output: ['text'],
-    supports: [
-      'frequencyPenalty',
-      'maxCompletionTokens',
-      'presencePenalty',
-      'responseFormat',
-      'seed',
-      'stop',
-      'temperature',
-      'topP',
-    ],
-  },
-  context_window: 131072,
-  max_output_tokens: 12000,
-  pricing: {
-    text: {
-      input: {
-        normal: 0.28,
-        cached: 0,
-      },
-      output: {
-        normal: 1.1,
-      },
-    },
-    image: 0,
-  },
-} as const
 const BAIDU_ERNIE_4_5_VL_28B_A3B = {
   id: 'baidu/ernie-4.5-vl-28b-a3b',
   name: 'Baidu: ERNIE 4.5 VL 28B A3B',
@@ -1686,11 +1683,11 @@ const DEEPSEEK_DEEPSEEK_CHAT = {
   pricing: {
     text: {
       input: {
-        normal: 0.2288,
+        normal: 0.2002,
         cached: 0,
       },
       output: {
-        normal: 0.9144,
+        normal: 0.8001,
       },
     },
     image: 0,
@@ -1960,15 +1957,15 @@ const DEEPSEEK_DEEPSEEK_V3_2 = {
     ],
   },
   context_window: 131072,
-  max_output_tokens: 65536,
+  max_output_tokens: 64000,
   pricing: {
     text: {
       input: {
-        normal: 0.252,
-        cached: 0.0252,
+        normal: 0.2288,
+        cached: 0,
       },
       output: {
-        normal: 0.378,
+        normal: 0.3432,
       },
     },
     image: 0,
@@ -2113,68 +2110,6 @@ const ESSENTIALAI_RNJ_1_INSTRUCT = {
       },
     },
     image: 0,
-  },
-} as const
-const GOOGLE_GEMINI_2_0_FLASH_001 = {
-  id: 'google/gemini-2.0-flash-001',
-  name: 'Google: Gemini 2.0 Flash',
-  supports: {
-    input: ['text', 'image', 'document', 'audio', 'video'],
-    output: ['text'],
-    supports: [
-      'maxCompletionTokens',
-      'responseFormat',
-      'seed',
-      'stop',
-      'temperature',
-      'toolChoice',
-      'topP',
-    ],
-  },
-  context_window: 1048576,
-  max_output_tokens: 8192,
-  pricing: {
-    text: {
-      input: {
-        normal: 0.1,
-        cached: 0.1083333333,
-      },
-      output: {
-        normal: 0.4,
-      },
-    },
-    image: 1e-7,
-  },
-} as const
-const GOOGLE_GEMINI_2_0_FLASH_LITE_001 = {
-  id: 'google/gemini-2.0-flash-lite-001',
-  name: 'Google: Gemini 2.0 Flash Lite',
-  supports: {
-    input: ['text', 'image', 'document', 'audio', 'video'],
-    output: ['text'],
-    supports: [
-      'maxCompletionTokens',
-      'responseFormat',
-      'seed',
-      'stop',
-      'temperature',
-      'toolChoice',
-      'topP',
-    ],
-  },
-  context_window: 1048576,
-  max_output_tokens: 8192,
-  pricing: {
-    text: {
-      input: {
-        normal: 0.075,
-        cached: 0,
-      },
-      output: {
-        normal: 0.3,
-      },
-    },
-    image: 7.5e-8,
   },
 } as const
 const GOOGLE_GEMINI_2_5_FLASH = {
@@ -3230,11 +3165,11 @@ const INCLUSIONAI_RING_2_6_1T = {
   pricing: {
     text: {
       input: {
-        normal: 0.3,
-        cached: 0.06,
+        normal: 0.075,
+        cached: 0.015,
       },
       output: {
-        normal: 2.5,
+        normal: 0.625,
       },
     },
     image: 0,
@@ -4210,10 +4145,11 @@ const MINIMAX_MINIMAX_M2_7 = {
     ],
   },
   context_window: 204800,
+  max_output_tokens: 131072,
   pricing: {
     text: {
       input: {
-        normal: 0.26,
+        normal: 0.279,
         cached: 0,
       },
       output: {
@@ -8363,16 +8299,16 @@ const QWEN_QWEN3_30B_A3B_INSTRUCT_2507 = {
       'topP',
     ],
   },
-  context_window: 262144,
-  max_output_tokens: 262144,
+  context_window: 131072,
+  max_output_tokens: 32000,
   pricing: {
     text: {
       input: {
-        normal: 0.09,
+        normal: 0.0428,
         cached: 0,
       },
       output: {
-        normal: 0.3,
+        normal: 0.1716,
       },
     },
     image: 0,
@@ -9987,15 +9923,14 @@ const TENCENT_HY3_PREVIEW = {
     ],
   },
   context_window: 262144,
-  max_output_tokens: 262144,
   pricing: {
     text: {
       input: {
-        normal: 0.066,
-        cached: 0.029,
+        normal: 0.063,
+        cached: 0.021,
       },
       output: {
-        normal: 0.26,
+        normal: 0.21,
       },
     },
     image: 0,
@@ -10772,7 +10707,6 @@ const Z_AI_GLM_5 = {
     ],
   },
   context_window: 202752,
-  max_output_tokens: 16384,
   pricing: {
     text: {
       input: {
@@ -10780,7 +10714,7 @@ const Z_AI_GLM_5 = {
         cached: 0.12,
       },
       output: {
-        normal: 2.08,
+        normal: 1.92,
       },
     },
     image: 0,
@@ -10845,7 +10779,6 @@ const Z_AI_GLM_5_1 = {
     ],
   },
   context_window: 202752,
-  max_output_tokens: 131072,
   pricing: {
     text: {
       input: {
@@ -11081,6 +11014,15 @@ export type OpenRouterModelOptionsByName = {
       OpenRouterBaseOptions,
       'maxCompletionTokens' | 'stop' | 'temperature' | 'toolChoice' | 'topP'
     >
+  [ANTHROPIC_CLAUDE_FABLE_5.id]: OpenRouterCommonOptions &
+    Pick<
+      OpenRouterBaseOptions,
+      | 'maxCompletionTokens'
+      | 'reasoning'
+      | 'responseFormat'
+      | 'stop'
+      | 'toolChoice'
+    >
   [ANTHROPIC_CLAUDE_HAIKU_4_5.id]: OpenRouterCommonOptions &
     Pick<
       OpenRouterBaseOptions,
@@ -11285,18 +11227,6 @@ export type OpenRouterModelOptionsByName = {
       | 'stop'
       | 'temperature'
       | 'toolChoice'
-      | 'topP'
-    >
-  [BAIDU_ERNIE_4_5_300B_A47B.id]: OpenRouterCommonOptions &
-    Pick<
-      OpenRouterBaseOptions,
-      | 'frequencyPenalty'
-      | 'maxCompletionTokens'
-      | 'presencePenalty'
-      | 'responseFormat'
-      | 'seed'
-      | 'stop'
-      | 'temperature'
       | 'topP'
     >
   [BAIDU_ERNIE_4_5_VL_28B_A3B.id]: OpenRouterCommonOptions &
@@ -11647,28 +11577,6 @@ export type OpenRouterModelOptionsByName = {
       | 'maxCompletionTokens'
       | 'presencePenalty'
       | 'responseFormat'
-      | 'stop'
-      | 'temperature'
-      | 'toolChoice'
-      | 'topP'
-    >
-  [GOOGLE_GEMINI_2_0_FLASH_001.id]: OpenRouterCommonOptions &
-    Pick<
-      OpenRouterBaseOptions,
-      | 'maxCompletionTokens'
-      | 'responseFormat'
-      | 'seed'
-      | 'stop'
-      | 'temperature'
-      | 'toolChoice'
-      | 'topP'
-    >
-  [GOOGLE_GEMINI_2_0_FLASH_LITE_001.id]: OpenRouterCommonOptions &
-    Pick<
-      OpenRouterBaseOptions,
-      | 'maxCompletionTokens'
-      | 'responseFormat'
-      | 'seed'
       | 'stop'
       | 'temperature'
       | 'toolChoice'
@@ -15052,6 +14960,7 @@ export type OpenRouterModelInputModalitiesByName = {
   [ANTHRACITE_ORG_MAGNUM_V4_72B.id]: ReadonlyArray<'text'>
   [ANTHROPIC_CLAUDE_3_HAIKU.id]: ReadonlyArray<'text' | 'image'>
   [ANTHROPIC_CLAUDE_3_5_HAIKU.id]: ReadonlyArray<'text' | 'image'>
+  [ANTHROPIC_CLAUDE_FABLE_5.id]: ReadonlyArray<'text' | 'image' | 'document'>
   [ANTHROPIC_CLAUDE_HAIKU_4_5.id]: ReadonlyArray<'text' | 'image' | 'document'>
   [ANTHROPIC_CLAUDE_OPUS_4.id]: ReadonlyArray<'image' | 'text' | 'document'>
   [ANTHROPIC_CLAUDE_OPUS_4_1.id]: ReadonlyArray<'image' | 'text' | 'document'>
@@ -15077,7 +14986,6 @@ export type OpenRouterModelInputModalitiesByName = {
   [ARCEE_AI_TRINITY_LARGE_THINKING.id]: ReadonlyArray<'text'>
   [ARCEE_AI_TRINITY_MINI.id]: ReadonlyArray<'text'>
   [ARCEE_AI_VIRTUOSO_LARGE.id]: ReadonlyArray<'text'>
-  [BAIDU_ERNIE_4_5_300B_A47B.id]: ReadonlyArray<'text'>
   [BAIDU_ERNIE_4_5_VL_28B_A3B.id]: ReadonlyArray<'text' | 'image'>
   [BAIDU_ERNIE_4_5_VL_424B_A47B.id]: ReadonlyArray<'image' | 'text'>
   [BYTEDANCE_SEED_SEED_1_6.id]: ReadonlyArray<'image' | 'text' | 'video'>
@@ -15104,12 +15012,6 @@ export type OpenRouterModelInputModalitiesByName = {
   [DEEPSEEK_DEEPSEEK_V4_FLASH.id]: ReadonlyArray<'text'>
   [DEEPSEEK_DEEPSEEK_V4_PRO.id]: ReadonlyArray<'text'>
   [ESSENTIALAI_RNJ_1_INSTRUCT.id]: ReadonlyArray<'text'>
-  [GOOGLE_GEMINI_2_0_FLASH_001.id]: ReadonlyArray<
-    'text' | 'image' | 'document' | 'audio' | 'video'
-  >
-  [GOOGLE_GEMINI_2_0_FLASH_LITE_001.id]: ReadonlyArray<
-    'text' | 'image' | 'document' | 'audio' | 'video'
-  >
   [GOOGLE_GEMINI_2_5_FLASH.id]: ReadonlyArray<
     'document' | 'image' | 'text' | 'audio' | 'video'
   >
@@ -15449,6 +15351,7 @@ export const OPENROUTER_CHAT_MODELS = [
   ANTHRACITE_ORG_MAGNUM_V4_72B.id,
   ANTHROPIC_CLAUDE_3_HAIKU.id,
   ANTHROPIC_CLAUDE_3_5_HAIKU.id,
+  ANTHROPIC_CLAUDE_FABLE_5.id,
   ANTHROPIC_CLAUDE_HAIKU_4_5.id,
   ANTHROPIC_CLAUDE_OPUS_4.id,
   ANTHROPIC_CLAUDE_OPUS_4_1.id,
@@ -15468,7 +15371,6 @@ export const OPENROUTER_CHAT_MODELS = [
   ARCEE_AI_TRINITY_LARGE_THINKING.id,
   ARCEE_AI_TRINITY_MINI.id,
   ARCEE_AI_VIRTUOSO_LARGE.id,
-  BAIDU_ERNIE_4_5_300B_A47B.id,
   BAIDU_ERNIE_4_5_VL_28B_A3B.id,
   BAIDU_ERNIE_4_5_VL_424B_A47B.id,
   BYTEDANCE_SEED_SEED_1_6.id,
@@ -15495,8 +15397,6 @@ export const OPENROUTER_CHAT_MODELS = [
   DEEPSEEK_DEEPSEEK_V4_FLASH.id,
   DEEPSEEK_DEEPSEEK_V4_PRO.id,
   ESSENTIALAI_RNJ_1_INSTRUCT.id,
-  GOOGLE_GEMINI_2_0_FLASH_001.id,
-  GOOGLE_GEMINI_2_0_FLASH_LITE_001.id,
   GOOGLE_GEMINI_2_5_FLASH.id,
   GOOGLE_GEMINI_2_5_FLASH_IMAGE.id,
   GOOGLE_GEMINI_2_5_FLASH_LITE.id,

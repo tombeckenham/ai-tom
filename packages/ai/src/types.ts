@@ -51,6 +51,7 @@ export type ToolCallState =
   | 'approval-requested' // Waiting for user approval
   | 'approval-responded' // User has approved/denied
   | 'complete' // Result is complete
+  | 'error' // Tool execution failed (terminal)
 
 /**
  * Tool result states - track the lifecycle of a tool result
@@ -491,6 +492,12 @@ export type ToolExecutionContext<TContext = unknown> =
     /** The ID of the tool call being executed */
     toolCallId?: string
     /**
+     * Abort signal for the current chat run. Aborts when the run's
+     * `abortController` fires (or middleware aborts). Long-running tools —
+     * e.g. MCP `callTool` — should forward this to cancel in-flight work.
+     */
+    abortSignal?: AbortSignal
+    /**
      * Emit a custom event during tool execution.
      * Events are streamed to the client in real-time as AG-UI CUSTOM events.
      *
@@ -812,41 +819,6 @@ export interface TextOptions<
    */
   systemPrompts?: Array<SystemPrompt>
   agentLoopStrategy?: AgentLoopStrategy
-  /**
-   * Controls the randomness of the output.
-   * Higher values (e.g., 0.8) make output more random, lower values (e.g., 0.2) make it more focused and deterministic.
-   * Range: [0.0, 2.0]
-   *
-   * Note: Generally recommended to use either temperature or topP, but not both.
-   *
-   * Provider usage:
-   * - OpenAI: `temperature` (number) - in text.top_p field
-   * - Anthropic: `temperature` (number) - ranges from 0.0 to 1.0, default 1.0
-   * - Gemini: `generationConfig.temperature` (number) - ranges from 0.0 to 2.0
-   */
-  temperature?: number
-  /**
-   * Nucleus sampling parameter. An alternative to temperature sampling.
-   * The model considers the results of tokens with topP probability mass.
-   * For example, 0.1 means only tokens comprising the top 10% probability mass are considered.
-   *
-   * Note: Generally recommended to use either temperature or topP, but not both.
-   *
-   * Provider usage:
-   * - OpenAI: `text.top_p` (number)
-   * - Anthropic: `top_p` (number | null)
-   * - Gemini: `generationConfig.topP` (number)
-   */
-  topP?: number
-  /**
-   * The maximum number of tokens to generate in the response.
-   *
-   * Provider usage:
-   * - OpenAI: `max_output_tokens` (number) - includes visible output and reasoning tokens
-   * - Anthropic: `max_tokens` (number, required) - range x >= 1
-   * - Gemini: `generationConfig.maxOutputTokens` (number)
-   */
-  maxTokens?: number
   /**
    * Additional metadata to attach to the request.
    * Can be used for tracking, debugging, or passing custom information.
@@ -1685,6 +1657,12 @@ export interface VideoUrlResult {
   url: string
   /** When the URL expires, if applicable */
   expiresAt?: Date
+  /**
+   * Usage information for the completed generation, when the adapter can report
+   * it. For usage-based providers (e.g. fal) this carries `unitsBilled` — the
+   * real billed quantity — so consumers can compute exact cost.
+   */
+  usage?: TokenUsage
 }
 
 // ============================================================================

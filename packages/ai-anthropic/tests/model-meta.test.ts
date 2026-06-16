@@ -1,6 +1,8 @@
 import { describe, expectTypeOf, it } from 'vitest'
+import { ANTHROPIC_MODELS } from '../src/model-meta'
 import type {
   AnthropicChatModelProviderOptionsByName,
+  AnthropicChatModelToolCapabilitiesByName,
   AnthropicModelInputModalitiesByName,
 } from '../src/model-meta'
 import type { AnthropicMessageMetadataByModality } from '../src/message-types'
@@ -143,6 +145,29 @@ describe('Anthropic Model Provider Options Type Assertions', () => {
       expectTypeOf<Options>().toExtend<BaseOptions>()
     })
 
+    it('claude-fable-5 should support thinking options', () => {
+      type Options = AnthropicChatModelProviderOptionsByName['claude-fable-5']
+
+      // Should have thinking options (adaptive thinking)
+      expectTypeOf<Options>().toExtend<AnthropicThinkingOptions>()
+
+      // Should have service tier options (priority_tier support)
+      expectTypeOf<Options>().toExtend<AnthropicServiceTierOptions>()
+
+      // Should have base options
+      expectTypeOf<Options>().toExtend<BaseOptions>()
+
+      // Verify specific properties exist
+      expectTypeOf<Options>().toHaveProperty('thinking')
+      expectTypeOf<Options>().toHaveProperty('service_tier')
+      expectTypeOf<Options>().toHaveProperty('container')
+      expectTypeOf<Options>().toHaveProperty('context_management')
+      expectTypeOf<Options>().toHaveProperty('mcp_servers')
+      expectTypeOf<Options>().toHaveProperty('stop_sequences')
+      expectTypeOf<Options>().toHaveProperty('tool_choice')
+      expectTypeOf<Options>().toHaveProperty('top_k')
+    })
+
     it('claude-opus-4-5 should support thinking options', () => {
       type Options = AnthropicChatModelProviderOptionsByName['claude-opus-4-5']
 
@@ -211,6 +236,7 @@ describe('Anthropic Model Provider Options Type Assertions', () => {
     it('AnthropicChatModelProviderOptionsByName should have entries for all chat models', () => {
       type Keys = keyof AnthropicChatModelProviderOptionsByName
 
+      expectTypeOf<'claude-fable-5'>().toExtend<Keys>()
       expectTypeOf<'claude-opus-4-5'>().toExtend<Keys>()
       expectTypeOf<'claude-sonnet-4-6'>().toExtend<Keys>()
       expectTypeOf<'claude-sonnet-4-5'>().toExtend<Keys>()
@@ -221,6 +247,20 @@ describe('Anthropic Model Provider Options Type Assertions', () => {
       expectTypeOf<'claude-opus-4'>().toExtend<Keys>()
       expectTypeOf<'claude-3-5-haiku'>().toExtend<Keys>()
       expectTypeOf<'claude-3-haiku'>().toExtend<Keys>()
+    })
+
+    it('every model in ANTHROPIC_MODELS should have entries in all three type maps', () => {
+      type ModelId = (typeof ANTHROPIC_MODELS)[number]
+
+      expectTypeOf<ModelId>().toExtend<
+        keyof AnthropicChatModelProviderOptionsByName
+      >()
+      expectTypeOf<ModelId>().toExtend<
+        keyof AnthropicModelInputModalitiesByName
+      >()
+      expectTypeOf<ModelId>().toExtend<
+        keyof AnthropicChatModelToolCapabilitiesByName
+      >()
     })
   })
 
@@ -559,6 +599,28 @@ describe('Anthropic Model Input Modality Type Assertions', () => {
     AnthropicMessageMetadataByModality['document']
   >
   type MessageWithContent<T> = { role: 'user'; content: Array<T> }
+
+  describe('Claude Fable 5 (text + image + document)', () => {
+    type Modalities = AnthropicModelInputModalitiesByName['claude-fable-5']
+    type Message = ConstrainedModelMessage<MakeInputModalitiesTypes<Modalities>>
+
+    it('should allow TextPart, ImagePart, and DocumentPart', () => {
+      expectTypeOf<MessageWithContent<AnthropicTextPart>>().toExtend<Message>()
+      expectTypeOf<MessageWithContent<AnthropicImagePart>>().toExtend<Message>()
+      expectTypeOf<
+        MessageWithContent<AnthropicDocumentPart>
+      >().toExtend<Message>()
+    })
+
+    it('should NOT allow AudioPart or VideoPart', () => {
+      expectTypeOf<
+        MessageWithContent<AnthropicAudioPart>
+      >().not.toExtend<Message>()
+      expectTypeOf<
+        MessageWithContent<AnthropicVideoPart>
+      >().not.toExtend<Message>()
+    })
+  })
 
   describe('Claude Opus 4.5 (text + image + document)', () => {
     type Modalities = AnthropicModelInputModalitiesByName['claude-opus-4-5']

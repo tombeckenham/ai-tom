@@ -1,7 +1,7 @@
 ---
 title: OpenTelemetry
 id: otel
-order: 4
+order: 3
 description: "Emit vendor-neutral OpenTelemetry traces and metrics from every TanStack AI chat() call, following the OTel GenAI semantic conventions."
 keywords:
   - tanstack ai
@@ -29,7 +29,7 @@ Wire up your OTel SDK however you already do (e.g. `@opentelemetry/sdk-node`). T
 ```ts
 import { chat } from '@tanstack/ai'
 import { otelMiddleware } from '@tanstack/ai/middlewares/otel'
-import { openaiText } from '@tanstack/ai-openai/adapters'
+import { openaiText } from '@tanstack/ai-openai'
 import { trace, metrics } from '@opentelemetry/api'
 
 const otel = otelMiddleware({
@@ -72,6 +72,15 @@ Iteration spans are numbered (`#0`, `#1`, ...) so distinct iterations of the sam
 | iteration | `gen_ai.request.max_tokens` | from config |
 | iteration | `gen_ai.usage.input_tokens` | per iteration |
 | iteration | `gen_ai.usage.output_tokens` | per iteration |
+| root / iteration | `gen_ai.usage.total_tokens` | provider-reported total |
+| root / iteration | `gen_ai.usage.cost` | provider-reported cost, when available |
+| root / iteration | `gen_ai.usage.cache_read.input_tokens` | cached prompt tokens, when reported |
+| root / iteration | `gen_ai.usage.cache_creation.input_tokens` | cache-write prompt tokens, when reported |
+| root / iteration | `gen_ai.usage.reasoning.output_tokens` | reasoning/thinking tokens, when reported |
+| root / iteration | `tanstack.ai.usage.duration_seconds` | duration-based billing (e.g. transcription), when reported |
+| root / iteration | `tanstack.ai.usage.upstream_cost` | gateway upstream cost (e.g. OpenRouter), when reported |
+| root / iteration | `tanstack.ai.usage.upstream_input_cost` | upstream input cost split, when reported |
+| root / iteration | `tanstack.ai.usage.upstream_output_cost` | upstream output cost split, when reported |
 | iteration | `gen_ai.response.finish_reasons` | `[stop]`, `[tool_calls]`, ... |
 | root | `gen_ai.usage.input_tokens` | rolled up |
 | root | `gen_ai.usage.output_tokens` | rolled up |
@@ -80,6 +89,8 @@ Iteration spans are numbered (`#0`, `#1`, ...) so distinct iterations of the sam
 | tool | `gen_ai.tool.call.id` | tool call id |
 | tool | `gen_ai.tool.type` | `function` |
 | tool | `tanstack.ai.tool.outcome` | `success` / `error` |
+
+Usage attributes beyond input/output tokens are emitted only when the provider reports them, so spans stay clean otherwise. Cache and reasoning breakdowns use the official GenAI semconv names; `gen_ai.usage.cost` and `gen_ai.usage.total_tokens` are de-facto extensions consumed directly by backends like PostHog — without them, backends re-derive cost from their own price tables and lose cache discounts and gateway markup. Fields with no established convention (duration-based billing, the upstream cost split) are TanStack-namespaced.
 
 ### Metrics
 
@@ -168,4 +179,3 @@ otelMiddleware({
 
 - [Middleware](./middleware) — the lifecycle this middleware hooks into
 - [Debug Logging](./debug-logging) — quick console-output diagnostics, complementary to OTel
-- [Observability](./observability) — TanStack AI's built-in event client
